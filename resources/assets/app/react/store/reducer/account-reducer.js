@@ -1,0 +1,76 @@
+import ActionTypes from '../constant/constant';
+
+const INITIAL_STATE = {
+    user: '',
+    fetch_users: '',
+    fetch_roles: '',
+    delete_user: '',
+    save_user: '',
+    error: '',
+    is_loading: false,
+}
+
+export default (state = INITIAL_STATE, action) => {
+    switch (action.type) {
+        case ActionTypes.FETCH_ROLES:
+            return ({
+                ...state,
+                fetch_roles: action.payload.data
+            })
+            break;
+        case ActionTypes.FETCH_USERS:
+            return ({
+                ...state,
+                fetch_users: action.payload.data
+            })
+            break;
+        case ActionTypes.DELETE_USER:
+            return ({
+                ...state,
+                delete_user: action.payload.data
+            })
+            break;
+        case ActionTypes.SAVE_USER:
+            return ({
+                ...state,
+                error: '',
+                save_user: action.payload.data,
+
+            })
+            break;
+        case ActionTypes.LOGIN:
+            return ({
+                ...state,
+                user: action.payload.data
+            })
+            break;
+        case ActionTypes.SIGN_OUT:
+            return ({
+                ...state,
+                user: action.payload.data
+            })
+            break;
+        case ActionTypes.ERROR:
+            return ({
+                ...state,
+                error: action.payload
+            })
+            break;
+        case ActionTypes.LOADING:
+            return ({
+                ...state,
+                is_loading: action.payload
+            })
+            break;
+        case ActionTypes.UNLOADING:
+            return ({
+                ...state,
+                is_loading: action.payload
+            })
+            break;
+        default:
+            return state;
+            break;
+    }
+
+}
