@@ -1,4 +1,3 @@
-Development
 To run this project Follow up these steps.
 
 1-  First need to Clone repo.
