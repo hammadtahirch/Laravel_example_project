@@ -5840,8 +5840,8 @@ module.exports = warning;
 
 "use strict";
 var Config = {
-    API_SERVER: 'https://hammad-dev-boldcommerce.fwd.wf/api/',
-    WEB_ADDRESS: 'https://hammad-dev-boldcommerce.fwd.wf/'
+    API_SERVER: 'http://afternoon-reef-86862.herokuapp.com/api/',
+    WEB_ADDRESS: 'http://afternoon-reef-86862.herokuapp.com/'
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (Config);
