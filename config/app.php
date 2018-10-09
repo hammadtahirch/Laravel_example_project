@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'https://hammad-dev-boldcommerce.fwd.wf'),
+    'url' => env('APP_URL', 'http://afternoon-reef-86862.herokuapp.com'),
 
     /*
     |--------------------------------------------------------------------------

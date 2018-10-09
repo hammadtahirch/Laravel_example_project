@@ -10,5 +10,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+Route::get('/', function () {
+    dd("Hello");
+});
 Route::get('admin/{path?}', 'React\ReactController@adminPortal')->where('path', '.*');
