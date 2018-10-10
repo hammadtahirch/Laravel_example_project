@@ -1,6 +1,6 @@
 const Config = {
-    API_SERVER: 'http://afternoon-reef-86862.herokuapp.com/api/',
-    WEB_ADDRESS: 'http://afternoon-reef-86862.herokuapp.com/'
+    API_SERVER: 'https://hammad-dev-boldcommerce.fwd.wf/api/',
+    WEB_ADDRESS: 'https://hammad-dev-boldcommerce.fwd.wf/'
 }
 
 export default Config;
