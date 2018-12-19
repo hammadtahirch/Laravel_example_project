@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,7 +45,7 @@ class Shop extends Model
      */
     public function user()
     {
-        return $this->hasOne(User::class, 'id', 'user_id');
+        return $this->hasOne('App\Models\Eloquent\User', 'id', 'user_id');
     }
 
     /**
@@ -55,7 +55,7 @@ class Shop extends Model
      */
     public function shop_time_slot()
     {
-        return $this->hasMany(ShopTimeSlot::class, 'shop_id', 'id');
+        return $this->hasMany('App\Models\Eloquent\ShopTimeSlot', 'shop_id', 'id');
     }
 
     /**

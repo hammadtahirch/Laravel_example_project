@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\Role;
 use App\Services\ConstantServices\StatusCodes;
 use App\Services\TransformerServices\CustomJsonSerializer;
 use App\Services\TransformerServices\RoleTransformer;
-use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Database\QueryException;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Validator;
+use Zend\Diactoros\Response\ArraySerializer;
 
-class RoleService
+class RoleRepository
 {
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +32,7 @@ class RoleService
      *
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct($response)
     {
         $this->_response = $response;
         $this->_fractal = new Manager();

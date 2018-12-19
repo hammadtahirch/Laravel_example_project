@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\Permission;
 use App\Models\Eloquent\Role;
@@ -15,7 +15,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Validator;
 
-class PermissionService
+class PermissionRepository
 {
     /*
     |--------------------------------------------------------------------------

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\ShopTimeSlot;
 use App\Services\ControllerServices\ShopTimeSlotService;
+use EllipseSynergie\ApiResponse\Laravel\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -23,9 +24,21 @@ class ShopTimeSlotController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(ShopTimeSlotService $timeSlot, $shop_id)
+    public function index(ShopTimeSlotService $timeSlotService, $shop_id)
     {
-        return $timeSlot->index($shop_id);
+        return $timeSlotService->index($shop_id);
+    }
+
+    /**
+     * Save the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function save(ShopTimeSlotService $timeSlotService, $shop_id, Request $request)
+    {
+        return $timeSlotService->save($shop_id, $request);
     }
 
     /**
@@ -35,9 +48,9 @@ class ShopTimeSlotController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ShopTimeSlotService $timeSlot, $shop_id, Request $request, $id)
+    public function update(ShopTimeSlotService $timeSlotService, $shop_id, Request $request, $id)
     {
-        $timeSlot->update($shop_id,$request,$id);
+        return $timeSlotService->update($shop_id, $request, $id);
     }
 
     /**

@@ -28,7 +28,6 @@ export function _fetchAllRoles() {
 }
 
 export function _fetchAllUser(params) {
-    debugger;
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();

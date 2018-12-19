@@ -8,7 +8,7 @@
 
 namespace App\Services\TransformerServices;
 
-use App\Models\Role;
+use App\Models\Eloquent\Role;
 use League\Fractal;
 
 class RoleTransformer extends Fractal\TransformerAbstract

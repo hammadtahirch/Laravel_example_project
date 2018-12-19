@@ -10,26 +10,14 @@ use App\Http\Controllers\Controller;
 class RoleController extends Controller
 {
 
-    protected $_roleService = null;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct(Response $response)
-    {
-        $this->_roleService = new RoleService($response);
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return array[]
      */
-    public function index()
+    public function index(RoleService $roleService)
     {
-        return $this->_roleService->index();
+        return $roleService->index();
     }
 
     /**
@@ -38,9 +26,9 @@ class RoleController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return array[]
      */
-    public function store(Request $request)
+    public function store(RoleService $roleService, Request $request)
     {
-        return $this->_roleService->store($request);
+        return $roleService->store($request);
     }
 
     /**
@@ -49,7 +37,7 @@ class RoleController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(RoleService $roleService, $id)
     {
         //
     }
@@ -61,9 +49,9 @@ class RoleController extends Controller
      * @param  int $id
      * @return array[]
      */
-    public function update(Request $request, $id)
+    public function update(RoleService $roleService, Request $request, $id)
     {
-        return $this->_roleService->update($request,$id);
+        return $roleService->update($request, $id);
     }
 
     /**
@@ -72,7 +60,7 @@ class RoleController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(RoleService $roleService, $id)
     {
         //
     }

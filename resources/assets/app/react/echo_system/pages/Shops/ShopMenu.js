@@ -58,7 +58,6 @@ class ShopMenu extends Component {
      * @param var event
      */
     handleChange(moment) {
-        debugger;
         this.setState({
             moment
         });
@@ -98,15 +97,15 @@ class ShopMenu extends Component {
                                 <div className="regular-page-content-wrapper mt-30 min-height">
                                     <div className="regular-page-text">
                                         <h2>Menu</h2>
-                                        <DatetimePickerTrigger
-                                            shortcuts={shortcuts}
-                                            moment={this.state.moment}
-                                            onChange={this.handleChange}
-                                            showCalendarPicker={false}
-                                            showTimePicker={true}>
-                                            <input type="text" value={this.state.moment.format('YYYY-MM-DD HH:mm')}
-                                                   readOnly/>
-                                        </DatetimePickerTrigger>
+                                        {/*<DatetimePickerTrigger*/}
+                                            {/*shortcuts={shortcuts}*/}
+                                            {/*moment={this.state.moment}*/}
+                                            {/*onChange={this.handleChange}*/}
+                                            {/*showCalendarPicker={false}*/}
+                                            {/*showTimePicker={true}>*/}
+                                            {/*<input type="text" value={this.state.moment.format('YYYY-MM-DD HH:mm')}*/}
+                                                   {/*readOnly/>*/}
+                                        {/*</DatetimePickerTrigger>*/}
                                     </div>
                                 </div>
                             </div>

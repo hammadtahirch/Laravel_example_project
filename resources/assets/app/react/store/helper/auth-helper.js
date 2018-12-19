@@ -63,6 +63,8 @@ export function getBase64(file) {
 }
 
 export function exceptionHandler(error) {
+    debugger;
+
     console.log(error);
     let code = error.response;
     switch (code.status) {

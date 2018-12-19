@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\Shop;
 use App\Services\TransformerServices\CustomJsonSerializer;
@@ -17,7 +17,7 @@ use League\Fractal\Resource\Item;
 use Validator;
 use App\Services\ConstantServices\StatusCodes;
 
-class ShopService
+class ShopRepository
 {
     /*
     |--------------------------------------------------------------------------
@@ -28,6 +28,7 @@ class ShopService
     |
     */
 
+    protected $_roleService = null;
     protected $_response = null;
     protected $_fractal = null;
 
@@ -37,7 +38,7 @@ class ShopService
      * @param Response $response
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct($response)
     {
         $this->_response = $response;
         $this->_fractal = new Manager();
@@ -48,7 +49,7 @@ class ShopService
     /**
      * Display a listing of the resource.
      *
-     * @return array []
+     * @return @return array []
      */
     public function index($request)
     {

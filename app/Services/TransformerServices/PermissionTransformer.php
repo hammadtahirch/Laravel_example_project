@@ -8,7 +8,7 @@
 
 namespace App\Services\TransformerServices;
 
-use App\Models\Permission;
+use App\Models\Eloquent\Permission;
 use League\Fractal;
 
 class PermissionTransformer extends Fractal\TransformerAbstract

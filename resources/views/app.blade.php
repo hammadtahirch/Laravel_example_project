@@ -14,12 +14,12 @@
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="{{secure_asset('css/core-style.css')}}">
 {{--    <link rel="stylesheet" href="{{secure_asset('css/style.css')}}">--}}
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtbwG3Fsd-qb_h-MiGk1zQaOgZ_rM8Xrs&libraries=places"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBv9Y4d7JAPywr1NB2dlZIBnG7mGEpdwKs&libraries=places"></script>
     </head>
     <body>
         <div id="root"></div>
 
-        <script src="{{secure_asset('app/js/app.js')}}" ></script>
+        <script src="{{secure_asset('app/js/app.js')}}?version=1" ></script>
 
         <script src="{{secure_asset('js/jquery/jquery-2.2.4.min.js')}}"></script>
         <!-- Popper js -->

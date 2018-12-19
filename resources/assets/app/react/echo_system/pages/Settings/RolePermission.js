@@ -248,7 +248,6 @@ class RolePermission extends Component {
      * _roleList
      */
     _roleList() {
-        // debugger
         if (this.props.fetch_roles !== '') {
             return this.props.fetch_roles.roles.map((role, index) => {
                 return (
@@ -412,7 +411,6 @@ class RolePermission extends Component {
  * @return states
  */
 function mapStateToProp(state) {
-    // debugger;
     return ({
         fetch_permissions: state.setting.fetch_permissions,
         fetch_roles: state.account.fetch_roles,

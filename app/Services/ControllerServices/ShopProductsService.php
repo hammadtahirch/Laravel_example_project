@@ -2,8 +2,10 @@
 
 namespace App\Services\ControllerServices;
 
+use App\Models\Eloquent\Product;
 use App\Models\Eloquent\Shop;
 use App\Services\TransformerServices\CustomJsonSerializer;
+use App\Services\TransformerServices\ProductTransformer;
 use App\Services\TransformerServices\ShopTransformer;
 use App\Services\TransformerServices\UserTransformer;
 use Carbon\Carbon;
@@ -14,23 +16,22 @@ use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Item;
+use League\Fractal\Serializer\JsonApiSerializer;
 use Validator;
 use App\Services\ConstantServices\StatusCodes;
 
-class ShopService
+class ShopProductsService
 {
     /*
     |--------------------------------------------------------------------------
     | Shop Service
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling shop Activity
+    | This Service is responsible for handling shop Products Activity
     |
     */
 
     protected $_response = null;
-    protected $_fractal = null;
-
     /**
      * Create a new Service instance.
      *
@@ -48,27 +49,17 @@ class ShopService
     /**
      * Display a listing of the resource.
      *
-     * @return array []
+     * @return @return array []
      */
-    public function index($request)
+    public function index($shop_id,$request)
     {
         try {
-            $shopPagination = Shop::query()
-                ->with(
-                    [
-                        'user' => function ($query) {
-                            $query->select("id", "name", "email");
-                        },
-                        'shop_time_slot' => function ($query) {
-                            $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
-                        }
-                    ]
-                )
+            $productPagination = Product::query()
                 ->paginate(10);
-            $shopObject = $shopPagination->getCollection();
+            $productObject = $productPagination->getCollection();
 
-            $resource = new Collection($shopObject, new ShopTransformer(), 'shops');
-            $resource->setPaginator(new IlluminatePaginatorAdapter($shopPagination));
+            $resource = new Collection($productObject, new ProductTransformer(), 'products');
+            $resource->setPaginator(new IlluminatePaginatorAdapter($productPagination));
             return $this->_fractal->createData($resource)->toArray();
 
         } catch (QueryException $exception) {
@@ -94,7 +85,7 @@ class ShopService
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store($request)
+    public function store($shop_id,$request)
     {
         $requestObject = $request->all();
         $isValidate = $this->_shopCreateValidator($requestObject);
@@ -150,7 +141,7 @@ class ShopService
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($shop_id,$id)
     {
         //
     }
@@ -162,7 +153,7 @@ class ShopService
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update($request, $id)
+    public function update($shop_id,$request, $id)
     {
         $requestObject = $request->all();
         $isValidate = $this->_shopUpdateValidator($requestObject);
@@ -198,7 +189,7 @@ class ShopService
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($shop_id,$id)
     {
         try {
 

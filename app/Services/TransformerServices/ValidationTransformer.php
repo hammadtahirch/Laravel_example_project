@@ -2,7 +2,7 @@
 
 namespace App\Services\TransformerServices;
 
-use App\Models\User;
+use App\Models\Eloquent\User;
 use League\Fractal;
 
 class ValidationTransformer extends Fractal\TransformerAbstract

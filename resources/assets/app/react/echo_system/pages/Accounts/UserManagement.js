@@ -95,7 +95,7 @@ class UserManagement extends Component {
      * _builtQuery
      */
     _builtQuery() {
-        debugger;
+
         let fill = {};
         if (this.state.filter.filterName !== '' && this.state.filter.filterValue !== '') {
 

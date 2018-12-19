@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class ShopTimeSlot extends Model
+class Product extends Model
 {
     use SoftDeletes;
 
@@ -18,13 +18,13 @@ class ShopTimeSlot extends Model
     protected $fillable = [
         'id',
         'shop_id',
-        'day',
-        'deliver_start_time',
-        'delivery_end_time',
-        'change_delivery_date',
-        'pickup_start_time',
-        'pickup_end_time',
-        'change_pickup_date',
+        'title',
+        'description',
+        'image',
+        'price',
+        'is_published',
+        'published_date',
+        'status',
     ];
 
     /**
@@ -59,4 +59,5 @@ class ShopTimeSlot extends Model
         $model->deleted_by = Auth::user()->id;
         $model->save();
     }
+
 }

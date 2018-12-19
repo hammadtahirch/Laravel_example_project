@@ -208,8 +208,6 @@ class ShopManagement extends Component {
      * @param var is_confirm
      */
     handleDeleteShop(_isOpen, shop = null, is_confirm = false) {
-        console.log(shop);
-        debugger;
         if (shop !== null) {
             this.setState({
                 shop: {
@@ -399,9 +397,9 @@ class ShopManagement extends Component {
     }
 
     /**
-     * _userList
+     * _shopList
      */
-    _userList() {
+    _shopList() {
         if (this.props.fetch_shops !== '') {
             return this.props.fetch_shops.shops.map((shop, index) => {
                 return (
@@ -502,7 +500,7 @@ class ShopManagement extends Component {
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            {this._userList()}
+                                            {this._shopList()}
 
                                             </tbody>
                                         </table>

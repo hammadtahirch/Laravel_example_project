@@ -1,26 +1,31 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Eloquent;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Zizaco\Entrust\EntrustRole;
 
-class Role extends EntrustRole
+class ShopTimeSlot extends Model
 {
+    use SoftDeletes;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        "id",
-        "name",
-        "display_name",
-        "description",
-        "created_at",
-        "updated_at"
+        'id',
+        'shop_id',
+        'day',
+        'deliver_start_time',
+        'delivery_end_time',
+        'change_delivery_date',
+        'pickup_start_time',
+        'pickup_end_time',
+        'change_pickup_date',
     ];
-
-    public function permission()
-    {
-        return $this->belongsToMany('App\Models\Permission', 'permission_role', 'role_id', 'permission_id');
-    }
 
     /**
      *

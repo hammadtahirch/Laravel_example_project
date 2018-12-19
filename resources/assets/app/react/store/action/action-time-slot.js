@@ -1,14 +1,43 @@
 import {_setHeaders, exceptionHandler, setSession} from "../helper/auth-helper";
 import ActionTypes from "../constant/constant";
 
-export function _fetchShopTimeSlot(params) {
+export function _fetchShopTimeSlot(shop_id) {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
-        debugger;
-        instance.get('shop/' + params.id + "/time_slot")
+        instance.get('shop/' + shop_id + "/time_slot")
             .then(function (response) {
                 dispatch({type: ActionTypes.FETCH_SHOPS_TIME_SLOT, payload: response})
+                dispatch({type: ActionTypes.LOADING, payload: false});
+            })
+            .catch(function (error) {
+                exceptionHandler(error);
+            });
+    }
+}
+
+export function _saveShopTimeSlot(shop_id, params) {
+    return dispatch => {
+        dispatch({type: ActionTypes.LOADING, payload: true});
+        const instance = _setHeaders();
+        instance.put('shop/' + shop_id + "/time_slot/" + params.id, {shop_time_slot: params})
+            .then(function (response) {
+                dispatch({type: ActionTypes.SAVE_SHOPS_TIME_SLOT, payload: response})
+                dispatch({type: ActionTypes.LOADING, payload: false});
+            })
+            .catch(function (error) {
+                exceptionHandler(error);
+            });
+    }
+}
+
+export function _saveShopDateSlot(shop_id, params) {
+    return dispatch => {
+        dispatch({type: ActionTypes.LOADING, payload: true});
+        const instance = _setHeaders();
+        instance.put('shop/' + shop_id + "/time_slot/", {shop_time_slot: params})
+            .then(function (response) {
+                dispatch({type: ActionTypes.SAVE_SHOPS_TIME_SLOT, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
             })
             .catch(function (error) {

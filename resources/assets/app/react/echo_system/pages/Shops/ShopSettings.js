@@ -58,7 +58,6 @@ class ShopSettings extends Component {
      * @param var event
      */
     handleChange(moment) {
-        debugger;
         this.setState({
             moment
         });

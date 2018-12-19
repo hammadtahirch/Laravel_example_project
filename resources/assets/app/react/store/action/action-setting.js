@@ -8,6 +8,7 @@ export function _fetchAllPermission(params) {
         const instance = _setHeaders();
         instance.get('permission', {params: params})
             .then(function (response) {
+                debugger;
                 dispatch({type: ActionTypes.FETCH_PERMISSIONS, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
             })

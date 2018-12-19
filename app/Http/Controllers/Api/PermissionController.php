@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\ControllerServices\AuthService;
 use App\Services\ControllerServices\PermissionService;
-use App\Services\ControllerServices\RoleService;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -20,14 +19,11 @@ class PermissionController extends Controller
      *
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, AuthService $authService)
     {
-        $this->_permissionService = new PermissionService($response);
-        $this->_authService = new AuthService($response);
-
-        $this->middleware(function ($request, $next) {
-            if (!$this->_authService->AuthChecker('PERMISSION_construct')) {
-                return $this->_authService->AuthAbort();
+        $this->middleware(function ($request, $next) use ($authService) {
+            if ($authService->AuthChecker('PERMISSION_construct')) {
+                return $authService->AuthAbort();
             }
             return $next($request);
         });
@@ -38,9 +34,9 @@ class PermissionController extends Controller
      *
      * @return array[]
      */
-    public function index(Request $request)
+    public function index(Request $request, PermissionService $permissionService)
     {
-        return $this->_permissionService->index($request);
+        return $permissionService->index($request);
     }
 
     /**
@@ -49,9 +45,9 @@ class PermissionController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return array[]
      */
-    public function store(Request $request)
+    public function store(Request $request, PermissionService $permissionService)
     {
-        return $this->_permissionService->store($request);
+        return $permissionService->store($request);
     }
 
     /**
@@ -61,9 +57,9 @@ class PermissionController extends Controller
      * @param  int $id
      * @return array[]
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, PermissionService $permissionService)
     {
-        return $this->_permissionService->update($request, $id);
+        return $permissionService->update($request, $id);
     }
 
     /**
@@ -72,8 +68,8 @@ class PermissionController extends Controller
      * @param  int $id
      * @return array[]
      */
-    public function destroy($id)
+    public function destroy($id, PermissionService $permissionService)
     {
-        return $this->_permissionService->destroy($id);
+        return $permissionService->destroy($id);
     }
 }

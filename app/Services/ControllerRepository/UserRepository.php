@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\User;
 use App\Services\ConstantServices\GeneralConstants;
 use App\Services\TransformerServices\UserTransformer;
-use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +12,7 @@ use Illuminate\Support\Str;
 use Validator;
 use App\Services\ConstantServices\StatusCodes;
 
-class UserService
+class UserRepository
 {
     /*
     |--------------------------------------------------------------------------
@@ -24,6 +23,7 @@ class UserService
     |
     */
 
+    protected $_roleService = null;
     protected $_response = null;
 
     /**
@@ -31,8 +31,9 @@ class UserService
      *
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct($response)
     {
+        $this->_roleService = new RoleRepository($response);
         $this->_response = $response;
 
     }
@@ -460,8 +461,8 @@ class UserService
             if ($request->has("role_id")) {
                 return $query->where('email', 'like', '%' . $request->email . '%')
                     ->whereHas('roles', function ($query) {
-                        $query->where("name", "=", GeneralConstants::SHOP_KEEPER);
-                    });
+                    $query->where("name", "=", GeneralConstants::SHOP_KEEPER);
+                });
             } else {
                 return $query->where('email', '=', $request->email);
             }

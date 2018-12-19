@@ -1,16 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Eloquent;
 
-use App\Services\ConstantServices\GeneralConstants;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Zizaco\Entrust\EntrustPermission;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
 
-class Permission extends EntrustPermission
+class User extends Authenticatable
 {
+
+    use HasApiTokens,
+        Notifiable;
     use EntrustUserTrait {
         restore as private restoreA;
     }
@@ -18,26 +21,38 @@ class Permission extends EntrustPermission
         restore as private restoreB;
     }
 
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
-        "id",
-        "name",
-        "display_name",
-        "description",
-        "created_at",
-        "updated_at"
+        'name',
+        'email',
+        'password',
+        'phone_number',
+        'role_id',
+        'status'
     ];
 
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
 
+    /**
+     * Create a has one relation with Role.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     */
     public function roles()
     {
-        return $this->belongsToMany('App\Models\Role', 'permission_role', 'permission_id', 'role_id')
-            ->select('id', "name", "display_name", "description");
-    }
-
-    public function detachRoles($id)
-    {
-        DB::table('permission_role')->where('role_id', '<>', GeneralConstants::SUPPER_ADMIN_ID)->where(["permission_id" => $id])->delete();
-        return $this;
+        return $this->belongsToMany('App\Models\Eloquent\Role', 'role_user', 'user_id', 'role_id');
     }
 
     public function restore()

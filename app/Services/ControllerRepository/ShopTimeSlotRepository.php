@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\Shop;
 use App\Models\Eloquent\ShopTimeSlot;
@@ -14,7 +14,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Validator;
 
-class ShopTimeSlotService
+class ShopTimeSlotRepository
 {
     /*
     |--------------------------------------------------------------------------

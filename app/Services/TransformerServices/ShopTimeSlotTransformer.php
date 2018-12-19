@@ -2,9 +2,9 @@
 
 namespace App\Services\TransformerServices;
 
-use App\Models\Shop;
-use App\Models\ShopTimeSlot;
-use App\Models\User;
+use App\Models\Eloquent\Shop;
+use App\Models\Eloquent\ShopTimeSlot;
+use App\Models\Eloquent\User;
 use League\Fractal\TransformerAbstract;
 
 ;

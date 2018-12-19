@@ -18,27 +18,14 @@ class ShopController extends Controller
     |
     */
 
-    protected $_shopService = null;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @param Response $response
-     * @return void
-     */
-    public function __construct(Response $response)
-    {
-        $this->_shopService = new ShopService($response);
-    }
-
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function index(Request $request)
+    public function index(ShopService $shopService, Request $request)
     {
-        return $this->_shopService->index($request);
+        return $shopService->index($request);
     }
 
     /**
@@ -47,9 +34,9 @@ class ShopController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ShopService $shopService, Request $request)
     {
-        return $this->_shopService->store($request);
+        return $shopService->store($request);
     }
 
     /**
@@ -58,7 +45,7 @@ class ShopController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(ShopService $shopService, $id)
     {
         //
     }
@@ -70,9 +57,9 @@ class ShopController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ShopService $shopService, Request $request, $id)
     {
-        return $this->_shopService->update($request, $id);
+        return $shopService->update($request, $id);
     }
 
     /**
@@ -81,8 +68,8 @@ class ShopController extends Controller
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(ShopService $shopService, $id)
     {
-        return $this->_shopService->destroy($id);
+        return $shopService->destroy($id);
     }
 }
