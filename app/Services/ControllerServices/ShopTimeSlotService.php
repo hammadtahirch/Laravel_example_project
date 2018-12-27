@@ -4,6 +4,7 @@ namespace App\Services\ControllerServices;
 
 use App\Models\Eloquent\Shop;
 use App\Models\Eloquent\ShopTimeSlot;
+use App\Services\ControllerRepository\ShopTimeSlotRepository;
 use App\Services\TransformerServices\CustomJsonSerializer;
 use App\Services\TransformerServices\ShopTimeSlotTransformer;
 use App\Services\TransformerServices\UserTransformer;
@@ -24,16 +25,21 @@ class ShopTimeSlotService
     | This Service is responsible for handling shop Activity
     |
     */
+    protected $_shopTimeSlotRepository = null;
+    protected $_response;
+    protected $_fractal;
 
     /**
      * Create a new Service instance.
      *
      * @param Response $response
+     * @param ShopTimeSlotRepository $shopTimeSlotRepository
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, ShopTimeSlotRepository $shopTimeSlotRepository)
     {
         $this->_response = $response;
+        $this->_shopTimeSlotRepository = $shopTimeSlotRepository;
         $this->_fractal = new Manager();
         $this->_fractal->setSerializer(new CustomJsonSerializer());
 
@@ -42,99 +48,58 @@ class ShopTimeSlotService
     /**
      * Display a listing of the resource.
      *
+     * @param $shop_id
      * @return array []
      */
     public function index($shop_id)
     {
-        try {
-            $timeSlotObject = ShopTimeSlot::query()
-                ->where(["shop_id" => $shop_id])
-                ->get();
-
-            $resource = new Collection($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slots');
+        $collectionResponse = $this->_shopTimeSlotRepository->index($shop_id);
+        if ($collectionResponse->has("data")) {
+            $resource = new Collection($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slots');
             return $this->_fractal->createData($resource)->toArray();
-
-        } catch (QueryException $exception) {
+        } else {
             return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
+                $collectionResponse->pull("exception")
             );
         }
     }
+
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  int $shop_id
+     * @return array []
      */
     public function save($shop_id, $request)
     {
-        $requestObject = $request->all();
-        $requestObject = $requestObject['shop_time_slot'];
-        try {
-            $timeSlotObject = '';
-            if ($timeSlotObject->update($requestObject)) {
-                $resource = new Item($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slot');
-                return $this->_fractal->createData($resource)->toArray();
-            }
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception]);
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_shopTimeSlotRepository->save($shop_id, $request);
+        if ($collectionResponse->has("data")) {
+            $resource = new Item($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slot');
+            return $this->_fractal->createData($resource)->toArray();
+
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'shop');
     }
+
     /**
      * Update the specified resource in storage.
      *
+     * @param  $shop_id
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return array []
      */
     public function update($shop_id, $request, $id)
     {
-        dd($shop_id, $request, $id);
-        $requestObject = $request->all();
-        $requestObject = $requestObject['shop_time_slot'];
-        try {
-            $timeSlotObject = Shop::find($id);
-            if ($timeSlotObject->update($requestObject)) {
-                $resource = new Item($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slot');
-                return $this->_fractal->createData($resource)->toArray();
-            }
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception]);
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_shopTimeSlotRepository->update($shop_id, $request, $id);
+        if ($collectionResponse->has("data")) {
+            $resource = new Item($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slot');
+            return $this->_fractal->createData($resource)->toArray();
+
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'shop');
     }
 }

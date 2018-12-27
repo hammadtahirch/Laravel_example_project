@@ -4,14 +4,9 @@ namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\Shop;
 use App\Models\Eloquent\ShopTimeSlot;
-use App\Services\TransformerServices\CustomJsonSerializer;
-use App\Services\TransformerServices\ShopTimeSlotTransformer;
-use App\Services\TransformerServices\UserTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Database\QueryException;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
+use Illuminate\Support\Collection;
 use Validator;
 
 class ShopTimeSlotRepository
@@ -24,6 +19,7 @@ class ShopTimeSlotRepository
     | This Service is responsible for handling shop Activity
     |
     */
+    protected $_collection;
 
     /**
      * Create a new Service instance.
@@ -31,18 +27,16 @@ class ShopTimeSlotRepository
      * @param Response $response
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct()
     {
-        $this->_response = $response;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
+        $this->_collection = new Collection();
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return array []
+     * @param $shop_id
+     * @return Collection $_collection
      */
     public function index($shop_id)
     {
@@ -51,31 +45,32 @@ class ShopTimeSlotRepository
                 ->where(["shop_id" => $shop_id])
                 ->get();
 
-            $resource = new Collection($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slots');
-            return $this->_fractal->createData($resource)->toArray();
+            $this->_collection->put("data", $timeSlotObject);
 
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("data",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("data",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
+        return $this->_collection;
     }
+
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  int $shop_id
+     * @return Collection $_collection
      */
     public function save($shop_id, $request)
     {
@@ -84,57 +79,54 @@ class ShopTimeSlotRepository
         try {
             $timeSlotObject = '';
             if ($timeSlotObject->update($requestObject)) {
-                $resource = new Item($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slot');
-                return $this->_fractal->createData($resource)->toArray();
+                $this->_collection->pull("data", $timeSlotObject);
             }
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->pull("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->pull("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'shop');
+        return $this->_collection;
     }
+
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
+     * @param  int $shop_id
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection $_collection
      */
     public function update($shop_id, $request, $id)
     {
-        dd($shop_id, $request, $id);
         $requestObject = $request->all();
         $requestObject = $requestObject['shop_time_slot'];
         try {
             $timeSlotObject = Shop::find($id);
             if ($timeSlotObject->update($requestObject)) {
-                $resource = new Item($timeSlotObject, new ShopTimeSlotTransformer(), 'shop_time_slot');
-                return $this->_fractal->createData($resource)->toArray();
+                $this->_collection->pull("data", $timeSlotObject);
             }
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->pull("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->pull("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'shop');
+        return $this->_collection;
     }
 }

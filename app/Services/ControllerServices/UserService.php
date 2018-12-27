@@ -2,14 +2,11 @@
 
 namespace App\Services\ControllerServices;
 
-use App\Models\Eloquent\User;
 use App\Services\ConstantServices\GeneralConstants;
+use App\Services\ControllerRepository\UserRepository;
 use App\Services\TransformerServices\UserTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Validator;
 use App\Services\ConstantServices\StatusCodes;
 
@@ -25,67 +22,44 @@ class UserService
     */
 
     protected $_response = null;
+    protected $_userRepository = null;
 
     /**
      * Create a new Service instance.
      *
+     * @param Response $response
+     * @param UserRepository $userRepository
+     *
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct(Response $response, UserRepository $userRepository)
     {
         $this->_response = $response;
-
+        $this->_userRepository = $userRepository;
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param $request
+     * @return \League\Fractal\Resource\Collection
      */
     public function index($request)
     {
-        try {
-            $userObject = User::query();
-            $userObject = $this->_userFilter($userObject, $request);
-            $userObject = $userObject->whereHas('roles', function ($query) {
-                $query->where("name", "<>", GeneralConstants::SUPPER_ADMIN);
-            })
-                ->orderBy('id', 'DESC');
-
-            if ($request->has("_render")) {
-                $userObject = $userObject->get();
-                return $this->_response
-                    ->withCollection($userObject, new UserTransformer, 'users');
-            } else {
-                $userObject = $userObject->paginate(10);
-                return $this->_response
-                    ->withPaginator($userObject, new UserTransformer, 'users');
-            }
-
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_userRepository->index($request);
+        if ($collectionResponse->has("data")) {
+            return $this->_response
+                ->withPaginator($collectionResponse->pull("data"), new UserTransformer, 'users');
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
-
-
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return \League\Fractal\Resource\Collection
      */
     public function store($request)
     {
@@ -94,51 +68,13 @@ class UserService
         if (!empty($isValidate)) {
             return $isValidate;
         }
-        $requestObject = $requestObject['user'];
-        try {
-            $userObject = new User();
-
-            $userObject->name = $requestObject['first_name'] . " " . $requestObject['last_name'];
-            $userObject->email = $requestObject['email'];
-            $userObject->password = Str::random(32);
-            $userObject->phone_number = $requestObject['phone_number'];
-            $userObject->role_id = (integer)$requestObject['role_id'];
-            $userObject->status = (boolean)$requestObject['status'];
-
-            $userObject->save();
-            if ($userObject->id > 0) {
-                $userObject
-                    ->find($userObject->id)
-                    ->roles()
-                    ->attach($requestObject['role_id']);
-            }
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception]);
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_userRepository->store($request);
+        if ($collectionResponse->has("data")) {
+            return $this->_response
+                ->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
-        return $this->_response
-            ->withItem($userObject, new UserTransformer, 'user');
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -146,7 +82,7 @@ class UserService
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return \League\Fractal\Resource\Collection
      */
     public function update($request, $id)
     {
@@ -155,34 +91,13 @@ class UserService
         if (!empty($isValidate)) {
             return $isValidate;
         }
-        $requestObject = $requestObject['user'];
-        try {
-            $userObject = User::find($id);
-            $userObject->name = $requestObject['first_name'] . " " . $requestObject['last_name'];
-            $userObject->email = $requestObject['email'];
-            $userObject->phone_number = $requestObject['phone_number'];
-            $userObject->role_id = (integer)$requestObject['role_id'];
-            $userObject->status = (boolean)$requestObject['status'];
-
-            if ($userObject->update($userObject->toArray())) {
-                $userObject->roles()->sync([]);
-                $userObject->roles()->attach($requestObject['role_id']);
-            }
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception]);
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_userRepository->update($request, $id);
+        if ($collectionResponse->has("data")) {
+            return $this->_response
+                ->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
-        return $this->_response
-            ->withItem($userObject, new UserTransformer, 'user');
     }
 
     /**
@@ -193,30 +108,13 @@ class UserService
      */
     public function destroy($id)
     {
-        try {
-            $userObject = User::find($id);
-            if (!$userObject) {
-                return $this->_response->errorNotFound(['message' => 'User not found.']);
-            }
-            if ($userObject->delete()) {
-                return $this->_response->withItem($userObject, new UserTransformer, 'user');
-            } else {
-                return $this->_response->errorInternalError(['message' => 'Internal server error user not deleted']);
-            }
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+        $collectionResponse = $this->_userRepository->destroy($id);
+        if ($collectionResponse->has("data")) {
+            return $this->_response->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+        } else if ($collectionResponse->has("not_found")) {
+            return $this->_response->withItem($collectionResponse->pull("not_found"), new UserTransformer, 'user');
+        } else {
+            return $this->_response->withItem($collectionResponse->pull("exception"), new UserTransformer, 'user');
         }
     }
 
@@ -229,25 +127,17 @@ class UserService
      */
     public function login($request)
     {
-        $request = $request->all();
-        $isValidate = $this->_loginValidator($request);
+        $requestObject = $request->all();
+        $isValidate = $this->_loginValidator($requestObject);
         if (!empty($isValidate)) {
             return $isValidate;
         }
-        $request = $request['user'];
-        if (Auth::attempt(['email' => $request['email'], 'password' => $request['password'] . "_" . strtolower($request['email'])])) {
-            $user = Auth::user();
+        $collectionResponse = $this->_userRepository->login($request);
+        if ($collectionResponse->has("data")) {
             return response()->json(
-                [
-                    'success' => collect(
-                        [
-                            "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
-                            "user" => $user
-                        ]
-                    )
-                ], StatusCodes::SUCCESS);
+                $collectionResponse->pull("data"), StatusCodes::SUCCESS);
         } else {
-            return $this->_response->errorUnauthorized("username or password is wrong.");
+            return $this->_response->errorUnauthorized($collectionResponse->pull("exception"));
         }
     }
 
@@ -265,32 +155,14 @@ class UserService
         if (!empty($isValidate)) {
             return $isValidate;
         }
-        $request = $request['user'];
-        $request['password'] = bcrypt($request['password'] . "_" . strtolower($request['email']));
-        try {
-            $user = User::create($request);
-        } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
-        } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+
+        $collectionResponse = $this->_userRepository->register($request);
+        if ($collectionResponse->has("data")) {
+            return response()->json($collectionResponse->pull("data"), StatusCodes::SUCCESS);
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
 
-        return response()->json(collect(
-            [
-                "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
-                "user" => $user
-            ]
-        ), StatusCodes::SUCCESS);
     }
 
     /**
@@ -302,29 +174,13 @@ class UserService
      */
     public function signOut($request)
     {
-        try {
-            $signOut = $request->user()->token()->revoke();
-            if ($signOut) {
-                return response()->json(collect(
-                    [
-                        "message" => 'Sign Out successfully.'
-                    ]
-                ), StatusCodes::SUCCESS);
-            }
-        } catch (QueryException $exception) {
-            return response()->json(collect(["query_exception" => $exception]), StatusCodes::BAD_REQUEST);
+
+        $collectionResponse = $this->_userRepository->signOut($request);
+        if ($collectionResponse->has("data")) {
+            return response()->json($collectionResponse->pull("data"), StatusCodes::SUCCESS);
+        } else {
+            return response()->json($collectionResponse->pull("exception"), StatusCodes::BAD_REQUEST);
         }
-
-    }
-
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @return Json Response
-     */
-    public function details()
-    {
-        return '';
     }
 
     /**

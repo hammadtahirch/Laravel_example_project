@@ -4,13 +4,11 @@ namespace App\Services\ControllerRepository;
 
 use App\Models\Eloquent\User;
 use App\Services\ConstantServices\GeneralConstants;
-use App\Services\TransformerServices\UserTransformer;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Validator;
-use App\Services\ConstantServices\StatusCodes;
 
 class UserRepository
 {
@@ -23,25 +21,23 @@ class UserRepository
     |
     */
 
-    protected $_roleService = null;
-    protected $_response = null;
+    protected $_collection = null;
 
     /**
      * Create a new Service instance.
      *
      * @return void
      */
-    public function __construct($response)
+    public function __construct()
     {
-        $this->_roleService = new RoleRepository($response);
-        $this->_response = $response;
+        $this->_collection = new Collection();
 
     }
 
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param $request
+     * @return Collection _collection
      */
     public function index($request)
     {
@@ -54,47 +50,34 @@ class UserRepository
                 ->orderBy('id', 'DESC');
 
             if ($request->has("_render")) {
-                $userObject = $userObject->get();
-                return $this->_response
-                    ->withCollection($userObject, new UserTransformer, 'users');
+                $this->_collection->put("data", $userObject->get());
             } else {
-                $userObject = $userObject->paginate(10);
-                return $this->_response
-                    ->withPaginator($userObject, new UserTransformer, 'users');
+                $this->_collection->put("data", $userObject->paginate(10));
             }
 
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            $this->_collection->put("exception", [
+                "message" => "Oops! query exception contact to admin",
+                "query_exception" => $exception
+            ]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
-                [
-                    "message" => "Oops! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            $this->_collection->put("exception", [
+                "message" => "Oops! exception contact to admin",
+                "query_exception" => $exception
+            ]);
         }
-
-
+        return $this->_collection;
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Collection _collection
      */
     public function store($request)
     {
         $requestObject = $request->all();
-        $isValidate = $this->_userCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $requestObject = $requestObject['user'];
         try {
             $userObject = new User();
@@ -113,33 +96,23 @@ class UserRepository
                     ->roles()
                     ->attach($requestObject['role_id']);
             }
+            $this->_collection->put("data", $userObject);
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem($userObject, new UserTransformer, 'user');
 
-    }
+        return $this->_collection;
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
     }
 
     /**
@@ -147,15 +120,11 @@ class UserRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection
      */
     public function update($request, $id)
     {
         $requestObject = $request->all();
-        $isValidate = $this->_userUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $requestObject = $requestObject['user'];
         try {
             $userObject = User::find($id);
@@ -169,56 +138,58 @@ class UserRepository
                 $userObject->roles()->sync([]);
                 $userObject->roles()->attach($requestObject['role_id']);
             }
+            $this->_collection->put("data", $userObject);
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem($userObject, new UserTransformer, 'user');
+        return $this->_collection;
+
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection
      */
     public function destroy($id)
     {
         try {
             $userObject = User::find($id);
             if (!$userObject) {
-                return $this->_response->errorNotFound(['message' => 'User not found.']);
+                $this->_collection->put("not_found", ['message' => 'User not found.']);
             }
             if ($userObject->delete()) {
-                return $this->_response->withItem($userObject, new UserTransformer, 'user');
+                $this->_collection->put("data", $userObject);
             } else {
-                return $this->_response->errorInternalError(['message' => 'Internal server error user not deleted']);
+                $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
             }
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! Query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
+        return $this->_collection;
     }
 
     /**
@@ -226,224 +197,87 @@ class UserRepository
      *
      * @param $request
      *
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection _collection
      */
     public function login($request)
     {
         $request = $request->all();
-        $isValidate = $this->_loginValidator($request);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $request = $request['user'];
         if (Auth::attempt(['email' => $request['email'], 'password' => $request['password'] . "_" . strtolower($request['email'])])) {
             $user = Auth::user();
-            return response()->json(
+            $this->_collection->put("data",
                 [
-                    'success' => collect(
-                        [
-                            "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
-                            "user" => $user
-                        ]
-                    )
-                ], StatusCodes::SUCCESS);
+                    'success' => [
+                        "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
+                        "user" => $user
+                    ]
+                ]);
         } else {
-            return $this->_response->errorUnauthorized("username or password is wrong.");
+            $this->_collection->put("exception", "username or password is wrong.");
         }
+        return $this->_collection;
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param array $request
+     * @param $request
      *
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection _collection
      */
     public function register($request)
     {
         $request = $request->all();
-        $isValidate = $this->_registrationValidator($request);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $request = $request['user'];
         $request['password'] = bcrypt($request['password'] . "_" . strtolower($request['email']));
         try {
             $user = User::create($request);
+            $this->_collection->put("data",
+                [
+                    "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
+                    "user" => $user
+                ]
+            );
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-
-        return response()->json(collect(
-            [
-                "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
-                "user" => $user
-            ]
-        ), StatusCodes::SUCCESS);
+        return $this->_collection;
     }
 
     /**
      * this is responsible to sign out from application
      *
-     * @param Request $request
+     * @param $request
      *
-     * @return \League\Fractal\Resource\Collection
+     * @return Collection
      */
     public function signOut($request)
     {
         try {
             $signOut = $request->user()->token()->revoke();
             if ($signOut) {
-                return response()->json(collect(
+                $this->_collection->put("data",
                     [
                         "message" => 'Sign Out successfully.'
                     ]
-                ), StatusCodes::SUCCESS);
+                );
             }
         } catch (QueryException $exception) {
-            return response()->json(collect(["query_exception" => $exception]), StatusCodes::BAD_REQUEST);
+            $this->_collection->put("exception", ["query_exception" => $exception]);
         }
-
-    }
-
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @return Json Response
-     */
-    public function details()
-    {
-        return '';
-    }
-
-    /**
-     * This function responsible for validating user on registration page.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _registrationValidator(array $request)
-    {
-        $rules = [
-            'user.name' => 'required',
-            'user.email' => 'required|email',
-            'user.password' => 'required',
-            'user.c_password' => 'required|same:user.password',
-        ];
-        $messages = [
-            'user.name.required' => "Oops! name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.password.required' => "Oops! password is required.",
-            'user.c_password.required' => "Oops! retype is required.",
-            'user.c_password.same' => "Oops! Password does not match.",
-        ];
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
-        }
-    }
-
-    /**
-     * This function responsible for validating user on update.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _userUpdateValidator(array $request)
-    {
-        $rules = [
-            'user.first_name' => 'required',
-            'user.last_name' => 'required',
-            'user.email' => 'required|email',
-            'user.phone_number' => 'required',
-            'user.role_id' => 'required',
-            'user.status' => 'required',
-
-        ];
-        $messages = [
-            'user.first_name.required' => "Oops! first name is required.",
-            'user.last_name.required' => "Oops! last name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.phone_number.required' => "Oops! phone number is not correct format.",
-            'user.role_id.required' => "Oops! role is not correct format.",
-            'user.status.required' => "Oops! status is not correct format.",
-        ];
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
-        }
-    }
-
-    /**
-     * This function responsible for validating user on update.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _userCreateValidator(array $request)
-    {
-        $rules = [
-            'user.first_name' => 'required',
-            'user.last_name' => 'required',
-            'user.email' => 'required|email',
-            'user.phone_number' => 'required',
-            'user.role_id' => 'required',
-            'user.status' => 'required',
-
-        ];
-        $messages = [
-            'user.first_name.required' => "Oops! first name is required.",
-            'user.last_name.required' => "Oops! last name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.phone_number.required' => "Oops! phone number is not correct format.",
-            'user.role_id.required' => "Oops! role is not correct format.",
-            'user.status.required' => "Oops! status is not correct format.",
-
-        ];
-
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
-        }
-    }
-
-    /**
-     * This function responsible for validating user on login page.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _loginValidator(array $request)
-    {
-        $rules = [
-            'user.email' => 'required|email',
-            'user.password' => 'required',
-        ];
-        $messages = [
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.password.required' => "Oops! password is required."
-        ];
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            $collection = collect(["errors" => $validator->errors()]);
-            return response()->json($collection, StatusCodes::UNCROSSABLE);
-        }
+        return $this->_collection;
     }
 
     /**
@@ -454,15 +288,14 @@ class UserRepository
      */
     private function _userFilter($query, $request)
     {
-
         if ($request->has("name")) {
             return $query->where('name', 'like', '%' . $request->name . '%');
         } else if ($request->has("email")) {
             if ($request->has("role_id")) {
                 return $query->where('email', 'like', '%' . $request->email . '%')
                     ->whereHas('roles', function ($query) {
-                    $query->where("name", "=", GeneralConstants::SHOP_KEEPER);
-                });
+                        $query->where("name", "=", GeneralConstants::SHOP_KEEPER);
+                    });
             } else {
                 return $query->where('email', '=', $request->email);
             }
