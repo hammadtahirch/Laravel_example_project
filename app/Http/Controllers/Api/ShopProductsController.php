@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\ControllerServices\ShopProductsService;
-use App\Services\ControllerServices\ShopService;
+use App\Services\AppServices\ShopProductsService;
+use App\Services\AppServices\ShopService;
 use EllipseSynergie\ApiResponse\Laravel\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

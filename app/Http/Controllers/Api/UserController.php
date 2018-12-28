@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use EllipseSynergie\ApiResponse\Contracts\Response;
-use App\Services\ControllerServices\UserService;
+use App\Services\AppServices\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Validator;

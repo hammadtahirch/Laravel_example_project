@@ -1,15 +1,11 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\AppServices;
 
-use App\Models\Eloquent\Shop;
-use App\Models\Eloquent\ShopTimeSlot;
-use App\Services\ControllerRepository\ShopTimeSlotRepository;
-use App\Services\TransformerServices\CustomJsonSerializer;
-use App\Services\TransformerServices\ShopTimeSlotTransformer;
-use App\Services\TransformerServices\UserTransformer;
+use App\Models\Repositories\ShopTimeSlotRepository;
+use App\Services\Transformers\CustomJsonSerializer;
+use App\Services\Transformers\ShopTimeSlotTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
-use Illuminate\Database\QueryException;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -25,7 +21,7 @@ class ShopTimeSlotService
     | This Service is responsible for handling shop Activity
     |
     */
-    protected $_shopTimeSlotRepository = null;
+    protected $_shopTimeSlotRepository;
     protected $_response;
     protected $_fractal;
 

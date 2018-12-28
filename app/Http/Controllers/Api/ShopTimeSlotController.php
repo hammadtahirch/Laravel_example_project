@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\ShopTimeSlot;
-use App\Services\ControllerServices\ShopTimeSlotService;
+use App\Services\AppServices\ShopTimeSlotService;
 use EllipseSynergie\ApiResponse\Laravel\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;

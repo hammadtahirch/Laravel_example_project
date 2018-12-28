@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\TransformerServices;
+namespace App\Services\Transformers;
 
 use App\Models\Eloquent\Shop;
 use App\Models\Eloquent\User;

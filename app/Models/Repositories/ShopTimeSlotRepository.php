@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\ControllerRepository;
+namespace App\Models\Repositories;
 
 use App\Models\Eloquent\Shop;
 use App\Models\Eloquent\ShopTimeSlot;

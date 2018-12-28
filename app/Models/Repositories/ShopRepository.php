@@ -1,23 +1,17 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Models\Repositories;
 
 use App\Models\Eloquent\Shop;
-use App\Services\TransformerServices\CustomJsonSerializer;
-use App\Services\TransformerServices\ShopTransformer;
-use App\Services\TransformerServices\UserTransformer;
 use Carbon\Carbon;
 use EllipseSynergie\ApiResponse\Contracts\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\Item;
 use Validator;
-use App\Services\ConstantServices\StatusCodes;
 
-class ShopService
+class ShopRepository
 {
     /*
     |--------------------------------------------------------------------------
@@ -28,8 +22,7 @@ class ShopService
     |
     */
 
-    protected $_response = null;
-    protected $_fractal = null;
+    protected $_collection;
 
     /**
      * Create a new Service instance.
@@ -37,18 +30,17 @@ class ShopService
      * @param Response $response
      * @return void
      */
-    public function __construct(Response $response)
+    public function __construct()
     {
-        $this->_response = $response;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
+        $this->_collection = new Collection();
 
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return array []
+     * @param $request
+     * @return Collection $_collection
      */
     public function index($request)
     {
@@ -65,42 +57,35 @@ class ShopService
                     ]
                 )
                 ->paginate(10);
-            $shopObject = $shopPagination->getCollection();
 
-            $resource = new Collection($shopObject, new ShopTransformer(), 'shops');
-            $resource->setPaginator(new IlluminatePaginatorAdapter($shopPagination));
-            return $this->_fractal->createData($resource)->toArray();
-
+            $this->_collection->put("data", $shopPagination);
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
+        return $this->_collection;
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Collection $_collection
      */
     public function store($request)
     {
         $requestObject = $request->all();
-        $isValidate = $this->_shopCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $requestObject = $requestObject['shop'];
         try {
 
@@ -122,81 +107,60 @@ class ShopService
                     ->where(["id" => $shopObject->id])
                     ->first();
             }
-
-            $resource = new Item($shopObject, new ShopTransformer(), 'shop');
-            return $this->_fractal->createData($resource)->toArray();
+            $this->_collection->put("data", $shopObject);
 
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'user');
+        return $this->_collection;
 
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection $_collection
      */
     public function update($request, $id)
     {
         $requestObject = $request->all();
-        $isValidate = $this->_shopUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
         $requestObject = $requestObject['shop'];
         try {
-
-            $resource = new Item('', new ShopTransformer(), 'shop');
-            return $this->_fractal->createData($resource)->toArray();
-
+            $this->_collection->put("data", []);
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-        return $this->_response
-            ->withItem('', new UserTransformer, 'shop');
+        return $this->_collection;
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection $_collection
      */
     public function destroy($id)
     {
@@ -204,7 +168,7 @@ class ShopService
 
             $shopObject = Shop::find($id);
             if (!$shopObject) {
-                return $this->_response->errorNotFound(['message' => 'User not found.']);
+                $this->_collection->put("not_found", ['message' => 'User not found.']);
             }
             if ($shopObject->delete()) {
                 $shopObject = $shopObject->with(
@@ -217,106 +181,26 @@ class ShopService
                         }
                     ]
                 )->first();
-                return $this->_response->withItem($shopObject, new ShopTransformer(), 'user');
+                $this->_collection->put("data", $shopObject);
             } else {
-                return $this->_response->errorInternalError(['message' => 'Internal server error user not deleted']);
+                $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
             }
-            $resource = new Item('', new ShopTransformer(), 'shop');
-            return $this->_fractal->createData($resource)->toArray();
         } catch (QueryException $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! Query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
-            return $this->_response->errorInternalError(
+            $this->_collection->put("exception",
                 [
                     "message" => "Oops! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         }
-    }
-
-    /**
-     * This function responsible for validating shop on update.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _shopUpdateValidator(array $request)
-    {
-        $rules = [
-            'shop.title' => 'required',
-            'shop.user_id' => 'required',
-            'shop.address' => 'required',
-            'shop.city' => 'required',
-            'shop.province' => 'required',
-            'shop.country' => 'required',
-            'shop.portal_code' => 'required',
-            'shop.latitude' => 'required',
-            'shop.longitude' => 'required',
-
-
-        ];
-        $messages = [
-            'shop.title.required' => "Oops! title is required.",
-            'shop.user_id.required' => "Oops! user is required.",
-            'shop.address.required' => "Oops! address is required.",
-            'shop.city.required' => "Oops! city is required.",
-            'shop.province.required' => "Oops! province is required.",
-            'shop.country.required' => "Oops! country is required.",
-            'shop.portal_code.required' => "Oops! portal_code is required.",
-            'shop.latitude.required' => "Oops! latitude is required.",
-            'shop.longitude.required' => "Oops! longitude is required.",
-
-        ];
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
-        }
-    }
-
-    /**
-     * This function responsible for validating shop on update.
-     *
-     * @param  array $request
-     * @return \League\Fractal\Resource\Collection
-     */
-    private function _shopCreateValidator(array $request)
-    {
-        $rules = [
-            'shop.title' => 'required',
-            'shop.user_id' => 'required',
-            'shop.address' => 'required',
-            'shop.city' => 'required',
-            'shop.province' => 'required',
-            'shop.country' => 'required',
-            'shop.portal_code' => 'required',
-            'shop.latitude' => 'required',
-            'shop.longitude' => 'required',
-
-
-        ];
-        $messages = [
-            'shop.title.required' => "Oops! title is required.",
-            'shop.user_id.required' => "Oops! user is required.",
-            'shop.address.required' => "Oops! address is required.",
-            'shop.city.required' => "Oops! city is required.",
-            'shop.province.required' => "Oops! province is required.",
-            'shop.country.required' => "Oops! country is required.",
-            'shop.portal_code.required' => "Oops! portal_code is required.",
-            'shop.latitude.required' => "Oops! latitude is required.",
-            'shop.longitude.required' => "Oops! longitude is required.",
-
-        ];
-
-        $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
-        if ($validator->fails()) {
-            return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
-        }
+        return $this->_collection;
     }
 
     /**
@@ -342,7 +226,7 @@ class ShopService
     /**
      * This function responsible for filter records from Query.
      *
-     * @param  array $request
+     * @param  Model $query
      * @return Collection
      */
     private function generateShopTimings($query)

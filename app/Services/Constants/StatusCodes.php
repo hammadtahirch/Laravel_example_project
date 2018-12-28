@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\ConstantServices;
+namespace App\Services\Constants;
 
 /**
  * [StatusCodes 'Define status for http requests']

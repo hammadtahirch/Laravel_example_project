@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Services\ControllerServices\AuthService;
-use App\Services\ControllerServices\PermissionService;
+use App\Services\AppServices\AuthService;
+use App\Services\AppServices\PermissionService;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,19 +11,20 @@ use App\Http\Controllers\Controller;
 class PermissionController extends Controller
 {
 
-    protected $_permissionService = null;
-    protected $_authService = null;
+    protected $_permissionService;
+    protected $_authService;
 
     /**
      * Create a new controller instance.
      *
+     * @param AuthService $authService
      * @return void
      */
-    public function __construct(Response $response, AuthService $authService)
+    public function __construct(AuthService $authService)
     {
         $this->middleware(function ($request, $next) use ($authService) {
-            if ($authService->AuthChecker('PERMISSION_construct')) {
-                return $authService->AuthAbort();
+            if (!$authService->authChecker('PERMISSION_construct')) {
+                return $authService->authAbort();
             }
             return $next($request);
         });
@@ -32,6 +33,8 @@ class PermissionController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request ,
+     * @param PermissionService $permissionService
      * @return array[]
      */
     public function index(Request $request, PermissionService $permissionService)
@@ -43,6 +46,7 @@ class PermissionController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
+     * @param  PermissionService $permissionService
      * @return array[]
      */
     public function store(Request $request, PermissionService $permissionService)
@@ -55,6 +59,7 @@ class PermissionController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
+     * @param  PermissionService $permissionService
      * @return array[]
      */
     public function update(Request $request, $id, PermissionService $permissionService)
@@ -66,6 +71,7 @@ class PermissionController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int $id
+     * @param  PermissionService $permissionService
      * @return array[]
      */
     public function destroy($id, PermissionService $permissionService)

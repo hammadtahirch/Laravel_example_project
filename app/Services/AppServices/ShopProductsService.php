@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\AppServices;
 
 use App\Models\Eloquent\Product;
 use App\Models\Eloquent\Shop;
-use App\Services\TransformerServices\CustomJsonSerializer;
-use App\Services\TransformerServices\ProductTransformer;
-use App\Services\TransformerServices\ShopTransformer;
-use App\Services\TransformerServices\UserTransformer;
+use App\Services\Transformers\CustomJsonSerializer;
+use App\Services\Transformers\ProductTransformer;
+use App\Services\Transformers\ShopTransformer;
+use App\Services\Transformers\UserTransformer;
 use Carbon\Carbon;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Database\QueryException;
@@ -18,7 +18,7 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Item;
 use League\Fractal\Serializer\JsonApiSerializer;
 use Validator;
-use App\Services\ConstantServices\StatusCodes;
+use App\Services\Constants\StatusCodes;
 
 class ShopProductsService
 {
@@ -31,7 +31,7 @@ class ShopProductsService
     |
     */
 
-    protected $_response = null;
+    protected $_response;
     /**
      * Create a new Service instance.
      *

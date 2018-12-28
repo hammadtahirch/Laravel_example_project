@@ -2,7 +2,7 @@
 
 namespace App\Models\Eloquent;
 
-use App\Services\ConstantServices\GeneralConstants;
+use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;

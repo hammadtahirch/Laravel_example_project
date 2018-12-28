@@ -6,7 +6,7 @@
  * Time: 10:34 AM
  */
 
-namespace App\Services\TransformerServices;
+namespace App\Services\Transformers;
 
 use App\Models\Eloquent\Permission;
 use League\Fractal;

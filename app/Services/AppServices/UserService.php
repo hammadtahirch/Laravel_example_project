@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services\ControllerServices;
+namespace App\Services\AppServices;
 
-use App\Services\ConstantServices\GeneralConstants;
-use App\Services\ControllerRepository\UserRepository;
-use App\Services\TransformerServices\UserTransformer;
+use App\Services\Constants\GeneralConstants;
+use App\Models\Repositories\UserRepository;
+use App\Services\Transformers\UserTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Support\Collection;
 use Validator;
-use App\Services\ConstantServices\StatusCodes;
+use App\Services\Constants\StatusCodes;
 
 class UserService
 {
@@ -21,8 +21,8 @@ class UserService
     |
     */
 
-    protected $_response = null;
-    protected $_userRepository = null;
+    protected $_response;
+    protected $_userRepository;
 
     /**
      * Create a new Service instance.

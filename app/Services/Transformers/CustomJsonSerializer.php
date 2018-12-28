@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\TransformerServices;
+namespace App\Services\Transformers;
 
 use League\Fractal\Pagination\CursorInterface;
 use League\Fractal\Pagination\PaginatorInterface;

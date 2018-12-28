@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Services\ControllerRepository;
+namespace App\Models\Repositories;
 
 use App\Models\Eloquent\User;
-use App\Services\ConstantServices\GeneralConstants;
+use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
