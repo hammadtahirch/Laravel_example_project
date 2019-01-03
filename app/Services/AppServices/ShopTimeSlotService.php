@@ -11,7 +11,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Validator;
 
-class ShopTimeSlotService
+class ShopTimeSlotService extends BaseService
 {
     /*
     |--------------------------------------------------------------------------

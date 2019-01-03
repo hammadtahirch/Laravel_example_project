@@ -4,13 +4,12 @@ namespace App\Models\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
-class Product extends Model
+class ProductVariance extends Model
 {
     use SoftDeletes;
 
-    protected $table = "products";
+    protected $table = "product_variances";
 
     /**
      * The attributes that are mass assignable.
@@ -21,12 +20,11 @@ class Product extends Model
         'id',
         'shop_id',
         'title',
+        'product_id',
         'description',
-        'image',
-        'price',
-        'is_published',
-        'published_date',
-        'status',
+        'max_permitted',
+        'min_permitted',
+        'description',
     ];
 
     /**
@@ -34,9 +32,9 @@ class Product extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
-    public function product_variance()
+    public function product_variance_option()
     {
-        return $this->hasMany('App\Models\Eloquent\ProductVariance', 'product_id', 'id');
+        return $this->hasMany('App\Models\Eloquent\ProductVarianceOption', 'variance_id', 'id');
     }
 
     /**
@@ -71,5 +69,4 @@ class Product extends Model
         $model->deleted_by = Auth::user()->id;
         $model->save();
     }
-
 }

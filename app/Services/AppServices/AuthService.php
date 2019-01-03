@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use League\Fractal\Manager;
 use Validator;
 
-class AuthService
+class AuthService extends BaseService
 {
     /*
     |--------------------------------------------------------------------------

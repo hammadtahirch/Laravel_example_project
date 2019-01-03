@@ -1,6 +1,6 @@
 const Config = {
-    API_SERVER: 'https://hammad-dev-boldapps.fwd.wf/api/',
-    WEB_ADDRESS: 'https://hammad-dev-boldapps.fwd.wf/'
+    API_SERVER: 'https://1d44fdd8.ngrok.io/api/',
+    WEB_ADDRESS: 'https://1d44fdd8.ngrok.io/'
 }
 
 export default Config;

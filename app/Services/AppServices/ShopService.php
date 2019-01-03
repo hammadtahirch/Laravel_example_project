@@ -13,7 +13,7 @@ use League\Fractal\Resource\Item;
 use Validator;
 use App\Services\Constants\StatusCodes;
 
-class ShopService
+class ShopService extends BaseService
 {
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,6 @@ class ShopService
      */
     public function index($request)
     {
-
         $collectionResponse = $this->_shopRepository->index($request);
         if ($collectionResponse->has("data")) {
             $shopObject = $collectionResponse->pull("data");
@@ -80,9 +79,9 @@ class ShopService
         if (!empty($isValidate)) {
             return $isValidate;
         }
-
         $collectionResponse = $this->_shopRepository->store($request);
-        if ($collectionResponse->hsa("data")) {
+        if ($collectionResponse->has("data")) {
+
             $resource = new Item($collectionResponse->pull("data"), new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
         } else {

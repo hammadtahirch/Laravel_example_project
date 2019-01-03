@@ -22,9 +22,10 @@ class ShopProductsController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param $shop_id
      * @param Request $request
      * @param ShopProductsService $shopProductsService
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return array []
      */
     public function index($shop_id, Request $request, ShopProductsService $shopProductsService)
     {
@@ -34,9 +35,10 @@ class ShopProductsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  $shop_id
+     * @param  Request $request
      * @param  ShopProductsService $shopProductsService
-     * @return \Illuminate\Http\Response
+     * @return array []
      */
     public function store($shop_id, Request $request, ShopProductsService $shopProductsService)
     {
@@ -46,7 +48,8 @@ class ShopProductsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param  $shop_id
+     * @param  $id
      * @param  ShopProductsService $shopProductsService
      * @return \Illuminate\Http\Response
      */
@@ -58,10 +61,11 @@ class ShopProductsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param  $shop_id
+     * @param  Request $request
+     * @param  $id
      * @param  ShopProductsService $shopProductsService
-     * @return \Illuminate\Http\Response
+     * @return array []
      */
     public function update($shop_id, Request $request, $id, ShopProductsService $shopProductsService)
     {
@@ -71,9 +75,10 @@ class ShopProductsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param  $shop_id
      * @param  int $id
      * @param  ShopProductsService $shopProductsService
-     * @return \Illuminate\Http\Response
+     * @return array []
      */
     public function destroy($shop_id, $id, ShopProductsService $shopProductsService)
     {

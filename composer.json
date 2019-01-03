@@ -32,8 +32,8 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Services/HelperServices/QueryHelper.php",
-            "app/Services/HelperServices/UtilityHelper.php"
+            "app/Services/Helpers/QueryHelper.php",
+            "app/Services/Helpers/UtilityHelper.php"
         ]
     },
     "autoload-dev": {

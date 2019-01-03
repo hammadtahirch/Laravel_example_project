@@ -92,7 +92,9 @@ class ShopRepository
             $shopObject = new Shop($requestObject);
             $shopObject->save();
             if ($shopObject->id > 0) {
+
                 $this->generateShopTimings($shopObject);
+
                 $shopObject = $shopObject
                     ->with(
                         [
@@ -107,6 +109,7 @@ class ShopRepository
                     ->where(["id" => $shopObject->id])
                     ->first();
             }
+
             $this->_collection->put("data", $shopObject);
 
         } catch (QueryException $exception) {

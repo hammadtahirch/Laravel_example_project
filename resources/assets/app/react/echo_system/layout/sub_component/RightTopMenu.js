@@ -27,7 +27,7 @@ class RightTopMenu extends Component {
         return (
             <div className="header-meta d-flex clearfix justify-content-end">
                 { session !== null? <div className="user-login-info">
-                    <a href="/admin/login" className="dropdown-toggle" data-toggle="dropdown"
+                    <a href="" className="dropdown-toggle" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
                         <img src={require('../../../assets/img/core-img/user.svg')} alt=""/>
                     </a>

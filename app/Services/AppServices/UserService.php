@@ -10,7 +10,7 @@ use Illuminate\Support\Collection;
 use Validator;
 use App\Services\Constants\StatusCodes;
 
-class UserService
+class UserService extends BaseService
 {
     /*
     |--------------------------------------------------------------------------
@@ -48,6 +48,10 @@ class UserService
     {
         $collectionResponse = $this->_userRepository->index($request);
         if ($collectionResponse->has("data")) {
+            if ($request->has("_render")) {
+                return $this->_response
+                    ->withCollection($collectionResponse->pull("data"), new UserTransformer, 'users');
+            }
             return $this->_response
                 ->withPaginator($collectionResponse->pull("data"), new UserTransformer, 'users');
         } else {

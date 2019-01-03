@@ -6,6 +6,7 @@ use App\Services\AppServices\ShopService;
 use EllipseSynergie\ApiResponse\Laravel\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Collection;
 
 class ShopController extends Controller
 {
@@ -21,7 +22,7 @@ class ShopController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return Collection $collection
      */
     public function index(ShopService $shopService, Request $request)
     {
@@ -36,18 +37,8 @@ class ShopController extends Controller
      */
     public function store(ShopService $shopService, Request $request)
     {
+        dd($shopService->store($request));
         return $shopService->store($request);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(ShopService $shopService, $id)
-    {
-        //
     }
 
     /**

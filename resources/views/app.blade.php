@@ -14,23 +14,20 @@
     <!-- Core Style CSS -->
     <link rel="stylesheet" href="{{secure_asset('css/core-style.css')}}">
 {{--    <link rel="stylesheet" href="{{secure_asset('css/style.css')}}">--}}
-        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBv9Y4d7JAPywr1NB2dlZIBnG7mGEpdwKs&libraries=places"></script>
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAb5QA9bGFyk-PP0wo3f7V9OYNqvr-EQVc&libraries=places"></script>
+
+
     </head>
     <body>
         <div id="root"></div>
 
-        <script src="{{secure_asset('app/js/app.js')}}?version=1" ></script>
-
-        <script src="{{secure_asset('js/jquery/jquery-2.2.4.min.js')}}"></script>
-        <!-- Popper js -->
-        {{-- <script src="{{secure_asset('js/popper.min.js')}}"></script> --}}
-        <!-- Bootstrap js -->
-        {{-- <script src="{{secure_asset('js/bootstrap.min.js')}}"></script> --}}
-        <!-- Plugins js -->
-        <script src="{{secure_asset('js/plugins.js')}}"></script>
-        <!-- Classy Nav js -->
-        <script src="{{secure_asset('js/classy-nav.min.js')}}"></script>
-        <!-- Active js -->
-        <script src="{{secure_asset('js/active.js')}}"></script>
     </body>
+
+    <script src="{{secure_asset('js/jquery/jquery-2.2.4.min.js')}}"></script>
+    <script src="{{secure_asset('js/plugins.js')}}"></script>
+    <!-- Classy Nav js -->
+    <script src="{{secure_asset('js/classy-nav.min.js')}}"></script>
+    <!-- Active js -->
+    <script src="{{secure_asset('js/active.js')}}"></script>
+    <script src="{{secure_asset('app/js/app.js')}}?version=1" ></script>
 </html>

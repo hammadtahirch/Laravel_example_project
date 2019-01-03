@@ -12,7 +12,7 @@ use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
 use Validator;
 
-class RoleService
+class RoleService extends BaseService
 {
     /*
     |--------------------------------------------------------------------------
