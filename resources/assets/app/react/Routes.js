@@ -14,6 +14,8 @@ import Error500 from "./echo_system/pages/Errors/Error500";
 import ShopTimeSlots from "./echo_system/pages/Shops/ShopTimeSlots";
 import ShopMenu from "./echo_system/pages/Shops/ShopMenu";
 import ShopSettings from "./echo_system/pages/Shops/ShopSettings";
+import Collections from "./echo_system/pages/Settings/Collections";
+import EmailTemplates from "./echo_system/pages/Settings/EmailTemplates";
 
 class Routes extends Component {
     render() {
@@ -27,6 +29,8 @@ class Routes extends Component {
                             <Route exact path='/admin/dashboard' component={Dashboard}/>
                             <Route exact path='/admin/user_management' component={UserManagement}/>
                             <Route exact path='/admin/shop_management' component={ShopManagement}/>
+                            <Route exact path='/admin/collections' component={Collections}/>
+                            <Route exact path='/admin/templates' component={EmailTemplates}/>
                             <Route exact path='/admin/shop/:id/time_slot' component={ShopTimeSlots}/>
                             <Route exact path='/admin/shop/:id/menu' component={ShopMenu}/>
                             <Route exact path='/admin/shop/:id/settings' component={ShopSettings}/>

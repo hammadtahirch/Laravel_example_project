@@ -14,10 +14,10 @@ class BaseService
 {
     /*
     |--------------------------------------------------------------------------
-    | Shop Products Service
+    | Base Service
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling shop Products Activity
+    | This Service is responsible for handling Base Activity
     |
     */
 

@@ -20,7 +20,6 @@ class ValidationTransformer extends Fractal\TransformerAbstract
      * Create a new transformer instance.
      *
      * @param array $validation
-     *
      * @return array
      */
     public function transform($validation)

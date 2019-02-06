@@ -75,7 +75,7 @@ class ShopTimeSlots extends Component {
      * @param var event
      */
     handleChange(moment) {
-        debugger;
+        // debugger;
         this.setState({
             moment
         });
@@ -85,7 +85,7 @@ class ShopTimeSlots extends Component {
      * handleInputChange
      */
     handleInputChange(event) {
-        debugger;
+        // debugger;
         const {name, value} = event.target;
         const {shop_time_slot} = this.state;
         this.setState({

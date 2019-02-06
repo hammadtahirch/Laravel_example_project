@@ -7,6 +7,7 @@ use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Validator;
 
@@ -14,14 +15,17 @@ class UserRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | User Service
+    | User Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling user Activity
+    | This Repository is responsible for handling user Activity
     |
     */
 
-    protected $_collection = null;
+    /**
+     * @var Collection
+     */
+    protected $_collection;
 
     /**
      * Create a new Service instance.
@@ -47,7 +51,7 @@ class UserRepository
             $userObject = $userObject->whereHas('roles', function ($query) {
                 $query->where("name", "<>", GeneralConstants::SUPPER_ADMIN);
             })
-                ->orderBy('id', 'DESC');
+                ->orderBy('created_at', 'DESC');
 
             if ($request->has("_render")) {
                 $this->_collection->put("data", $userObject->get());
@@ -80,23 +84,21 @@ class UserRepository
         $requestObject = $request->all();
         $requestObject = $requestObject['user'];
         try {
+
             $userObject = new User();
 
             $userObject->name = $requestObject['first_name'] . " " . $requestObject['last_name'];
             $userObject->email = $requestObject['email'];
             $userObject->password = Str::random(32);
             $userObject->phone_number = $requestObject['phone_number'];
-            $userObject->role_id = (integer)$requestObject['role_id'];
+            $userObject->role_id = $requestObject['role_id'];
             $userObject->status = (boolean)$requestObject['status'];
 
             $userObject->save();
-            if ($userObject->id > 0) {
-                $userObject
-                    ->find($userObject->id)
-                    ->roles()
-                    ->attach($requestObject['role_id']);
+            if (!empty($userObject->id)) {
+                DB::table('role_user')->insert(["user_id" => $userObject->id, "role_id" => $requestObject['role_id']]);
             }
-            $this->_collection->put("data", $userObject);
+            $this->_collection->put("data", $userObject->with("roles")->first());
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
@@ -110,7 +112,6 @@ class UserRepository
                 ]
             );
         }
-
         return $this->_collection;
 
     }
@@ -131,14 +132,14 @@ class UserRepository
             $userObject->name = $requestObject['first_name'] . " " . $requestObject['last_name'];
             $userObject->email = $requestObject['email'];
             $userObject->phone_number = $requestObject['phone_number'];
-            $userObject->role_id = (integer)$requestObject['role_id'];
+            $userObject->role_id = $requestObject['role_id'];
             $userObject->status = (boolean)$requestObject['status'];
 
             if ($userObject->update($userObject->toArray())) {
-                $userObject->roles()->sync([]);
-                $userObject->roles()->attach($requestObject['role_id']);
+                DB::table('role_user')->where(["user_id" => $userObject->id])
+                    ->update(["role_id" => $requestObject['role_id']]);
             }
-            $this->_collection->put("data", $userObject);
+            $this->_collection->put("data", $userObject->with("roles")->first());
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
@@ -170,7 +171,7 @@ class UserRepository
                 $this->_collection->put("not_found", ['message' => 'User not found.']);
             }
             if ($userObject->delete()) {
-                $this->_collection->put("data", $userObject);
+                $this->_collection->put("data", $userObject->with("roles")->first());
             } else {
                 $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
             }
@@ -213,7 +214,7 @@ class UserRepository
                     ]
                 ]);
         } else {
-            $this->_collection->put("exception", "username or password is wrong.");
+            $this->_collection->put("exception", "Whoop! the { email } or { password } you’ve entered doesn’t match any account");
         }
         return $this->_collection;
     }

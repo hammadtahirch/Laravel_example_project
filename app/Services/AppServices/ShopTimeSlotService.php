@@ -21,8 +21,20 @@ class ShopTimeSlotService extends BaseService
     | This Service is responsible for handling shop Activity
     |
     */
+
+    /**
+     * @var ShopTimeSlotRepository
+     */
     protected $_shopTimeSlotRepository;
+
+    /**
+     * @var Response
+     */
     protected $_response;
+
+    /**
+     * @var Manager
+     */
     protected $_fractal;
 
     /**

@@ -22,7 +22,6 @@ class ProductTransformer extends TransformerAbstract
      * Create a new transformer instance.
      *
      * @param Product $product
-     *
      * @return array
      */
     public function transform(Product $product)

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Services\AppServices\AuthService;
 use App\Services\AppServices\PermissionService;
-use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 

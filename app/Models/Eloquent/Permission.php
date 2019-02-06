@@ -3,21 +3,29 @@
 namespace App\Models\Eloquent;
 
 use App\Services\Constants\GeneralConstants;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Zizaco\Entrust\EntrustPermission;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
+use Illuminate\Support\Str;
 
-class Permission extends EntrustPermission
+class Permission extends Model
 {
-    use EntrustUserTrait {
-        restore as private restoreA;
-    }
-    use SoftDeletes {
-        restore as private restoreB;
-    }
+    /**
+     * @trait
+     */
+    use SoftDeletes;
 
+    /**
+     * @var
+     */
+    public $incrementing = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         "id",
         "name",
@@ -27,23 +35,23 @@ class Permission extends EntrustPermission
         "updated_at"
     ];
 
-
+    /**
+     * Create belongs to many relation with Role.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
+     */
     public function roles()
     {
         return $this->belongsToMany('App\Models\Eloquent\Role', 'permission_role', 'permission_id', 'role_id')
             ->select('id', "name", "display_name", "description");
     }
 
+    /**
+     * Remove Roles from permission role table
+     */
     public function detachRoles($id)
     {
         DB::table('permission_role')->where('role_id', '<>', GeneralConstants::SUPPER_ADMIN_ID)->where(["permission_id" => $id])->delete();
-        return $this;
-    }
-
-    public function restore()
-    {
-        $this->restoreA();
-        $this->restoreB();
     }
 
     /**
@@ -60,6 +68,7 @@ class Permission extends EntrustPermission
             if (!empty(Auth::user())) {
                 $model->created_by = Auth::user()->id;
             }
+            self::set_model_id($model);
         });
         static::updating(function ($model) {
             if (!empty(Auth::user())) {
@@ -73,6 +82,21 @@ class Permission extends EntrustPermission
         });
     }
 
+    /**
+     * set model id attribute.
+     *
+     * @param $model
+     */
+    public static function set_model_id($model)
+    {
+        $model->{$model->getKeyName()} = Str::uuid()->toString();
+    }
+
+    /**
+     * set deleted by attribute.
+     *
+     * @param $model
+     */
     public static function deleted_by($model)
     {
         $model->deleted_by = Auth::user()->id;

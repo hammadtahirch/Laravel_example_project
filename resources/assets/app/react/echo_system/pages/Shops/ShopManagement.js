@@ -13,10 +13,15 @@ import {_fetchAllShop, _saveShop, _deleteShop} from "../../../store/action/actio
 import Modal from "react-responsive-modal";
 import SuggestionInput from "../sub_components/SuggestionInput";
 import {_fetchAllUser} from "../../../store/action/action-acounts";
+import store from "../../../store"
 import PlacesAutocomplete, {
     geocodeByAddress,
     getLatLng,
 } from 'react-places-autocomplete';
+import ValidationErrors from "../sub_components/ValidationErrors";
+import ActionTypes from "../../../store/constant/constant";
+import classNames from 'classnames'
+import Dropzone from "react-dropzone";
 
 const queryString = require('query-string');
 
@@ -58,6 +63,7 @@ class ShopManagement extends Component {
                 portal_code: '',
                 latitude: '',
                 longitude: '',
+                dataUrl: "",
                 user: {
                     id: '',
                     name: '',
@@ -69,17 +75,40 @@ class ShopManagement extends Component {
                 filterName: '',
                 filterValue: ''
             },
-            error: '',
 
         };
     }
 
+    /**
+     * componentDidMount [react default life cycle functions]
+     */
+    componentDidMount() {
+        this.props.fetch_shop_list(this._builtQuery());
+    }
 
     /**
-     * componentWillMount [react default life cycle functions]
+     * handle drop zone drag and drop event
+     *
+     * @param e
      */
-    componentWillMount() {
-        this.props.fetch_shop_list(this._builtQuery());
+    onDrop(e) {
+        e.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const fileAsBinaryString = reader.result;
+                const {shop} = this.state;
+                this.setState({
+                    shop: {
+                        ...shop,
+                        dataUrl: fileAsBinaryString
+                    }
+                });
+            };
+
+            reader.onabort = () => console.log('file reading was aborted');
+            reader.onerror = () => console.log('file reading has failed');
+            reader.readAsDataURL(file);
+        })
     }
 
     /**
@@ -87,15 +116,7 @@ class ShopManagement extends Component {
      * @param NextProps
      */
     componentWillReceiveProps(NextProps) {
-        this.setState({"error": NextProps.error});
-        this.setState({"_suggestions": NextProps.fetch_users})
-    }
-
-    /**
-     * componentDidMount [react default life cycle functions]
-     */
-    componentDidMount() {
-
+        this.setState({"_suggestions": NextProps.fetch_user_props})
     }
 
     /**
@@ -188,6 +209,7 @@ class ShopManagement extends Component {
                         portal_code: '',
                         latitude: '',
                         longitude: '',
+                        dataUrl: '',
                         user: {
                             id: '',
                             name: '',
@@ -198,6 +220,7 @@ class ShopManagement extends Component {
                     error: ''
                 }
             );
+            store.dispatch({type: ActionTypes.ERROR, payload: ""})
         }
     }
 
@@ -285,42 +308,6 @@ class ShopManagement extends Component {
      */
     handleModalSave(shop) {
         this.props.save_shop(shop);
-        setTimeout(
-            function () {
-                if (this.state.error == '') {
-                    toast.success("Congratulation! shop Saved successfully.");
-                    this.setState(
-                        {
-                            shop: {
-                                id: '',
-                                user_id: '',
-                                title: '',
-                                description: '',
-                                address: '',
-                                city: '',
-                                province: '',
-                                country: '',
-                                portal_code: '',
-                                latitude: '',
-                                longitude: '',
-                                user: {
-                                    id: '',
-                                    name: '',
-                                    email: ''
-                                }
-
-                            },
-                        }
-                    );
-                    this.props.fetch_shop_list(this._builtQuery());
-                    this.handleIsModelOpen(false);
-
-                }
-            }
-                .bind(this),
-            1000);
-
-
     }
 
     /**
@@ -400,8 +387,8 @@ class ShopManagement extends Component {
      * _shopList
      */
     _shopList() {
-        if (this.props.fetch_shops !== '') {
-            return this.props.fetch_shops.shops.map((shop, index) => {
+        if (this.props.fetch_shop_props !== '') {
+            return this.props.fetch_shop_props.shops.map((shop, index) => {
                 return (
                     <tr key={index}>
                         <td>{shop.id}</td>
@@ -456,58 +443,65 @@ class ShopManagement extends Component {
                         <div className="row justify-content-center">
                             <div className="col-12 col-md-12">
                                 <div className="regular-page-content-wrapper clear-10">
-                                    <div className="regular-page-text">
-                                        <h2>Shop Management</h2>
-                                        <button className="btn btn-outline-dark font-14 mb-30 pull-right"
-                                                onClick={() => this.handleIsModelOpen(true)}>Create Shop
-                                        </button>
-                                        <div className="clear-5"></div>
-                                        <form className="mb-30">
-                                            <div className="row ">
-                                                <div className="col-md-2">
-                                                    <select className="form-control" name="filterName"
-                                                            onChange={(e) => this.handleFilter(e)}>
-                                                        <option value='filter_by'>Filter By</option>
-                                                        <option value='name'>Name</option>
-                                                        <option value='email'>Email</option>
-                                                        <option value='phone_number'>Phone Number</option>
-                                                    </select>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <input type="text" className="form-control" name="filterValue"
-                                                           onChange={(e) => this.handleFilter(e)}
-                                                           placeholder="Please Enter Query"/>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <button type="button" className="btn btn-outline-dark font-14"
-                                                            onClick={(e) => this.handleSearch(e)}>
-                                                        Search
-                                                    </button>
-                                                </div>
+                                    <div className="regular-page-text mb-15">
+                                        <div className="card">
+                                            <div className="card-body">
+                                                <h5 className="card-title">Shop Management</h5>
+                                                <hr/>
+                                                <button className="btn btn-outline-dark font-14 mb-30 pull-right"
+                                                        onClick={() => this.handleIsModelOpen(true)}>Create Shop
+                                                </button>
+                                                <div className="clear-5"></div>
+                                                <form className="mb-30">
+                                                    <div className="row ">
+                                                        <div className="col-md-2">
+                                                            <select className="form-control" name="filterName"
+                                                                    onChange={(e) => this.handleFilter(e)}>
+                                                                <option value='filter_by'>Filter By</option>
+                                                                <option value='name'>Name</option>
+                                                                <option value='email'>Email</option>
+                                                                <option value='phone_number'>Phone Number</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <input type="text" className="form-control"
+                                                                   name="filterValue"
+                                                                   onChange={(e) => this.handleFilter(e)}
+                                                                   placeholder="Please Enter Query"/>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <button type="button"
+                                                                    className="btn btn-outline-dark font-14"
+                                                                    onClick={(e) => this.handleSearch(e)}>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </form>
+
+                                                <table className="table table-bordered mb-30">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Id</th>
+                                                        <th>Title</th>
+                                                        <th>Description</th>
+                                                        <th>Address</th>
+                                                        <th>Email</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {this._shopList()}
+
+                                                    </tbody>
+                                                </table>
+                                                {this.props.fetch_shop_props.meta && this.props.fetch_shop_props.meta.pagination.total_pages > 1 &&
+                                                <Pagination meta={this.props.fetch_shop_props.meta}
+                                                            url={location.pathname}/>
+                                                }
                                             </div>
-
-                                        </form>
-
-                                        <table className="table table-bordered mb-30">
-                                            <thead>
-                                            <tr>
-                                                <th>Id</th>
-                                                <th>Title</th>
-                                                <th>Description</th>
-                                                <th>Address</th>
-                                                <th>Email</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {this._shopList()}
-
-                                            </tbody>
-                                        </table>
-                                        {this.props.fetch_shops.meta && this.props.fetch_shops.meta.pagination.total_pages > 1 &&
-                                        <Pagination meta={this.props.fetch_shops.meta}
-                                                    url={location.pathname}/>
-                                        }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -535,8 +529,31 @@ class ShopManagement extends Component {
 
                                     <form>
                                         <div className="row ">
-                                            <pre>{JSON.stringify(this.state.error)}</pre>
-
+                                            {(this.props.error !== "") &&
+                                            <ValidationErrors validationErrors={this.props.error.data}
+                                                              statusCode={this.props.error.status}/>
+                                            }
+                                            <div className="col-md-12 mb-2">
+                                                <Dropzone onDrop={(e) => this.onDrop(e)}>
+                                                    {({getRootProps, getInputProps, isDragActive}) => {
+                                                        return (
+                                                            <div
+                                                                {...getRootProps()}
+                                                                className={classNames('dropzone model-drop-zone', {'dropzone--isActive': isDragActive})}>
+                                                                <input
+                                                                    className="form-control" {...getInputProps()} />
+                                                                {
+                                                                    isDragActive ?
+                                                                        <span>Drop here</span> :
+                                                                        <span>Try dropping some files here,</span>
+                                                                }
+                                                            </div>
+                                                        )
+                                                    }}
+                                                </Dropzone>
+                                                {this.state.shop.dataUrl !== "" &&
+                                                <p>YaHu! the image selected.</p>}
+                                            </div>
                                             <SuggestionInput
                                                 lable={"Select User Account"}
                                                 suggestions={(this.state._suggestions == '') ? '' : this.state._suggestions.users}
@@ -704,9 +721,9 @@ class ShopManagement extends Component {
  */
 function mapStateToProp(state) {
     return ({
-        fetch_shops: state.shop.fetch_shops,
-        fetch_users: state.account.fetch_users,
-        error: state.account.error,
+        fetch_shop_props: state.shop.fetch_shops,
+        fetch_user_props: state.account.fetch_users,
+        error: state.error.error,
     })
 }
 

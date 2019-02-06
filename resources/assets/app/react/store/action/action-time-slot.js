@@ -1,6 +1,12 @@
 import {_setHeaders, exceptionHandler, setSession} from "../helper/auth-helper";
 import ActionTypes from "../constant/constant";
 
+/**
+ * fetch shop time slot
+ *
+ * @param shop_id
+ * @returns dispatch
+ */
 export function _fetchShopTimeSlot(shop_id) {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
@@ -16,6 +22,13 @@ export function _fetchShopTimeSlot(shop_id) {
     }
 }
 
+/**
+ * save shop time slot
+ *
+ * @param shop_id
+ * @param params
+ * @returns dispatch
+ */
 export function _saveShopTimeSlot(shop_id, params) {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
@@ -31,6 +44,13 @@ export function _saveShopTimeSlot(shop_id, params) {
     }
 }
 
+/**
+ *save shop date slot
+ *
+ * @param shop_id
+ * @param params
+ * @returns dispatch
+ */
 export function _saveShopDateSlot(shop_id, params) {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});

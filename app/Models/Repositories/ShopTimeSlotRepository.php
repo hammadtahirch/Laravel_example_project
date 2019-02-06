@@ -13,18 +13,21 @@ class ShopTimeSlotRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | ShopTime Slot Service
+    | ShopTime Slot Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling shop Activity
+    | This Repository is responsible for handling shop Activity
     |
     */
+
+    /**
+     * @var Collection
+     */
     protected $_collection;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @return void
      */
     public function __construct()
@@ -42,7 +45,7 @@ class ShopTimeSlotRepository
     {
         try {
             $timeSlotObject = ShopTimeSlot::query()
-                ->where(["shop_id" => $shop_id])
+                ->where(["shop_id" => $shop_id])->orderBy("day", "asc")
                 ->get();
 
             $this->_collection->put("data", $timeSlotObject);

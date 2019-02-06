@@ -12,13 +12,16 @@ class ShopProductsRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | Shop Service
+    | Shop Product Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling shop Products Activity
+    | This Repository is responsible for handling shop Products Activity
     |
     */
 
+    /**
+     * @var Collection
+     */
     protected $_collection;
 
     /**
@@ -42,6 +45,10 @@ class ShopProductsRepository
     {
         try {
             $productPagination = Product::query()
+                ->with(["product_variance" => function ($query) {
+                    $query->with("product_variance_option");
+                }])
+                ->where(["shop_id" => $shop_id])
                 ->paginate(10);
             $this->_collection->put("data", $productPagination);
         } catch (QueryException $exception) {

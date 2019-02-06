@@ -26,19 +26,17 @@ class UserTransformer extends Fractal\TransformerAbstract
      * Create a new transformer instance.
      *
      * @param User $user
-     *
      * @return array
      */
     public function transform(User $user)
     {
-
         return [
-            'id' => (int)$user->id,
-            'name' => (string)$user->name,
-            'email' => (string)$user->email,
-            'phone_number' => (string)$user->phone_number,
-            'role_id' => (int)$user->role_id,
-            'status' => (bool)$user->status,
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone_number' => $user->phone_number,
+            'role_id' => $user->role_id,
+            'status' => $user->status,
             'role' => $user->roles[0],
             "created_by" => $user->created_by,
             "updated_by" => $user->updated_by,

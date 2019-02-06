@@ -23,8 +23,19 @@ class RoleService extends BaseService
     |
     */
 
+    /**
+     * @var Response
+     */
     protected $_response ;
+
+    /**
+     * @var Manager
+     */
     protected $_fractal;
+
+    /**
+     * @var RoleRepository
+     */
     protected $_roleRepository;
 
     /**

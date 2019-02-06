@@ -20,7 +20,6 @@ class ShopTransformer extends TransformerAbstract
      * Create a new transformer instance.
      *
      * @param Shop $shop
-     *
      * @return array
      */
     public function transform(Shop $shop)

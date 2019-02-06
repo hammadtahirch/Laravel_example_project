@@ -22,7 +22,9 @@ class ShopController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Collection $collection
+     * @param ShopService $shopService
+     * @param Request $request
+     * @return array []
      */
     public function index(ShopService $shopService, Request $request)
     {
@@ -32,12 +34,12 @@ class ShopController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param ShopService $shopService
+     * @param Request $request
+     * @return array []
      */
     public function store(ShopService $shopService, Request $request)
     {
-        dd($shopService->store($request));
         return $shopService->store($request);
     }
 
@@ -45,8 +47,8 @@ class ShopController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  ShopService $shopService
+     * @return array []
      */
     public function update(ShopService $shopService, Request $request, $id)
     {
@@ -57,6 +59,7 @@ class ShopController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int $id
+     * @param ShopService $shopService
      * @return \Illuminate\Http\Response
      */
     public function destroy(ShopService $shopService, $id)

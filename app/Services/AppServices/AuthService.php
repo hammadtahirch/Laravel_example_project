@@ -2,6 +2,7 @@
 
 namespace App\Services\AppServices;
 
+use App\Models\Eloquent\User;
 use App\Models\Repositories\AuthRepository;
 use App\Services\Transformers\CustomJsonSerializer;
 use EllipseSynergie\ApiResponse\Laravel\Response;
@@ -21,8 +22,19 @@ class AuthService extends BaseService
     |
     */
 
+    /**
+     * @var Response
+     */
     protected $_response;
+
+    /**
+     * @var Manager
+     */
     protected $_fractal;
+
+    /**
+     * @var AuthRepository
+     */
     protected $_authRepository;
 
     /**
@@ -48,12 +60,6 @@ class AuthService extends BaseService
      */
     public function authChecker($permission_name)
     {
-
-//        $collectionResponse = $this->_authRepository->authChecker($permission_name);
-//        if ($collectionResponse->has("data")) {
-//            return $collectionResponse->pull("data");
-//        }
-//        dd(Auth::user()->can($permission_name));
         return Auth::user()->can($permission_name);
     }
 
@@ -64,10 +70,6 @@ class AuthService extends BaseService
      */
     public function authAbort()
     {
-//        $collectionResponse = $this->_authRepository->authAbort();
-//        if ($collectionResponse->has("forbidden")) {
-//            return $collectionResponse->pull("forbidden");
-//        }
         return $this->_response->errorForbidden("Oops! You do not have permission");
     }
 }

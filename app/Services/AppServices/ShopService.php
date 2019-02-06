@@ -2,7 +2,9 @@
 
 namespace App\Services\AppServices;
 
+use App\Jobs\GenerateResizedImageJob;
 use App\Models\Repositories\ShopRepository;
+use App\Models\Repositories\UploadRepository;
 use App\Services\Transformers\CustomJsonSerializer;
 use App\Services\Transformers\ShopTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
@@ -24,21 +26,46 @@ class ShopService extends BaseService
     |
     */
 
+    /**
+     * @var Response
+     */
     protected $_response;
+
+    /**
+     * @var Manager
+     */
     protected $_fractal;
+
+    /**
+     * @var ShopRepository
+     */
     protected $_shopRepository;
+
+    /**
+     * @var UploadService
+     */
+    protected $_uploadService;
+
+    /**
+     * @var UploadRepository
+     */
+    protected $_uploadRepository;
 
     /**
      * Create a new Service instance.
      *
      * @param Response $response
      * @param ShopRepository $shopRepository
+     * @param UploadService $uploadService
+     * @param UploadRepository $uploadRepository
      * @return void
      */
-    public function __construct(Response $response, ShopRepository $shopRepository)
+    public function __construct(Response $response, ShopRepository $shopRepository, UploadService $uploadService, UploadRepository $uploadRepository)
     {
         $this->_response = $response;
         $this->_shopRepository = $shopRepository;
+        $this->_uploadService = $uploadService;
+        $this->_uploadRepository = $uploadRepository;
         $this->_fractal = new Manager();
         $this->_fractal->setSerializer(new CustomJsonSerializer());
 
@@ -70,7 +97,7 @@ class ShopService extends BaseService
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return  array []
+     * @return  mixed
      */
     public function store($request)
     {
@@ -81,8 +108,23 @@ class ShopService extends BaseService
         }
         $collectionResponse = $this->_shopRepository->store($request);
         if ($collectionResponse->has("data")) {
+            $collectionResponse = $collectionResponse->pull("data");
 
-            $resource = new Item($collectionResponse->pull("data"), new ShopTransformer(), 'shop');
+            //upload image
+            $request->request->add(["shop_id" => $collectionResponse->id, "dataUrl" => $request->get("shop")["dataUrl"]]);
+            $imagePayload = $this->_uploadService->storeImage($request);
+
+            $request->request->add(["upload" => [
+                'name' => $imagePayload["name"],
+                'relative_path' => $imagePayload["relative_path"],
+                'absolute_path' => $imagePayload["relative_path"],
+                'collection_id' => $collectionResponse->id]
+            ]);
+            $this->_uploadRepository->store($request);
+            dispatch(new GenerateResizedImageJob($imagePayload, config("custom_config.shop_sizes")));
+            //upload image
+
+            $resource = new Item($collectionResponse, new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
@@ -94,7 +136,7 @@ class ShopService extends BaseService
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return array []
+     * @return mixed
      */
     public function update($request, $id)
     {
@@ -141,7 +183,7 @@ class ShopService extends BaseService
     private function _shopUpdateValidator(array $request)
     {
         $rules = [
-            'shop.title' => 'required',
+            'shop.title' => 'required |unique:shops,title,' . $request["shop"]["id"],
             'shop.user_id' => 'required',
             'shop.address' => 'required',
             'shop.city' => 'required',
@@ -154,15 +196,15 @@ class ShopService extends BaseService
 
         ];
         $messages = [
-            'shop.title.required' => "Oops! title is required.",
-            'shop.user_id.required' => "Oops! user is required.",
-            'shop.address.required' => "Oops! address is required.",
-            'shop.city.required' => "Oops! city is required.",
-            'shop.province.required' => "Oops! province is required.",
-            'shop.country.required' => "Oops! country is required.",
-            'shop.portal_code.required' => "Oops! portal_code is required.",
-            'shop.latitude.required' => "Oops! latitude is required.",
-            'shop.longitude.required' => "Oops! longitude is required.",
+            'shop.title.required' => "Whoops! the { title } is required.",
+            'shop.user_id.required' => "Whoops! the { user } is required.",
+            'shop.address.required' => "Whoops! the { address } is required.",
+            'shop.city.required' => "Whoops! the { city } is required.",
+            'shop.province.required' => "Whoops! the { province } is required.",
+            'shop.country.required' => "Whoops! the { country } is required.",
+            'shop.portal_code.required' => "Whoops! the { portal code } is required.",
+            'shop.latitude.required' => "Whoops! the { latitude } is required.",
+            'shop.longitude.required' => "Whoops! the {longitude } is required.",
 
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -180,7 +222,7 @@ class ShopService extends BaseService
     private function _shopCreateValidator(array $request)
     {
         $rules = [
-            'shop.title' => 'required',
+            'shop.title' => 'required |unique:shops,title',
             'shop.user_id' => 'required',
             'shop.address' => 'required',
             'shop.city' => 'required',
@@ -193,15 +235,15 @@ class ShopService extends BaseService
 
         ];
         $messages = [
-            'shop.title.required' => "Oops! title is required.",
-            'shop.user_id.required' => "Oops! user is required.",
-            'shop.address.required' => "Oops! address is required.",
-            'shop.city.required' => "Oops! city is required.",
-            'shop.province.required' => "Oops! province is required.",
-            'shop.country.required' => "Oops! country is required.",
-            'shop.portal_code.required' => "Oops! portal_code is required.",
-            'shop.latitude.required' => "Oops! latitude is required.",
-            'shop.longitude.required' => "Oops! longitude is required.",
+            'shop.title.required' => "Whoops! the { title } is required.",
+            'shop.user_id.required' => "Whoops! the { user } is required.",
+            'shop.address.required' => "Whoops! the { address } is required.",
+            'shop.city.required' => "Whoops! the { city } is required.",
+            'shop.province.required' => "Whoops! the { province } is required.",
+            'shop.country.required' => "Whoops! the { country } is required.",
+            'shop.portal_code.required' => "Whoops! the { portal code } is required.",
+            'shop.latitude.required' => "Whoops! the { latitude } is required.",
+            'shop.longitude.required' => "Whoops! the {longitude } is required.",
 
         ];
 

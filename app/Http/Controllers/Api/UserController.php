@@ -6,6 +6,7 @@ use EllipseSynergie\ApiResponse\Contracts\Response;
 use App\Services\AppServices\UserService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use League\Fractal\Resource\Collection;
 use Validator;
 
 class UserController extends Controller
@@ -23,7 +24,7 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return Collection
      */
     public function index(UserService $userService, Request $request)
     {
@@ -34,7 +35,7 @@ class UserController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return Collection
      */
     public function store(UserService $userService, Request $request)
     {
@@ -46,7 +47,7 @@ class UserController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Collection
      */
     public function update(UserService $userService, Request $request, $id)
     {
@@ -79,8 +80,8 @@ class UserController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
+     * @param UserService $userService
      * @param Request $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function register(UserService $userService, Request $request)
@@ -91,8 +92,8 @@ class UserController extends Controller
     /**
      * this is responsible to sign out from application
      *
+     * @param UserService $userService
      * @param Request $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function signOut(UserService $userService, Request $request)

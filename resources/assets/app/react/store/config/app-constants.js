@@ -1,6 +1,10 @@
-const Config = {
-    API_SERVER: 'https://1d44fdd8.ngrok.io/api/',
-    WEB_ADDRESS: 'https://1d44fdd8.ngrok.io/'
+/**
+ *
+ * @type {{API_SERVER: string, WEB_ADDRESS: string}}
+ */
+var Config = {
+    API_SERVER: API_DOMAIN + 'api/',
+    WEB_ADDRESS: API_DOMAIN
 }
 
 export default Config;

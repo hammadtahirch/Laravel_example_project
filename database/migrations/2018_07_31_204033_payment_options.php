@@ -14,15 +14,15 @@ class PaymentOptions extends Migration
     public function up()
     {
         Schema::create('payment_options', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('user_id');
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
             $table->string('card_type');
             $table->string('card_number');
             $table->string('expiration_month');
             $table->string('expiration_year');
-            $table->integer('created_by')->default(0);
-            $table->integer('updated_by')->default(0);
-            $table->integer('deleted_by')->default(0);
+            $table->uuid('created_by')->default(0);
+            $table->uuid('updated_by')->default(0);
+            $table->uuid('deleted_by')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

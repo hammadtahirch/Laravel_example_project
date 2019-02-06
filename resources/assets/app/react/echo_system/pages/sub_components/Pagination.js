@@ -7,6 +7,7 @@ class Pagination extends Component {
      * @param {[type]} props [description]
      */
     constructor(props) {
+        console.log("pagging"+ props);
         super(props);
         this.state = {
             total: this.props.meta.pagination.total,

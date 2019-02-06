@@ -1,7 +1,12 @@
 import axios from 'axios';
 import Config from "../config/app-constants";
 
-
+/**
+ * filter Geo location components
+ *
+ * @param response
+ * @returns {*}
+ */
 export function filterGeoLocationComponent(response) {
     if (response.length > 0) {
         let GeoLocation = {};
@@ -24,6 +29,11 @@ export function filterGeoLocationComponent(response) {
 
 }
 
+/**
+ * filter address components
+ *
+ * @param AddressComponent
+ */
 export function filterAddressComponent(AddressComponent) {
     let addressComponent = {};
 
@@ -48,6 +58,12 @@ export function filterAddressComponent(AddressComponent) {
     return addressComponent;
 }
 
+/**
+ * filter location coordinates
+ *
+ * @param coordinates
+ * @returns {{latitude: *, longitude: *}}
+ */
 export function filterCoordinates(coordinates) {
     let local = {
         latitude: coordinates.location.lat(),

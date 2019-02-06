@@ -9,25 +9,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Validator;
 
 class ShopRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | Shop Service
+    | Shop Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling shop Activity
+    | This Repository is responsible for handling shop Activity
     |
     */
 
+    /**
+     * @var Collection
+     */
     protected $_collection;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @return void
      */
     public function __construct()
@@ -88,10 +91,9 @@ class ShopRepository
         $requestObject = $request->all();
         $requestObject = $requestObject['shop'];
         try {
-
             $shopObject = new Shop($requestObject);
             $shopObject->save();
-            if ($shopObject->id > 0) {
+            if (!empty($shopObject->id)) {
 
                 $this->generateShopTimings($shopObject);
 
@@ -142,7 +144,24 @@ class ShopRepository
         $requestObject = $request->all();
         $requestObject = $requestObject['shop'];
         try {
-            $this->_collection->put("data", []);
+            $shopObject = Shop::find($id);
+            if ($shopObject->update($requestObject)) {
+
+                $shopObject = $shopObject
+                    ->with(
+                        [
+                            'user' => function ($query) {
+                                $query->select("id", "name", "email");
+                            },
+                            'shop_time_slot' => function ($query) {
+                                $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
+                            }
+                        ]
+                    )
+                    ->first();
+            }
+
+            $this->_collection->put("data", $shopObject);
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
@@ -237,6 +256,7 @@ class ShopRepository
         $timeSlotStack = [];
         for ($i = 1; $i <= 7; $i++) {
             $tempArray = [
+                'id' => Str::uuid()->toString(),
                 'shop_id' => $query->id,
                 'day' => $i,
                 'deliver_start_time' => "09:00:00",

@@ -2,16 +2,33 @@ import axios from 'axios';
 import Config from "../config/app-constants";
 import history from "../../History";
 
+/**
+ * check user session exist or not
+ *
+ * @returns {boolean}
+ */
 export function isLogin() {
     if (!getSession('login')) {
         return true;
     }
 }
 
+/**
+ * set local storage session
+ *
+ * @param key
+ * @param value
+ */
 export function setSession(key, value) {
     window.sessionStorage.setItem(key, JSON.stringify(value))
 }
 
+/**
+ * get local storage session
+ *
+ * @param key
+ * @returns {any}
+ */
 export function getSession(key) {
     try {
         return JSON.parse(window.sessionStorage.getItem(key));
@@ -21,10 +38,22 @@ export function getSession(key) {
 
 }
 
+/**
+ * set content header
+ *
+ * @returns {string}
+ * @private
+ */
 export function _headerContentType() {
     return 'application/json';
 }
 
+/**
+ * set auth header
+ *
+ * @returns {*}
+ * @private
+ */
 export function _headerAuth() {
     let login = getSession('login');
     try {
@@ -40,14 +69,26 @@ export function _headerAuth() {
     }
 }
 
+/**
+ * set headers for axios
+ *
+ * @returns {AxiosInstance}
+ * @private
+ */
 export function _setHeaders() {
     return axios.create({
         baseURL: Config.API_SERVER,
-        timeout: 1000,
-        headers: {'Content-Type': _headerContentType(), 'Authorization': _headerAuth()}
+        timeout: 180000,
+        headers: {'Content-Type': _headerContentType(), 'Authorization': _headerAuth(),"X-CSRF-TOKEN":CSRF_TOKEN}
     });
 }
 
+/**
+ * base 64 file data
+ *
+ * @param file
+ * @returns {Promise<any>}
+ */
 export function getBase64(file) {
     return new Promise((resolve, reject) => {
         var reader = new FileReader();
@@ -62,10 +103,12 @@ export function getBase64(file) {
     });
 }
 
+/**
+ * error function to redirect pages
+ *
+ * @param error
+ */
 export function exceptionHandler(error) {
-    debugger;
-
-    console.log(error);
     let code = error.response;
     switch (code.status) {
         case 403:

@@ -1,14 +1,20 @@
 import {_setHeaders, exceptionHandler} from "../helper/auth-helper";
 import ActionTypes from "../constant/constant";
 
+/**
+ * fetch permission
+ *
+ * @param params
+ * @returns dispatch
+ */
 export function _fetchAllPermission(params) {
-    debugger;
+    // debugger;
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         instance.get('permission', {params: params})
             .then(function (response) {
-                debugger;
+                // debugger;
                 dispatch({type: ActionTypes.FETCH_PERMISSIONS, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
             })
@@ -18,6 +24,12 @@ export function _fetchAllPermission(params) {
     }
 }
 
+/**
+ * save permission
+ *
+ * @param referenceData
+ * @returns dispatch
+ */
 export function _savePermission(referenceData) {
     let objectInstance = '';
     return dispatch => {
@@ -51,6 +63,12 @@ export function _savePermission(referenceData) {
     }
 }
 
+/**
+ * Remove permission
+ *
+ * @param referenceData
+ * @returns dispatch
+ */
 export function _deletePermission(referenceData) {
     let objectInstance = '';
     return dispatch => {

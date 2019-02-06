@@ -26,16 +26,15 @@ class RoleTransformer extends Fractal\TransformerAbstract
      * Create a new transformer instance.
      *
      * @param Role $role
-     *
      * @return array
      */
     public function transform(Role $role)
     {
         return [
-            'id' => (int)$role->id,
-            'name' => (string)$role->name,
-            'display_name' => (string)$role->display_name,
-            'description' => (string)$role->description,
+            'id' => $role->id,
+            'name' => $role->name,
+            'display_name' => $role->display_name,
+            'description' => $role->description,
         ];
     }
 }

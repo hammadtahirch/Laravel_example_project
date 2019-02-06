@@ -2,6 +2,8 @@
 
 namespace App\Services\AppServices;
 
+use App\Jobs\GenerateResizedImageJob;
+use App\Models\Repositories\UploadRepository;
 use App\Services\Constants\GeneralConstants;
 use App\Models\Repositories\UserRepository;
 use App\Services\Transformers\UserTransformer;
@@ -21,21 +23,42 @@ class UserService extends BaseService
     |
     */
 
+    /**
+     * @var Response
+     */
     protected $_response;
+
+    /**
+     * @var UserRepository
+     */
     protected $_userRepository;
+
+    /**
+     * @var UploadService
+     */
+    protected $_uploadService;
+
+    /**
+     * @var UploadRepository
+     */
+    protected $_uploadRepository;
 
     /**
      * Create a new Service instance.
      *
      * @param Response $response
      * @param UserRepository $userRepository
+     * @param UploadService $uploadService
+     * @param UploadRepository $uploadRepository
      *
      * @return void
      */
-    public function __construct(Response $response, UserRepository $userRepository)
+    public function __construct(Response $response, UserRepository $userRepository, UploadService $uploadService, UploadRepository $uploadRepository)
     {
         $this->_response = $response;
         $this->_userRepository = $userRepository;
+        $this->_uploadService = $uploadService;
+        $this->_uploadRepository = $uploadRepository;
     }
 
     /**
@@ -67,6 +90,7 @@ class UserService extends BaseService
      */
     public function store($request)
     {
+
         $requestObject = $request->all();
         $isValidate = $this->_userCreateValidator($requestObject);
         if (!empty($isValidate)) {
@@ -74,8 +98,23 @@ class UserService extends BaseService
         }
         $collectionResponse = $this->_userRepository->store($request);
         if ($collectionResponse->has("data")) {
+            $collectionResponse = $collectionResponse->pull("data");
+
+            //upload image
+            $request->request->add(["user_id" => $collectionResponse->id, "dataUrl" => $request->get("user")["dataUrl"]]);
+            $imagePayload = $this->_uploadService->storeImage($request);
+
+            $request->request->add(["upload" => [
+                'name' => $imagePayload["name"],
+                'relative_path' => $imagePayload["relative_path"],
+                'absolute_path' => $imagePayload["relative_path"],
+                'collection_id' => $collectionResponse->id]
+            ]);
+            $this->_uploadRepository->store($request);
+            dispatch(new GenerateResizedImageJob($imagePayload, config("custom_config.profile_sizes")));
+            //upload image
             return $this->_response
-                ->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+                ->withItem($collectionResponse, new UserTransformer, 'user');
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
@@ -226,20 +265,22 @@ class UserService extends BaseService
         $rules = [
             'user.first_name' => 'required',
             'user.last_name' => 'required',
-            'user.email' => 'required|email',
+            'user.email' => 'required|email|unique:users,email,' . $request["user"]["id"],
             'user.phone_number' => 'required',
             'user.role_id' => 'required',
             'user.status' => 'required',
 
         ];
         $messages = [
-            'user.first_name.required' => "Oops! first name is required.",
-            'user.last_name.required' => "Oops! last name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.phone_number.required' => "Oops! phone number is not correct format.",
-            'user.role_id.required' => "Oops! role is not correct format.",
-            'user.status.required' => "Oops! status is not correct format.",
+            'user.first_name.required' => "Whoops! the { first name } is required.",
+            'user.last_name.required' => "Whoops! the { last name } is required.",
+            'user.email.required' => "Whoops! the { email } is required",
+            'user.email.email' => "Whoops! the { email } is not correct format.",
+            'user.email.unique' => "Whoops! the { email } has already been taken.",
+            'user.phone_number.required' => "Whoops! the { phone number } required.",
+            'user.role_id.required' => "Whoops! the { role } is required.",
+            'user.status.required' => "Whoops! the { status } is required.",
+
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {
@@ -258,20 +299,21 @@ class UserService extends BaseService
         $rules = [
             'user.first_name' => 'required',
             'user.last_name' => 'required',
-            'user.email' => 'required|email',
+            'user.email' => 'required|email|unique:users,email',
             'user.phone_number' => 'required',
             'user.role_id' => 'required',
             'user.status' => 'required',
 
         ];
         $messages = [
-            'user.first_name.required' => "Oops! first name is required.",
-            'user.last_name.required' => "Oops! last name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.phone_number.required' => "Oops! phone number is not correct format.",
-            'user.role_id.required' => "Oops! role is not correct format.",
-            'user.status.required' => "Oops! status is not correct format.",
+            'user.first_name.required' => "Whoops! the { first name } is required.",
+            'user.last_name.required' => "Whoops! the { last name } is required.",
+            'user.email.required' => "Whoops! the { email } is required",
+            'user.email.email' => "Whoops! the { email } is not correct format.",
+            'user.email.unique' => "Whoops! the { email } has already been taken.",
+            'user.phone_number.required' => "Whoops! the { phone number } required.",
+            'user.role_id.required' => "Whoops! the { role } is required.",
+            'user.status.required' => "Whoops! the { status } is required.",
 
         ];
 
@@ -294,9 +336,9 @@ class UserService extends BaseService
             'user.password' => 'required',
         ];
         $messages = [
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.password.required' => "Oops! password is required."
+            'user.email.required' => "Whoops! the { email } is required",
+            'user.email.email' => "Whoops! the { email } is not correct format.",
+            'user.password.required' => "Whoops! the { password } is required."
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {
@@ -308,7 +350,8 @@ class UserService extends BaseService
     /**
      * This function responsible for filter records from Query.
      *
-     * @param  array $request
+     * @param  $query
+     * @param  $request
      * @return Collection
      */
     private function _userFilter($query, $request)

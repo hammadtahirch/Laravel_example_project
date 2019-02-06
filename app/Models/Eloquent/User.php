@@ -4,23 +4,32 @@ namespace App\Models\Eloquent;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Zizaco\Entrust\Traits\EntrustUserTrait;
 
+/**
+ * Class User
+ * @package App\Models\Eloquent
+ */
 class User extends Authenticatable
 {
 
-    use HasApiTokens,
-        Notifiable;
-    use EntrustUserTrait {
-        restore as private restoreA;
-    }
-    use SoftDeletes {
-        restore as private restoreB;
-    }
+    /**
+     * @traits
+     */
+    use HasApiTokens, Notifiable, SoftDeletes;
 
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string
+     */
+    protected $table = "users";
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +37,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        'id',
         'name',
         'email',
         'password',
@@ -55,11 +65,6 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\Eloquent\Role', 'role_user', 'user_id', 'role_id');
     }
 
-    public function restore()
-    {
-        $this->restoreA();
-        $this->restoreB();
-    }
 
     /**
      *
@@ -72,9 +77,12 @@ class User extends Authenticatable
         parent::boot();
 
         static::creating(function ($model) {
+
             if (!empty(Auth::user())) {
                 $model->created_by = Auth::user()->id;
             }
+            self::set_model_id($model);
+
         });
         static::updating(function ($model) {
             if (!empty(Auth::user())) {
@@ -88,6 +96,21 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * set model id attribute.
+     *
+     * @param $model
+     */
+    public static function set_model_id($model)
+    {
+        $model->{$model->getKeyName()} = Str::uuid()->toString();
+    }
+
+    /**
+     * set deleted by attribute.
+     *
+     * @param $model
+     */
     public static function deleted_by($model)
     {
         $model->deleted_by = Auth::user()->id;

@@ -26,16 +26,15 @@ class PermissionTransformer extends Fractal\TransformerAbstract
      * Create a new transformer instance.
      *
      * @param Permission $permission
-     *
      * @return array
      */
     public function transform(Permission $permission)
     {
         return [
-            'id' => (int)$permission->id,
-            'name' => (string)$permission->name,
-            'display_name' => (string)$permission->display_name,
-            'description' => (string)$permission->description,
+            'id' => $permission->id,
+            'name' => $permission->name,
+            'display_name' => $permission->display_name,
+            'description' => $permission->description,
             'roles' => $permission->roles
         ];
     }

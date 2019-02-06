@@ -1,8 +1,15 @@
 import {_setHeaders, exceptionHandler, setSession} from "../helper/auth-helper";
 import ActionTypes from "../constant/constant";
 
+/**
+ * fetch all shops
+ *
+ * @param params
+ * @returns dispatch
+ */
 export function _fetchAllShop(params) {
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         instance.get('shop', {params: params})
@@ -16,9 +23,16 @@ export function _fetchAllShop(params) {
     }
 }
 
+/**
+ * save shop
+ *
+ * @param data
+ * @returns dispatch
+ */
 export function _saveShop(data) {
     let objectInstance = '';
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         if (!data.id) {
@@ -28,9 +42,10 @@ export function _saveShop(data) {
 
                     dispatch({type: ActionTypes.SAVE_USER, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
+                    dispatch(_fetchAllShop());
                 })
                 .catch(function (error) {
-                    exceptionHandler(error);
+                    // exceptionHandler(error);
                     dispatch({type: ActionTypes.ERROR, payload: error.response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
                 });
@@ -39,9 +54,10 @@ export function _saveShop(data) {
                 .then(function (response) {
                     dispatch({type: ActionTypes.SAVE_USER, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
+                    dispatch(_fetchAllShop());
                 })
                 .catch(function (error) {
-                    exceptionHandler(error);
+                    // exceptionHandler(error);
                     dispatch({type: ActionTypes.ERROR, payload: error.response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
                 });
@@ -49,14 +65,22 @@ export function _saveShop(data) {
     }
 }
 
+/**
+ * Remove shop
+ *
+ * @param data
+ * @returns dispatch
+ */
 export function _deleteShop(data) {
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         instance.delete('shop/' + data.id)
             .then(function (response) {
                 dispatch({type: ActionTypes.DELETE_USER, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
+                dispatch(_fetchAllShop());
             })
             .catch(function (error) {
                 exceptionHandler(error);

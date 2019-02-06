@@ -5,6 +5,7 @@ import history from '../../../History';
 import {getSession} from "../../../store/helper/auth-helper";
 import Header from "../../layout/Header";
 import Loading from "../sub_components/Loading";
+import ValidationErrors from "../sub_components/ValidationErrors";
 
 class Login extends Component {
     /**
@@ -13,35 +14,19 @@ class Login extends Component {
      */
     constructor(props) {
         super(props);
-        if (getSession('login')) {
+        if (getSession('login') !== null) {
             history.push('dashboard');
         }
-        this.handleLogin = this.handleLogin.bind(this);
-        this.handleChange = this.handleChange.bind(this);
-
         this.state = {
             submitted: false,
             user: {
                 email: '',
                 password: ''
-            },
-            error: ''
+            }
         };
-    }
 
-    /**
-     * componentWillMount [react default life cycle functions]
-     */
-    componentWillMount() {
-
-    }
-
-    /**
-     * componentWillReceiveProps [react default life cycle functions]
-     * @param NextProps
-     */
-    componentWillReceiveProps(NextProps) {
-        this.setState({"error": NextProps.error});
+        this.handleLogin = this.handleLogin.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     /**
@@ -72,7 +57,6 @@ class Login extends Component {
      * @return {[type]} [description]
      */
     handleLogin() {
-        this.setState({"error": ''});
         this.props.login(this.state);
     }
 
@@ -81,7 +65,6 @@ class Login extends Component {
      * @return {[type]} [description]
      */
     render() {
-
         return (
             <div>
                 <Header/>
@@ -98,7 +81,10 @@ class Login extends Component {
                                     </div>
 
                                     <form action="#" method="post">
-                                        <pre>{JSON.stringify(this.state.error.data)}</pre>
+                                        {(this.props.error !== "") &&
+                                        <ValidationErrors validationErrors={this.props.error.data}
+                                                          statusCode={this.props.error.status}/>
+                                        }
                                         <div className="row">
 
                                             <div className="col-12 mb-3">
@@ -137,7 +123,7 @@ class Login extends Component {
  */
 function mapStateToProp(state) {
     return ({
-        error: state.account.error,
+        error: state.error.error,
     })
 }
 

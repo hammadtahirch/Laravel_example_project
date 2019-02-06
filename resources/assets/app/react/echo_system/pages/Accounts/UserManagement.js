@@ -10,6 +10,11 @@ import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {_fetchAllRoles, _fetchAllUser, _saveUser, _deleteUser} from "../../../store/action/action-acounts";
 import Modal from "react-responsive-modal";
+import ValidationErrors from "../sub_components/ValidationErrors";
+import ActionTypes from "../../../store/constant/constant";
+import store from "../../../store";
+import classNames from 'classnames'
+import Dropzone from "react-dropzone";
 
 const queryString = require('query-string');
 
@@ -21,7 +26,6 @@ class UserManagement extends Component {
      */
     constructor(props) {
         super(props);
-
         if (getSession('login') === null) {
             history.push('login');
         }
@@ -46,6 +50,7 @@ class UserManagement extends Component {
                 phone_number: '',
                 role_id: '',
                 status: '',
+                dataUrl: ''
 
             },
             filter: {
@@ -68,27 +73,36 @@ class UserManagement extends Component {
     }
 
     /**
-     * componentWillMount [react default life cycle functions]
-     */
-    componentWillMount() {
-        this.props.fetch_user_list(this._builtQuery());
-        this.props.fetch_roles_list();
-
-    }
-
-    /**
-     * componentWillReceiveProps [react default life cycle functions]
-     * @param NextProps
-     */
-    componentWillReceiveProps(NextProps) {
-        this.setState({"error": NextProps.error});
-    }
-
-    /**
      * componentDidMount [react default life cycle functions]
      */
     componentDidMount() {
+        this.props.fetch_user_list(this._builtQuery());
+        this.props.fetch_roles_list();
+    }
 
+    /**
+     * handle drop zone drag and drop event
+     *
+     * @param e
+     */
+    onDrop(e) {
+        e.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const fileAsBinaryString = reader.result;
+                const {user} = this.state;
+                this.setState({
+                    user: {
+                        ...user,
+                        dataUrl: fileAsBinaryString
+                    }
+                });
+            };
+
+            reader.onabort = () => console.log('file reading was aborted');
+            reader.onerror = () => console.log('file reading has failed');
+            reader.readAsDataURL(file);
+        })
     }
 
     /**
@@ -163,10 +177,12 @@ class UserManagement extends Component {
                         phone_number: '',
                         role_id: '',
                         status: '',
+                        dataUrl: "",
                     },
                     error: ''
                 }
             );
+            store.dispatch({type: ActionTypes.ERROR, payload: ''})
         }
     }
 
@@ -192,14 +208,6 @@ class UserManagement extends Component {
         }
         if (is_confirm !== false) {
             this.props.delete_user(this.state.user);
-            setTimeout(
-                function () {
-                    this.props.fetch_user_list(this._builtQuery());
-                    toast.success("Congratulation! User deleted successfully.");
-                }
-                    .bind(this),
-                100);
-
         }
         if (_isOpen === true) {
             this.setState({alert: {show: true}});
@@ -234,40 +242,14 @@ class UserManagement extends Component {
      */
     handleModalSave(user) {
         this.props.save_user(user);
-        setTimeout(
-            function () {
-                if (this.state.error == '') {
-                    toast.success("Congratulation! User Saved successfully.");
-                    this.setState(
-                        {
-                            user: {
-                                id: '',
-                                first_name: '',
-                                last_name: '',
-                                email: '',
-                                phone_number: '',
-                                role_id: '',
-                                status: '',
-                            }
-                        }
-                    );
-                    this.props.fetch_user_list(this._builtQuery());
-                    this.handleIsModelOpen(false);
-
-                }
-            }
-                .bind(this),
-            1000);
-
-
     }
 
     /**
      * _userList
      */
     _userList() {
-        if (this.props.fetch_users !== '') {
-            return this.props.fetch_users.users.map((user, index) => {
+        if (this.props.fetch_user_props !== '') {
+            return this.props.fetch_user_props.users.map((user, index) => {
                 return (
                     <tr key={index}>
                         <td>{user.name}</td>
@@ -299,8 +281,8 @@ class UserManagement extends Component {
      * _roleList
      */
     _roleList() {
-        if (this.props.fetch_roles !== '') {
-            return this.props.fetch_roles.roles.map(function (role, i) {
+        if (this.props.fetch_role_props !== '') {
+            return this.props.fetch_role_props.roles.map(function (role, i) {
                 return <option
                     value={role.id} key={i}>
                     {role.name}
@@ -318,6 +300,10 @@ class UserManagement extends Component {
                 maxWidth: "500px",
             }
         }
+
+        {
+            (this.props.save_user_props !== "") && toast.success("Wow! User Save Successfully.")
+        }
         return (
 
             <div>
@@ -331,57 +317,63 @@ class UserManagement extends Component {
                         <div className="row justify-content-center">
                             <div className="col-12 col-md-12">
                                 <div className="regular-page-content-wrapper clear-10">
-                                    <div className="regular-page-text">
-                                        <h2>User Management</h2>
-                                        <button className="btn btn-outline-dark font-14 mb-30 pull-right"
-                                                onClick={() => this.handleIsModelOpen(true)}>Create User
-                                        </button>
-                                        <div className="clear-5"></div>
-                                        <form className="mb-30">
-                                            <div className="row ">
-                                                <div className="col-md-2">
-                                                    <select className="form-control" name="filterName"
-                                                            onChange={(e) => this.handleFilter(e)}>
-                                                        <option value='filter_by'>Filter By</option>
-                                                        <option value='name'>Name</option>
-                                                        <option value='email'>Email</option>
-                                                        <option value='phone_number'>Phone Number</option>
-                                                    </select>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <input type="text" className="form-control" name="filterValue"
-                                                           onChange={(e) => this.handleFilter(e)}
-                                                           placeholder="Please Enter Query"/>
-                                                </div>
-                                                <div className="col-md-4">
-                                                    <button type="button" className="btn btn-outline-dark font-14"
-                                                            onClick={(e) => this.handleSearch(e)}>
-                                                        Search
-                                                    </button>
-                                                </div>
+                                    <div className="regular-page-text mb-15">
+                                        <div className="card">
+                                            <div className="card-body">
+                                                <h5 className="card-title">User Management</h5>
+                                                <button className="btn btn-outline-dark font-14 mb-30 pull-right"
+                                                        onClick={() => this.handleIsModelOpen(true)}>Create User
+                                                </button>
+                                                <div className="clear-5"></div>
+                                                <form className="mb-30">
+                                                    <div className="row ">
+                                                        <div className="col-md-2">
+                                                            <select className="form-control" name="filterName"
+                                                                    onChange={(e) => this.handleFilter(e)}>
+                                                                <option value='filter_by'>Filter By</option>
+                                                                <option value='name'>Name</option>
+                                                                <option value='email'>Email</option>
+                                                                <option value='phone_number'>Phone Number</option>
+                                                            </select>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <input type="text" className="form-control"
+                                                                   name="filterValue"
+                                                                   onChange={(e) => this.handleFilter(e)}
+                                                                   placeholder="Please Enter Query"/>
+                                                        </div>
+                                                        <div className="col-md-4">
+                                                            <button type="button"
+                                                                    className="btn btn-outline-dark font-14"
+                                                                    onClick={(e) => this.handleSearch(e)}>
+                                                                Search
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </form>
+
+                                                <table className="table table-bordered mb-30">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>Role</th>
+                                                        <th>Phone Number</th>
+                                                        <th>Actions</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {this._userList()}
+
+                                                    </tbody>
+                                                </table>
+                                                {this.props.fetch_user_props.meta && this.props.fetch_user_props.meta.pagination.total_pages > 1 &&
+                                                <Pagination meta={this.props.fetch_user_props.meta}
+                                                            url={location.pathname}/>
+                                                }
                                             </div>
-
-                                        </form>
-
-                                        <table className="table table-bordered mb-30">
-                                            <thead>
-                                            <tr>
-                                                <th>Name</th>
-                                                <th>Email</th>
-                                                <th>Role</th>
-                                                <th>Phone Number</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {this._userList()}
-
-                                            </tbody>
-                                        </table>
-                                        {this.props.fetch_users.meta && this.props.fetch_users.meta.pagination.total_pages > 1 &&
-                                        <Pagination meta={this.props.fetch_users.meta}
-                                                    url={location.pathname}/>
-                                        }
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -409,7 +401,31 @@ class UserManagement extends Component {
 
                                     <form>
                                         <div className="row ">
-                                            <pre>{JSON.stringify(this.state.error.data)}</pre>
+                                            {(this.props.error !== "") &&
+                                            <ValidationErrors validationErrors={this.props.error.data}
+                                                              statusCode={this.props.error.status}/>
+                                            }
+                                            <div className="col-md-12 mb-2">
+                                                <Dropzone onDrop={(e) => this.onDrop(e)}>
+                                                    {({getRootProps, getInputProps, isDragActive}) => {
+                                                        return (
+                                                            <div
+                                                                {...getRootProps()}
+                                                                className={classNames('dropzone model-drop-zone', {'dropzone--isActive': isDragActive})}>
+                                                                <input
+                                                                    className="form-control" {...getInputProps()} />
+                                                                {
+                                                                    isDragActive ?
+                                                                        <span>Drop here</span> :
+                                                                        <span>Try dropping some files here,</span>
+                                                                }
+                                                            </div>
+                                                        )
+                                                    }}
+                                                </Dropzone>
+                                                {this.state.user.dataUrl !== "" &&
+                                                <p>YaHu! the image selected.</p>}
+                                            </div>
                                             <div className="col-md-6 mb-3">
                                                 <label>First Name <span>*</span></label>
                                                 <input type="text" className="form-control" name="first_name"
@@ -528,9 +544,10 @@ class UserManagement extends Component {
  */
 function mapStateToProp(state) {
     return ({
-        fetch_users: state.account.fetch_users,
-        fetch_roles: state.account.fetch_roles,
-        error: state.account.error,
+        fetch_user_props: state.account.fetch_users,
+        fetch_role_props: state.account.fetch_roles,
+        save_user_props: state.account.save_user,
+        error: state.error.error,
     })
 }
 

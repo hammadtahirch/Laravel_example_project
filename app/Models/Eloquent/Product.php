@@ -5,11 +5,27 @@ namespace App\Models\Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
+/**
+ * Class Product
+ * @package App\Models\Eloquent
+ */
 class Product extends Model
 {
+    /**
+     * @trait
+     */
     use SoftDeletes;
 
+    /**
+     * @var bool
+     */
+    public $incrementing = false;
+
+    /**
+     * @var string
+     */
     protected $table = "products";
 
     /**
@@ -53,6 +69,7 @@ class Product extends Model
             if (!empty(Auth::user())) {
                 $model->created_by = Auth::user()->id;
             }
+            self::set_model_id($model);
         });
         static::updating(function ($model) {
             if (!empty(Auth::user())) {
@@ -66,6 +83,21 @@ class Product extends Model
         });
     }
 
+    /**
+     * set model id attribute.
+     *
+     * @param $model
+     */
+    public static function set_model_id($model)
+    {
+        $model->{$model->getKeyName()} = Str::uuid()->toString();
+    }
+
+    /**
+     * set deleted by attribute.
+     *
+     * @param $model
+     */
     public static function deleted_by($model)
     {
         $model->deleted_by = Auth::user()->id;

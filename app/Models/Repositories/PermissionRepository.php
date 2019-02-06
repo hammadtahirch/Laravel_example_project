@@ -7,25 +7,28 @@ use App\Models\Eloquent\Role;
 use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class PermissionRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | Permission Service
+    | Permission Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling Permission
+    | This Repository is responsible for handling Permission
     |
     */
 
+    /**
+     * @var Collection
+     */
     protected $_collection;
 
     /**
      * Create a new Service instance.
      *
-     * @param $response
      * @return void
      */
     public function __construct()
@@ -49,7 +52,9 @@ class PermissionRepository
                             $query->where('name', '<>', GeneralConstants::SUPPER_ADMIN);
                         }
                     ]
-                )->paginate(10);
+                )
+                ->orderBy("created_by", "DESC")
+                ->paginate(10);
 
             $this->_collection->put("data", $permissionPagination);
         } catch (QueryException $exception) {
@@ -79,9 +84,8 @@ class PermissionRepository
             $permissionObject->description = $requestObject['permission']['description'];
 
             $permissionObject->save();
-            if ($permissionObject->id > 0) {
-                $supper_admin = Role::where(["id" => 1])->first();
-                $supper_admin->attachPermission($permissionObject);
+            if (!empty($permissionObject->id)) {
+                DB::table('permission_role')->insert(["permission_id" => $permissionObject->id, "role_id" => GeneralConstants::SUPPER_ADMIN_ID]);
                 $permissionObject = $permissionObject->where(["id" => $requestObject->id])->first();
                 $this->_collection->put("data", $permissionObject);
             }
@@ -116,21 +120,22 @@ class PermissionRepository
             $permissionObject->display_name = $requestObject['permission']['display_name'];
             $permissionObject->description = $requestObject['permission']['description'];
 
-            if ($permissionObject->update($permissionObject->toArray())) {
-                $permissionObject->detachRoles($id);
-                foreach ($requestObject['permission']['roles'] as $index => $role) {
-                    $roleObject = Role::where(["id" => $role])->first();
-                    $roleObject->perms()->sync(array($id));
-                }
-                $permissionObject = $permissionObject->where(["id" => $id])->with(
-                    [
-                        'roles' => function ($query) {
-                            $query->where('name', '<>', GeneralConstants::SUPPER_ADMIN);
-                        }
-                    ]
-                )->first();
-                $this->_collection->put("data", $permissionObject);
+            $permissionObject->update($permissionObject->toArray());
+
+            DB::table('permission_role')->where(["permission_id" => $id])->delete();
+            foreach ($requestObject['permission']['roles'] as $index => $role) {
+                DB::table('permission_role')
+                    ->insert(["permission_id" => $id, "role_id" => $role['id']]);
             }
+            $permissionObject = $permissionObject->where(["id" => $id])->with(
+                [
+                    'roles' => function ($query) {
+                        $query->where('name', '<>', GeneralConstants::SUPPER_ADMIN);
+                    }
+                ]
+            )->first();
+            $this->_collection->put("data", $permissionObject);
+
 
         } catch (QueryException $exception) {
             $this->_collection->put("exception",

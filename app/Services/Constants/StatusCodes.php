@@ -3,61 +3,71 @@
 namespace App\Services\Constants;
 
 /**
- * [StatusCodes 'Define status for http requests']
+ * Class StatusCodes
+ * @package App\Services\Constants
  */
 class StatusCodes
 {
 
     /**
-     * [SUCCESS]
+     * SUCCESS
+     *
      * @var integer
      */
     const SUCCESS = 200;
 
     /**
-     * [NOT_FOUND]
+     * NOT_FOUND
+     *
      * @var integer
      */
     const NOT_FOUND = 404;
 
     /**
-     * [UNAUTHORIZED]
+     * UNAUTHORIZED
+     *
      * @var integer
      */
     const UNAUTHORIZED = 401;
 
     /**
-     * [NOT_FOUND ]
+     * NOT_FOUND
+     *
      * @var integer
      */
     const BAD_REQUEST = 400;
 
     /**
-     * [Method_Not_Allowed]
+     * Method_Not_Allowed
+     *
      * @var integer
      */
     const METHOD_NOT_ALLOWED = 405;
 
     /**
-     * [GONE]
+     * GONE
+     *
      * @var integer
      */
     const GONE = 410;
 
     /**
-     * [UNCROSSABLE]
+     * UNCROSSABLE
+     *
      * @var integer
      */
     const UNCROSSABLE = 422;
 
     /**
-     * [Internal description]
+     * Internal description
+     *
      * @var [type]
      */
     const INTERNAL_SERVER_ERROR = 500;
 
     /**
-     * [Internal description]
+     * Internal description
+     *
      * @var [type]
      */
     const SERVICES_UNAVAILABLE = 503;

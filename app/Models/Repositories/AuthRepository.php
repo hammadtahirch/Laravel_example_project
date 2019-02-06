@@ -10,13 +10,16 @@ class AuthRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | Auth Service
+    | Auth Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling Auth Operations
+    | This Repository is responsible for handling Auth Operations
     |
     */
 
+    /**
+     * @var Collection
+     */
    protected $_collection;
 
     /**

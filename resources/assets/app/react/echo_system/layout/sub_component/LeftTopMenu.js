@@ -68,6 +68,8 @@ class LeftTopMenu extends Component {
                                                 <a href={Config.WEB_ADDRESS + "admin/user_management"}>User Management</a>
                                             </li>
                                             <li><a href={Config.WEB_ADDRESS + "admin/shop_management"}>Shop Management</a></li>
+                                            <li><a href={Config.WEB_ADDRESS + "admin/collections"}>Collections</a></li>
+                                            <li><a href={Config.WEB_ADDRESS + "admin/templates"}>Templates</a></li>
 
                                         </ul>
                                         <span className="dd-trigger"></span><span className="dd-arrow"></span></li>

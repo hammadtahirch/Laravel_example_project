@@ -6,6 +6,7 @@ import history from "../../../History";
 import Header from "../../layout/Header";
 
 class Dashboard extends Component {
+
     /**
      * [constructor description]
      * @param {[type]} props [description]
@@ -30,9 +31,21 @@ class Dashboard extends Component {
                         <div className="row justify-content-center">
                             <div className="col-12 col-md-12">
                                 <div className="regular-page-content-wrapper clear-10">
-                                    <div className="regular-page-text">
-                                        <h2>DashBoard</h2>
-                                        <p>Mauris viverra cursus ante laoreet eleifend. Donec vel fringilla ante. Aenean finibus velit id urna vehicula, nec maximus est sollicitudin. Praesent at tempus lectus, eleifend blandit felis. Fusce augue arcu, consequat a nisl aliquet, consectetur elementum turpis. Donec iaculis lobortis nisl, et viverra risus imperdiet eu. Etiam mollis posuere elit non sagittis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc quis arcu a magna sodales venenatis. Integer non diam sit amet magna luctus mollis ac eu nisi. In accumsan tellus ut dapibus blandit.</p>
+                                    <div className="regular-page-text mb-15">
+                                        <div className="card">
+                                            <div className="card-body">
+                                                <h5 className="card-title">DashBoard</h5>
+                                                <p>Mauris viverra cursus ante laoreet eleifend. Donec vel fringilla
+                                                    ante. Aenean finibus velit id urna vehicula, nec maximus est
+                                                    sollicitudin. Praesent at tempus lectus, eleifend blandit felis.
+                                                    Fusce augue arcu, consequat a nisl aliquet, consectetur elementum
+                                                    turpis. Donec iaculis lobortis nisl, et viverra risus imperdiet eu.
+                                                    Etiam mollis posuere elit non sagittis. Lorem ipsum dolor sit amet,
+                                                    consectetur adipiscing elit. Nunc quis arcu a magna sodales
+                                                    venenatis. Integer non diam sit amet magna luctus mollis ac eu nisi.
+                                                    In accumsan tellus ut dapibus blandit.</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

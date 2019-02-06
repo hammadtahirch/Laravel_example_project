@@ -23,8 +23,7 @@ class ShopTimeSlotTransformer extends TransformerAbstract
     /**
      * Create a new transformer instance.
      *
-     * @param Shop $shop
-     *
+     * @param ShopTimeSlot $timeSlot
      * @return array
      */
     public function transform(ShopTimeSlot $timeSlot)

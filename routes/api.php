@@ -23,6 +23,8 @@ Route::group(['middleware' => 'auth:api'], function(){
 
     Route::resource('user', 'Api\UserController');
     Route::resource('shop', 'Api\ShopController');
+    Route::resource('collection', 'Api\CollectionController');
+    Route::resource('template', 'Api\EmailTemplateController');
     Route::resource('shop/{shop_id}/time_slot', 'Api\ShopTimeSlotController');
     Route::resource('shop/{shop_id}/products', 'Api\ShopProductsController');
     Route::resource('role', 'Api\RoleController');

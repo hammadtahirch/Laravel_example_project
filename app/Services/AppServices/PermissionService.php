@@ -24,8 +24,19 @@ class PermissionService extends BaseService
     |
     */
 
+    /**
+     * @var Response
+     */
     protected $_response;
+
+    /**
+     * @var Manager
+     */
     protected $_fractal;
+
+    /**
+     * @var PermissionRepository
+     */
     protected $_permissionRepository;
 
     /**
@@ -145,14 +156,15 @@ class PermissionService extends BaseService
     private function _roleUpdateValidator(array $request)
     {
         $rules = [
-            'permission.name' => 'required',
+            'permission.name' => 'required|unique:permissions,name' . $request["permission"]["id"],
             'permission.display_name' => 'required',
             'permission.description' => 'required',
         ];
         $messages = [
-            'permission.name.required' => "Oops! name is required.",
-            'permission.display_name.required' => "Oops! display_name is required.",
-            'permission.description.required' => "Oops! description is required.",
+            'permission.name.required' => "Whoops! the { name } is required.",
+            'permission.name.unique' => "Whoops! the { name } has already been taken.",
+            'permission.display_name.required' => "Whoops! the { display name } is required.",
+            'permission.description.required' => "Whoops! the { description } is required.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {
@@ -169,14 +181,15 @@ class PermissionService extends BaseService
     private function _roleCreateValidator(array $request)
     {
         $rules = [
-            'permission.name' => 'required',
+            'permission.name' => 'required|unique:permissions,name',
             'permission.display_name' => 'required',
             'permission.description' => 'required',
         ];
         $messages = [
-            'permission.name.required' => "Oops! name is required.",
-            'permission.display_name.required' => "Oops! display_name is required.",
-            'permission.description.required' => "Oops! description is required.",
+            'permission.name.required' => "Whoops! the { name } is required.",
+            'permission.name.unique' => "Whoops! the { name } has already been taken.",
+            'permission.display_name.required' => "Whoops! the { display name } is required.",
+            'permission.description.required' => "Whoops! the { description } is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);

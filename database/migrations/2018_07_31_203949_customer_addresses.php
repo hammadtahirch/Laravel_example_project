@@ -14,17 +14,17 @@ class CustomerAddresses extends Migration
     public function up()
     {
         Schema::create('customer_addresses', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('user_id');
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
             $table->string('address');
             $table->string('city');
             $table->string('province');
             $table->string('country');
             $table->string('latitude');
             $table->string('longitude');
-            $table->integer('created_by')->default(0);
-            $table->integer('updated_by')->default(0);
-            $table->integer('deleted_by')->default(0);
+            $table->uuid('created_by')->default(0);
+            $table->uuid('updated_by')->default(0);
+            $table->uuid('deleted_by')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

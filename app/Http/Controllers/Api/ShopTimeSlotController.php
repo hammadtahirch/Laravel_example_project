@@ -22,7 +22,9 @@ class ShopTimeSlotController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param ShopTimeSlotService $timeSlotService
+     * @param $shop_id
+     * @return mixed
      */
     public function index(ShopTimeSlotService $timeSlotService, $shop_id)
     {
@@ -32,9 +34,10 @@ class ShopTimeSlotController extends Controller
     /**
      * Save the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  ShopTimeSlotService $timeSlotService
+     * @param  $shop_id
+     * @param  Request $request
+     * @return mixed
      */
     public function save(ShopTimeSlotService $timeSlotService, $shop_id, Request $request)
     {
@@ -44,23 +47,14 @@ class ShopTimeSlotController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param  ShopTimeSlotService $timeSlotService
+     * @param  $shop_id
+     * @param  Request $request
+     * @param  $id
+     * @return mixed
      */
     public function update(ShopTimeSlotService $timeSlotService, $shop_id, Request $request, $id)
     {
         return $timeSlotService->update($shop_id, $request, $id);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }

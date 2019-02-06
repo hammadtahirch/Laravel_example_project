@@ -14,13 +14,13 @@ class Collects extends Migration
     public function up()
     {
         Schema::create('collects', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('shop_id');
-            $table->integer('collection_id');
-            $table->integer('product_id');
-            $table->integer('created_by')->default(0);
-            $table->integer('updated_by')->default(0);
-            $table->integer('deleted_by')->default(0);
+            $table->uuid('id')->primary();
+            $table->uuid('shop_id');
+            $table->uuid('collection_id');
+            $table->uuid('product_id');
+            $table->uuid('created_by')->default(0);
+            $table->uuid('updated_by')->default(0);
+            $table->uuid('deleted_by')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

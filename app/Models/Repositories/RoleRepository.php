@@ -3,6 +3,7 @@
 namespace App\Models\Repositories;
 
 use App\Models\Eloquent\Role;
+use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Validator;
@@ -11,10 +12,10 @@ class RoleRepository
 {
     /*
     |--------------------------------------------------------------------------
-    | Role Service
+    | Role Repository
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling Roles
+    | This Repository is responsible for handling Roles
     |
     */
 
@@ -39,7 +40,7 @@ class RoleRepository
     {
         try {
             $roleObject = Role::query()
-                ->where('id', '<>', 1)->get();
+                ->where('id', '<>', GeneralConstants::SUPPER_ADMIN_ID)->get();
             $this->_collection->put("data", $roleObject);
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
@@ -66,7 +67,7 @@ class RoleRepository
             $roleObject->display_name = $requestObject['role']['display_name'];
             $roleObject->description = $requestObject['role']['description'];
             $roleObject->save($requestObject);
-            if ($roleObject->id > 0) {
+            if (!empty($roleObject->id)) {
                 $roleObject = $roleObject->where(["id" => $requestObject->id])->first();
                 $this->_collection->put("data", $roleObject);
             }

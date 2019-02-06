@@ -4,13 +4,11 @@ import {_setHeaders, exceptionHandler, setSession} from "../helper/auth-helper";
 import Config from "../config/app-constants";
 import ActionTypes from "../constant/constant";
 
-export function signupAction(user) {
-
-    return dispatch => {
-        console.log('user', user);
-    }
-}
-
+/**
+ * fetch all user roles
+ *
+ * @returns {Function}
+ */
 export function _fetchAllRoles() {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
@@ -22,11 +20,18 @@ export function _fetchAllRoles() {
                 dispatch({type: ActionTypes.LOADING, payload: false});
             })
             .catch(function (error) {
-                exceptionHandler(error);
+                dispatch({type: ActionTypes.ERROR, payload: error.response})
+                dispatch({type: ActionTypes.LOADING, payload: false});
             });
     }
 }
 
+/**
+ * fetch all users
+ *
+ * @param params
+ * @returns dispatch
+ */
 export function _fetchAllUser(params) {
     return dispatch => {
         dispatch({type: ActionTypes.LOADING, payload: true});
@@ -37,29 +42,46 @@ export function _fetchAllUser(params) {
                 dispatch({type: ActionTypes.LOADING, payload: false});
             })
             .catch(function (error) {
-                exceptionHandler(error);
+                dispatch({type: ActionTypes.ERROR, payload: error.response})
+                dispatch({type: ActionTypes.LOADING, payload: false});
             });
     }
 }
 
+/**
+ * Remove users
+ *
+ * @param data
+ * @returns dispatch
+ */
 export function _deleteUser(data) {
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         instance.delete('user/' + data.id)
             .then(function (response) {
                 dispatch({type: ActionTypes.DELETE_USER, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
+                dispatch(_fetchAllUser());
             })
             .catch(function (error) {
-                exceptionHandler(error);
+                dispatch({type: ActionTypes.ERROR, payload: error.response})
+                dispatch({type: ActionTypes.LOADING, payload: false});
             });
     }
 }
 
+/**
+ * Save user
+ *
+ * @param data
+ * @returns {Function}
+ */
 export function _saveUser(data) {
     let objectInstance = '';
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         if (!data.id) {
@@ -69,9 +91,10 @@ export function _saveUser(data) {
 
                     dispatch({type: ActionTypes.SAVE_USER, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
+                    dispatch(_fetchAllUser());
                 })
                 .catch(function (error) {
-                    exceptionHandler(error);
+                    // exceptionHandler(error);
                     dispatch({type: ActionTypes.ERROR, payload: error.response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
 
@@ -81,9 +104,10 @@ export function _saveUser(data) {
                 .then(function (response) {
                     dispatch({type: ActionTypes.SAVE_USER, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
+                    dispatch(_fetchAllUser());
                 })
                 .catch(function (error) {
-                    exceptionHandler(error);
+                    // exceptionHandler(error);
                     dispatch({type: ActionTypes.ERROR, payload: error.response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
 
@@ -92,25 +116,37 @@ export function _saveUser(data) {
     }
 }
 
+/**
+ * user sign function
+ *
+ * @param user
+ * @returns dispatch
+ * @private
+ */
 export function _signInAction(user) {
     return dispatch => {
+        dispatch({type: ActionTypes.ERROR, payload: ""})
         dispatch({type: ActionTypes.LOADING, payload: true});
-        axios.post(Config.API_SERVER + 'login',
-            user
-        )
+        axios.post(Config.API_SERVER + 'login', user)
             .then(function (response) {
                 setSession('login', response);
                 dispatch({type: ActionTypes.LOADING, payload: false});
                 history.push('/admin/dashboard');
             })
             .catch(function (error) {
-                exceptionHandler(error);
+                // exceptionHandler(error);
                 dispatch({type: ActionTypes.ERROR, payload: error.response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
             });
     }
 }
 
+/**
+ * Remove user session from browser local storage
+ *
+ * @returns dispatch
+ * @private
+ */
 export function _signOutAction() {
     return dispatch => {
         const instance = _setHeaders();
@@ -120,7 +156,7 @@ export function _signOutAction() {
                 history.push('/admin/login');
             })
             .catch(function (error) {
-                exceptionHandler(error);
+                // exceptionHandler(error);
             });
     }
 }

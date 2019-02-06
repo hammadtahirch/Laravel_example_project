@@ -14,8 +14,8 @@ class Shops extends Migration
     public function up()
     {
         Schema::create('shops', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->integer('user_id')->default(0);
+            $table->uuid('id')->primary();
+            $table->uuid('user_id')->default(0);
             $table->string('title');
             $table->text('description');
             $table->string('address');
@@ -25,9 +25,9 @@ class Shops extends Migration
             $table->string('portal_code');
             $table->string('latitude');
             $table->string('longitude');
-            $table->integer('created_by')->default(0);
-            $table->integer('updated_by')->default(0);
-            $table->integer('deleted_by')->default(0);
+            $table->uuid('created_by')->default(0);
+            $table->uuid('updated_by')->default(0);
+            $table->uuid('deleted_by')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });
