@@ -1,7 +1,9 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+
 class EntrustSetupTables extends Migration
 {
     /**
@@ -22,8 +24,8 @@ class EntrustSetupTables extends Migration
 
         // Create table for associating roles to users (Many-to-Many)
         Schema::create('role_user', function (Blueprint $table) {
-            $table->uuid('user_id')->nullable();
-            $table->uuid('role_id')->nullable();
+            $table->uuid('user_id');
+            $table->uuid('role_id');
 
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('cascade');
@@ -44,9 +46,9 @@ class EntrustSetupTables extends Migration
 
         // Create table for associating permissions to roles (Many-to-Many)
         Schema::create('permission_role', function (Blueprint $table) {
-            $table->uuid('permission_id')->nullable();
-            $table->uuid('role_id')->nullable();
 
+            $table->uuid('permission_id');
+            $table->uuid('role_id');
             $table->foreign('permission_id')->references('id')->on('permissions')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('role_id')->references('id')->on('roles')

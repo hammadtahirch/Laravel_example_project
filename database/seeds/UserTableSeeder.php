@@ -13,6 +13,7 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         DB::table('users')->insert([
+
             "id"=>"3e6c7a9c-bd42-412d-8bd0-566432b27cda",
             'name' => "Admin",
             'email' => env('SUPPER_ADMIN_EMAIL'),

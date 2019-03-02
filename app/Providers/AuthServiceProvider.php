@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
-use Laravel\Passport\Passport; 
+use Laravel\Passport\Client;
+use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Psy\Util\Str;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -24,7 +26,15 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Passport::ignoreMigrations();
         $this->registerPolicies(); 
-        Passport::routes(); 
+        Passport::routes();
+        Client::creating(function (Client $client) {
+            $client->incrementing = false;
+            $client->id = \Illuminate\Support\Str::uuid();
+        });
+        Client::retrieved(function (Client $client) {
+            $client->incrementing = false;
+        });
     }
 }

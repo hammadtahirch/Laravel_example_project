@@ -15,4 +15,4 @@ yarn-error.log
 .env.dev
 public/app
 composer.lock
-public/uploads/
+public/uploads/*

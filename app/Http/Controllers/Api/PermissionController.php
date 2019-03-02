@@ -21,12 +21,12 @@ class PermissionController extends Controller
      */
     public function __construct(AuthService $authService)
     {
-        $this->middleware(function ($request, $next) use ($authService) {
-            if (!$authService->authChecker('PERMISSION_construct')) {
-                return $authService->authAbort();
-            }
-            return $next($request);
-        });
+//        $this->middleware(function ($request, $next) use ($authService) {
+//            if (!$authService->authChecker('PERMISSION_construct')) {
+//                return $authService->authAbort();
+//            }
+//            return $next($request);
+//        });
     }
 
     /**

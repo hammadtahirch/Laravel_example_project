@@ -20,6 +20,7 @@ class AlterProductTableAndProductVarience extends Migration
             $table->integer("min_permitted")->default(0)->after("product_id");
             $table->integer("max_permitted")->default(0)->after("product_id");
         });
+
         Schema::create("product_variance_options", function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('shop_id');
@@ -55,7 +56,7 @@ class AlterProductTableAndProductVarience extends Migration
      */
     public function down()
     {
-        Schema::table("product_variances",function (Blueprint $table){
+        Schema::table("product_variances", function (Blueprint $table) {
             $table->text("image");
             $table->double("price");
             $table->dropColumn("product_id");
