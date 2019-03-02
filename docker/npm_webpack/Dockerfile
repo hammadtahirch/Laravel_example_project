@@ -1,11 +1,11 @@
 FROM node:8.4
 
-MAINTAINER Mark St.Godard <markst.godard@boldcommerce.com>
+MAINTAINER Hammad Tahir <hammad.tahir.ch@gmail.com>
 
 RUN npm install -g webpack webpack-dev-server yarn
 
 VOLUME /app
 
-EXPOSE 3000
+EXPOSE 2000
 
 WORKDIR /app

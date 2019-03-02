@@ -19,6 +19,22 @@ class ProductTransformer extends TransformerAbstract
     */
 
     /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [];
+
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+        'upload'
+    ];
+
+    /**
      * Create a new transformer instance.
      *
      * @param Product $product
@@ -32,8 +48,7 @@ class ProductTransformer extends TransformerAbstract
             'shop_id' => $product->shop_id,
             'title' => $product->title,
             'description' => $product->description,
-            'image' => $product->image,
-            'price' => $product->price,
+            'price' => $product->price / 100,
             'is_published' => $product->is_published,
             'published_date' => $product->published_date,
             'status' => $product->status,
@@ -43,5 +58,20 @@ class ProductTransformer extends TransformerAbstract
             "created_at" => $product->created_at,
             "updated_at" => $product->updated_at
         ];
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Product $product
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeUpload(Product $product)
+    {
+        $uploadObject = $product->upload;
+        if (!empty($uploadObject))
+            return $this->item($uploadObject, new UploadTransformer(), false);
+        else
+            return null;
     }
 }

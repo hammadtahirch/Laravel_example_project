@@ -2,7 +2,9 @@
 
 namespace App\Services\AppServices;
 
+use App\Jobs\GenerateResizedImageJob;
 use App\Models\Repositories\ShopProductsRepository;
+use App\Models\Repositories\UploadRepository;
 use App\Services\Transformers\CustomJsonSerializer;
 use App\Services\Transformers\ProductTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
@@ -25,33 +27,21 @@ class ShopProductsService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
      * @var ShopProductsRepository
      */
     protected $_shopProductRepository;
 
+
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param ShopProductsRepository $shopProductsRepository
      * @return void
      */
-    public function __construct(Response $response, ShopProductsRepository $shopProductsRepository)
+    public function __construct(ShopProductsRepository $shopProductsRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_shopProductRepository = $shopProductsRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
 
     }
 
@@ -69,9 +59,28 @@ class ShopProductsService extends BaseService
             $productObject = $collectionResponse->pull("data");
             if ($this->hasPagingObject($productObject)) {
                 $productCollection = $productObject->getCollection();
-                $resource = new Collection($productCollection, new ProductTransformer(), 'product');
+                $resource = new Collection($productCollection, new ProductTransformer(), 'products');
                 $resource->setPaginator(new IlluminatePaginatorAdapter($productObject));
             }
+            return $this->_fractal->createData($resource)->toArray();
+        } else {
+            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $shop_id
+     * @param Request $request
+     * @return array []
+     */
+    public function show($shop_id, $id)
+    {
+        $collectionResponse = $this->_shopProductRepository->show($shop_id, $id);
+        if ($collectionResponse->has("data")) {
+            $productObject = $collectionResponse->pull("data");
+            $resource = new Item($productObject, new ProductTransformer(), 'product');
             return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
@@ -90,6 +99,9 @@ class ShopProductsService extends BaseService
         $collectionObject = $this->_shopProductRepository->store($shop_id, $request);
         if ($collectionObject->has("data")) {
             $productObject = $collectionObject->pull("data");
+            if (!empty($productObject->upload)) {
+                dispatch(new GenerateResizedImageJob($productObject->upload->toArray(), config("custom_config.product_size")));
+            }
             $resource = new Item($productObject, new ProductTransformer(), "product");
             return $this->_fractal->createData($resource)->toArray();
         } else {
@@ -112,6 +124,10 @@ class ShopProductsService extends BaseService
         $collectionObject = $this->_shopProductRepository->update($shop_id, $request, $id);
         if ($collectionObject->has("data")) {
             $productObject = $collectionObject->pull("data");
+            if (!empty($productObject->upload)) {
+                dispatch(new GenerateResizedImageJob($productObject->upload->toArray(), config("custom_config.product_size")));
+            }
+
             $resource = new Item($productObject, new ProductTransformer(), "product");
             return $this->_fractal->createData($resource)->toArray();
         } else {

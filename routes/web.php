@@ -14,4 +14,9 @@
 //Route::get('/', function () {
 //    dd(env("DB_CONNECTION"));
 //});
+use Illuminate\Support\Facades\Cache;
+
 Route::get('admin/{path?}', 'React\ReactController@adminPortal')->where('path', '.*');
+Route::get('/', function () {
+echo phpinfo();
+});

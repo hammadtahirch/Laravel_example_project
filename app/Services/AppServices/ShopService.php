@@ -27,48 +27,23 @@ class ShopService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
      * @var ShopRepository
      */
     protected $_shopRepository;
 
-    /**
-     * @var UploadService
-     */
-    protected $_uploadService;
-
-    /**
-     * @var UploadRepository
-     */
-    protected $_uploadRepository;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param ShopRepository $shopRepository
      * @param UploadService $uploadService
      * @param UploadRepository $uploadRepository
      * @return void
      */
-    public function __construct(Response $response, ShopRepository $shopRepository, UploadService $uploadService, UploadRepository $uploadRepository)
+    public function __construct(ShopRepository $shopRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_shopRepository = $shopRepository;
-        $this->_uploadService = $uploadService;
-        $this->_uploadRepository = $uploadRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
     }
 
     /**
@@ -109,21 +84,9 @@ class ShopService extends BaseService
         $collectionResponse = $this->_shopRepository->store($request);
         if ($collectionResponse->has("data")) {
             $collectionResponse = $collectionResponse->pull("data");
-
-            //upload image
-            $request->request->add(["shop_id" => $collectionResponse->id, "dataUrl" => $request->get("shop")["dataUrl"]]);
-            $imagePayload = $this->_uploadService->storeImage($request);
-
-            $request->request->add(["upload" => [
-                'name' => $imagePayload["name"],
-                'relative_path' => $imagePayload["relative_path"],
-                'absolute_path' => $imagePayload["relative_path"],
-                'collection_id' => $collectionResponse->id]
-            ]);
-            $this->_uploadRepository->store($request);
-            dispatch(new GenerateResizedImageJob($imagePayload, config("custom_config.shop_sizes")));
-            //upload image
-
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.shop_sizes")));
+            }
             $resource = new Item($collectionResponse, new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
         } else {
@@ -147,8 +110,13 @@ class ShopService extends BaseService
         }
 
         $collectionResponse = $this->_shopRepository->update($request, $id);
+
         if ($collectionResponse->has("data")) {
-            $resource = new Item($collectionResponse->pull("data"), new ShopTransformer(), 'shop');
+            $collectionResponse = $collectionResponse->pull("data");
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
+            }
+            $resource = new Item($collectionResponse, new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
 
         } else {
@@ -166,7 +134,7 @@ class ShopService extends BaseService
     {
         $collectionResponse = $this->_shopRepository->destroy($id);
         if ($collectionResponse->has("data")) {
-            return $this->_response->withItem($collectionResponse->pull("data"), new ShopTransformer(), 'user');
+            return $this->_response->withItem($collectionResponse->pull("data")->with("upload")->where(["id" => $id])->first(), new ShopTransformer(), 'user');
         } elseif ($collectionResponse->has("not_found")) {
             return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
         } else {

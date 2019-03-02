@@ -6,10 +6,6 @@ use App\Jobs\GenerateResizedImageJob;
 use App\Models\Repositories\CollectionRepository;
 use App\Models\Repositories\UploadRepository;
 use App\Services\Transformers\CollectionTransformer;
-use App\Services\Transformers\CustomJsonSerializer;
-use EllipseSynergie\ApiResponse\Contracts\Response;
-use Illuminate\Support\Str;
-use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Item;
@@ -28,48 +24,23 @@ class CollectionService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
      * @var CollectionRepository
      */
     protected $_collectionRepository;
 
-    /**
-     * @var UploadService
-     */
-    protected $_uploadService;
-
-    /**
-     * @var UploadRepository
-     */
-    protected $_uploadRepository;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param CollectionRepository $collectionRepository
      * @param UploadService $uploadService
      * @param UploadRepository $uploadRepository
      * @return void
      */
-    public function __construct(Response $response, CollectionRepository $collectionRepository, UploadService $uploadService, UploadRepository $uploadRepository)
+    public function __construct(CollectionRepository $collectionRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_collectionRepository = $collectionRepository;
-        $this->_uploadService = $uploadService;
-        $this->_uploadRepository = $uploadRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
     }
 
     /**
@@ -110,21 +81,9 @@ class CollectionService extends BaseService
         $collectionResponse = $this->_collectionRepository->store($request);
         if ($collectionResponse->has("data")) {
             $collectionResponse = $collectionResponse->pull("data");
-
-            //upload image
-            $request->request->add(["collection_id" => $collectionResponse->id, "dataUrl" => $request->get("collection")["dataUrl"]]);
-            $imagePayload = $this->_uploadService->storeImage($request);
-
-            $request->request->add(["upload" => [
-                'name' => $imagePayload["name"],
-                'relative_path' => $imagePayload["relative_path"],
-                'absolute_path' => $imagePayload["relative_path"],
-                'collection_id' => $collectionResponse->id]
-            ]);
-            $this->_uploadRepository->store($request);
-            dispatch(new GenerateResizedImageJob($imagePayload, config("custom_config.collection_size")));
-            //upload image
-
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.collection_size")));
+            }
             $resource = new Item($collectionResponse, new CollectionTransformer(), 'collection');
             return $this->_fractal->createData($resource)->toArray();
         } else {
@@ -149,7 +108,11 @@ class CollectionService extends BaseService
 
         $collectionResponse = $this->_collectionRepository->update($request, $id);
         if ($collectionResponse->has("data")) {
-            $resource = new Item($collectionResponse->pull("data"), new CollectionTransformer(), 'collection');
+            $collectionResponse = $collectionResponse->pull("data");
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
+            }
+            $resource = new Item($collectionResponse->where(["id" => $id])->with("upload")->first(), new CollectionTransformer(), 'collection');
             return $this->_fractal->createData($resource)->toArray();
 
         } else {
@@ -167,7 +130,7 @@ class CollectionService extends BaseService
     {
         $collectionResponse = $this->_collectionRepository->destroy($id);
         if ($collectionResponse->has("data")) {
-            return $this->_response->withItem($collectionResponse->pull("data"), new CollectionTransformer(), 'collection');
+            return $this->_response->withItem($collectionResponse->pull("data")->where(["id" => $id])->with("upload")->first(), new CollectionTransformer(), 'collection');
         } elseif ($collectionResponse->has("not_found")) {
             return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
         } else {

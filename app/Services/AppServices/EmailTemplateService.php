@@ -27,33 +27,20 @@ class EmailTemplateService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
-     * @var templateRepository
+     * @var EmailTemplateRepository
      */
     protected $_templateRepository;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param EmailTemplateRepository $emailTemplateRepository
      * @return void
      */
-    public function __construct(Response $response, EmailTemplateRepository $emailTemplateRepository)
+    public function __construct(EmailTemplateRepository $emailTemplateRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_templateRepository = $emailTemplateRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
 
     }
 

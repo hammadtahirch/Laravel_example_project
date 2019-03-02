@@ -56,6 +56,16 @@ class User extends Authenticatable
     ];
 
     /**
+     * relation function between 2 models (Collection & Upload)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function upload()
+    {
+        return $this->hasOne('App\Models\Eloquent\Upload', 'user_id', 'id');
+    }
+
+    /**
      * Create a has one relation with Role.
      *
      * @return \Illuminate\Database\Eloquent\Relations\belongsToMany

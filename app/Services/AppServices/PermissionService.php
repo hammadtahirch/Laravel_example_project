@@ -25,16 +25,6 @@ class PermissionService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
      * @var PermissionRepository
      */
     protected $_permissionRepository;
@@ -42,16 +32,13 @@ class PermissionService extends BaseService
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param $permissionRepository
      * @return void
      */
-    public function __construct(Response $response, PermissionRepository $permissionRepository)
+    public function __construct(PermissionRepository $permissionRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_permissionRepository = $permissionRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
 
     }
 

@@ -36,6 +36,16 @@ class Collection extends Model
     ];
 
     /**
+     * relation function between 2 models (Collection & Upload)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function upload()
+    {
+        return $this->hasOne('App\Models\Eloquent\Upload', 'collection_id', 'id');
+    }
+
+    /**
      *
      * boot
      *

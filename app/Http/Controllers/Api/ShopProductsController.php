@@ -51,11 +51,11 @@ class ShopProductsController extends Controller
      * @param  $shop_id
      * @param  $id
      * @param  ShopProductsService $shopProductsService
-     * @return \Illuminate\Http\Response
+     * @return array []
      */
     public function show($shop_id, $id, ShopProductsService $shopProductsService)
     {
-        return new \Illuminate\Http\Response;
+        return $shopProductsService->show($shop_id, $id);
     }
 
     /**

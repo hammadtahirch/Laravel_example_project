@@ -19,6 +19,23 @@ class CollectionTransformer extends TransformerAbstract
     */
 
     /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [
+    ];
+
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+        'upload'
+    ];
+
+    /**
      * Create a new transformer instance.
      *
      * @param Collection $collection
@@ -26,7 +43,6 @@ class CollectionTransformer extends TransformerAbstract
      */
     public function transform(Collection $collection)
     {
-
         return [
             'id' => $collection->id,
             'title' => $collection->title,
@@ -39,5 +55,20 @@ class CollectionTransformer extends TransformerAbstract
             "created_at" => $collection->created_at,
             "updated_at" => $collection->updated_at
         ];
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Collection $collection
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeUpload(Collection $collection)
+    {
+        $uploadObject = $collection->upload;
+        if (!empty($uploadObject))
+            return $this->item($uploadObject, new UploadTransformer(), false);
+        else
+            return null;
     }
 }

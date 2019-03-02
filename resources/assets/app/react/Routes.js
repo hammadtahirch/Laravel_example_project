@@ -12,10 +12,12 @@ import RolePermission from "./echo_system/pages/Settings/RolePermission";
 import Error403 from "./echo_system/pages/Errors/Error403";
 import Error500 from "./echo_system/pages/Errors/Error500";
 import ShopTimeSlots from "./echo_system/pages/Shops/ShopTimeSlots";
-import ShopMenu from "./echo_system/pages/Shops/ShopMenu";
+import ShopProducts from "./echo_system/pages/Shops/ShopProducts";
 import ShopSettings from "./echo_system/pages/Shops/ShopSettings";
 import Collections from "./echo_system/pages/Settings/Collections";
 import EmailTemplates from "./echo_system/pages/Settings/EmailTemplates";
+import CreateOrUpdateProduct from "./echo_system/pages/Shops/CreateOrUpdateProduct";
+import CreateUpdateProductVariance from "./echo_system/pages/Shops/CreateUpdateProductVariance";
 
 class Routes extends Component {
     render() {
@@ -32,7 +34,15 @@ class Routes extends Component {
                             <Route exact path='/admin/collections' component={Collections}/>
                             <Route exact path='/admin/templates' component={EmailTemplates}/>
                             <Route exact path='/admin/shop/:id/time_slot' component={ShopTimeSlots}/>
-                            <Route exact path='/admin/shop/:id/menu' component={ShopMenu}/>
+                            <Route exact path='/admin/shop/:id/products' component={ShopProducts}/>
+
+                            <Route exact path='/admin/shop/:id/create_or_update/:product_id?'
+                                   component={CreateOrUpdateProduct}/>
+                            <Route exact path='/admin/shop/:id/product/:product_id/create_update_product_variance/:variance_id?'
+                                   component={CreateUpdateProductVariance}/>
+                            <Route exact path='/admin/shop/:id/variance/:variance_id/create_update_variance_option/:option_id?'
+                                   component={CreateUpdateProductVariance}/>
+
                             <Route exact path='/admin/shop/:id/settings' component={ShopSettings}/>
 
                             <Route exact path='/admin/role_permission' component={RolePermission}/>

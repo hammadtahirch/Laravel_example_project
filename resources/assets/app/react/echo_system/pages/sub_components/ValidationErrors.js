@@ -31,7 +31,6 @@ class ValidationErrors extends Component {
 
 
         } else if (props.statusCode === 422) {
-            debugger;
             let errorList = [];
             for (var item = 0; item <= (Object.keys(props.validationErrors.errors).length) - 1; item++) {
                 errorList.push(

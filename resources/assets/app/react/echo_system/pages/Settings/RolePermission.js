@@ -22,7 +22,6 @@ class RolePermission extends Component {
      */
     constructor(props) {
         super(props);
-        this.hammad = [];
         if (getSession('login') === null) {
             history.push('login');
         }

@@ -173,6 +173,8 @@ class Collections extends Component {
                     id: collection.id,
                     title: collection.title,
                     description: collection.description,
+                    upload: collection.upload,
+                    dataUrl: '',
                 }
             }
         );
@@ -355,20 +357,7 @@ class Collections extends Component {
                                                                       statusCode={this.props.error.status}/>
                                                     }
 
-
-                                                    <div className="col-md-6 mb-3">
-                                                        <label>Title<span>*</span></label>
-                                                        <input type="text" className="form-control" name="title"
-                                                               value={this.state.collection.title}
-                                                               onChange={(e) => this.handleChange(e)}/>
-                                                    </div>
-                                                    <div className="col-md-6 mb-3">
-                                                        <label>Description<span>*</span></label>
-                                                        <input type="text" className="form-control" name="description"
-                                                               value={this.state.collection.description}
-                                                               onChange={(e) => this.handleChange(e)}/>
-                                                    </div>
-                                                    <div className="col-md-12 mb-2">
+                                                    <div className="col-md-8 mb-2">
                                                         <Dropzone onDrop={(e) => this.onDrop(e)}>
                                                             {({getRootProps, getInputProps, isDragActive}) => {
                                                                 return (
@@ -389,6 +378,24 @@ class Collections extends Component {
                                                         {this.state.collection.dataUrl !== "" &&
                                                         <p>YaHu! the image selected.</p>}
                                                     </div>
+                                                    <div className="col-md-4 mb-2">
+                                                        <img
+                                                            src={(this.state.collection.dataUrl) ? this.state.collection.dataUrl : (this.state.collection.upload) ? this.state.collection.upload.storage_url : require('../../../assets/img/placeholder-image.png')}
+                                                            className="model-drop-zone-preview"/>
+                                                    </div>
+                                                    <div className="col-md-6 mb-3">
+                                                        <label>Title<span>*</span></label>
+                                                        <input type="text" className="form-control" name="title"
+                                                               value={this.state.collection.title}
+                                                               onChange={(e) => this.handleChange(e)}/>
+                                                    </div>
+                                                    <div className="col-md-6 mb-3">
+                                                        <label>Description<span>*</span></label>
+                                                        <input type="text" className="form-control" name="description"
+                                                               value={this.state.collection.description}
+                                                               onChange={(e) => this.handleChange(e)}/>
+                                                    </div>
+
                                                     <div className="col-md-12 mb-3">
                                                         <button type="button"
                                                                 className="btn btn-outline-dark font-14 mb-30 pull-right"

@@ -4,6 +4,7 @@ namespace App\Models\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 /**
@@ -32,7 +33,6 @@ class ProductVariance extends Model
      */
     protected $fillable = [
         'id',
-        'shop_id',
         'title',
         'product_id',
         'description',

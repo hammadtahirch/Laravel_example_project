@@ -44,6 +44,7 @@ class UploadRepository
         $requestObject = $request->all();
         $requestObject = $requestObject['upload'];
         try {
+
             $uploadObject = new FileUpload($requestObject);
             $uploadObject->save();
             if (!empty($uploadObject->id)) {

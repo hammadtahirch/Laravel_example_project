@@ -19,7 +19,7 @@ use Illuminate\Http\Request;
 Route::post('login', 'Api\UserController@login');
 Route::post('register', 'Api\UserController@register');
 
-Route::group(['middleware' => 'auth:api'], function(){
+Route::group(['middleware' => 'auth:api'], function () {
 
     Route::resource('user', 'Api\UserController');
     Route::resource('shop', 'Api\ShopController');
@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth:api'], function(){
     Route::resource('template', 'Api\EmailTemplateController');
     Route::resource('shop/{shop_id}/time_slot', 'Api\ShopTimeSlotController');
     Route::resource('shop/{shop_id}/products', 'Api\ShopProductsController');
+    Route::resource('product/{product_id}/variances', 'Api\ProductVarianceController');
     Route::resource('role', 'Api\RoleController');
     Route::resource('permission', 'Api\PermissionController');
     Route::get('details', 'Api\UserController@details');
@@ -34,4 +35,4 @@ Route::group(['middleware' => 'auth:api'], function(){
 
     Route::post('test_permission_roles', 'Api\TestApiController@AddPermissionAndRoles');
 
-    });
+});

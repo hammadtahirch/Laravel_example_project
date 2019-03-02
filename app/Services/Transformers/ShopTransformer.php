@@ -1,9 +1,13 @@
 <?php
+
 namespace App\Services\Transformers;
 
 use App\Models\Eloquent\Shop;
+use App\Models\Eloquent\ShopTimeSlot;
 use App\Models\Eloquent\User;
-use League\Fractal\TransformerAbstract;;
+use League\Fractal\TransformerAbstract;
+
+;
 
 class ShopTransformer extends TransformerAbstract
 {
@@ -15,6 +19,24 @@ class ShopTransformer extends TransformerAbstract
     | This transformer is responsible to User Transformation
     |
     */
+
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [];
+
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+        'upload',
+        'user',
+        'shop_time_slot'
+    ];
 
     /**
      * Create a new transformer instance.
@@ -47,5 +69,50 @@ class ShopTransformer extends TransformerAbstract
             "created_at" => $shop->created_at,
             "updated_at" => $shop->updated_at
         ];
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Shop $shop
+     * @return mixed
+     */
+    public function includeUpload(Shop $shop)
+    {
+        $uploadObject = $shop->upload;
+        if (!empty($uploadObject))
+            return $this->item($uploadObject, new UploadTransformer(), false);
+        else
+            return $this->null();
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Shop $shop
+     * @return mixed
+     */
+    public function includeUser(Shop $shop)
+    {
+        $userObject = $shop->user;
+        if (!empty($userObject))
+            return $this->item($userObject, new UserTransformer(), false);
+        else
+            return $this->null();
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Shop $shop
+     * @return mixed
+     */
+    public function includeShopTimeSlot(Shop $shop)
+    {
+        $shopTimeSlotObject = $shop->shop_time_slot;
+        if (!empty($shopTimeSlotObject))
+            return $this->collection($shopTimeSlotObject, new ShopTimeSlotTransformer(), false);
+        else
+            return $this->null();
     }
 }

@@ -23,6 +23,24 @@ class UserTransformer extends Fractal\TransformerAbstract
     */
 
     /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $availableIncludes = [];
+
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+        'upload',
+        'role',
+
+    ];
+
+    /**
      * Create a new transformer instance.
      *
      * @param User $user
@@ -37,12 +55,41 @@ class UserTransformer extends Fractal\TransformerAbstract
             'phone_number' => $user->phone_number,
             'role_id' => $user->role_id,
             'status' => $user->status,
-            'role' => $user->roles[0],
             "created_by" => $user->created_by,
             "updated_by" => $user->updated_by,
             "deleted_at" => $user->deleted_at,
             "created_at" => $user->created_at,
             "updated_at" => $user->updated_at
         ];
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param User $user
+     * @return mixed
+     */
+    public function includeUpload(User $user)
+    {
+        $uploadObject = $user->upload;
+        if (!empty($uploadObject))
+            return $this->item($uploadObject, new UploadTransformer(), false);
+        else
+            return $this->null();
+    }
+
+    /**
+     * Include roles
+     *
+     * @param User $user
+     * @return mixed
+     */
+    public function includeRole(User $user)
+    {
+        $roleObject = $user->roles->first();
+        if (!empty($roleObject))
+            return $this->item($roleObject, new RoleTransformer(), false);
+        else
+            return $this->null();
     }
 }

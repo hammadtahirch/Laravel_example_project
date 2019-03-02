@@ -3,6 +3,7 @@
 namespace App\Models\Repositories;
 
 use App\Models\Eloquent\Shop;
+use App\Services\AppServices\UploadService;
 use Carbon\Carbon;
 use EllipseSynergie\ApiResponse\Contracts\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -29,13 +30,27 @@ class ShopRepository
     protected $_collection;
 
     /**
+     * @var UploadService
+     */
+    protected $_uploadService;
+
+    /**
+     * @var UploadRepository
+     */
+    protected $_uploadRepository;
+
+    /**
      * Create a new Service instance.
      *
+     * @param UploadService $uploadService
+     * @param UploadRepository $uploadRepository
      * @return void
      */
-    public function __construct()
+    public function __construct(UploadService $uploadService, UploadRepository $uploadRepository)
     {
         $this->_collection = new Collection();
+        $this->_uploadService = $uploadService;
+        $this->_uploadRepository = $uploadRepository;
 
     }
 
@@ -49,16 +64,7 @@ class ShopRepository
     {
         try {
             $shopPagination = Shop::query()
-                ->with(
-                    [
-                        'user' => function ($query) {
-                            $query->select("id", "name", "email");
-                        },
-                        'shop_time_slot' => function ($query) {
-                            $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
-                        }
-                    ]
-                )
+                ->with(['user', 'shop_time_slot', 'upload'])
                 ->paginate(10);
 
             $this->_collection->put("data", $shopPagination);
@@ -97,17 +103,22 @@ class ShopRepository
 
                 $this->generateShopTimings($shopObject);
 
+                //upload image
+                $request->request->add(["shop_id" => $shopObject->id, "dataUrl" => $request->get("shop")["dataUrl"]]);
+                $imagePayload = $this->_uploadService->storeImage($request);
+
+                $request->request->add(["upload" => [
+                    'name' => $imagePayload["name"],
+                    'relative_path' => $imagePayload["relative_path"],
+                    'storage_url' => $imagePayload["storage_url"],
+                    'shop_id' => $shopObject->id,
+                    'extension' => $imagePayload["extension"]]
+                ]);
+                $this->_uploadRepository->store($request);
+
+                //upload image
                 $shopObject = $shopObject
-                    ->with(
-                        [
-                            'user' => function ($query) {
-                                $query->select("id", "name", "email");
-                            },
-                            'shop_time_slot' => function ($query) {
-                                $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
-                            }
-                        ]
-                    )
+                    ->with(['user', 'shop_time_slot', 'upload'])
                     ->where(["id" => $shopObject->id])
                     ->first();
             }
@@ -147,17 +158,27 @@ class ShopRepository
             $shopObject = Shop::find($id);
             if ($shopObject->update($requestObject)) {
 
+                if (!empty($request->get('shop')["dataUrl"])) {
+
+                    if (!empty($request->get("shop")["upload"])) {
+                        $this->_uploadRepository->destroy($request->get("shop")["upload"]["id"]);
+                    }
+
+                    $request->request->add(["shop_id" => $id, "dataUrl" => $request->get("shop")["dataUrl"]]);
+                    $imagePayload = $this->_uploadService->storeImage($request);
+
+                    $request->request->add(["upload" => [
+                        'name' => $imagePayload["name"],
+                        'relative_path' => $imagePayload["relative_path"],
+                        'storage_url' => $imagePayload["storage_url"],
+                        'shop_id' => $id,
+                        'extension' => $imagePayload["extension"]
+                    ]]);
+                    $this->_uploadRepository->store($request);
+
+                }
                 $shopObject = $shopObject
-                    ->with(
-                        [
-                            'user' => function ($query) {
-                                $query->select("id", "name", "email");
-                            },
-                            'shop_time_slot' => function ($query) {
-                                $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
-                            }
-                        ]
-                    )
+                    ->with(['user', 'shop_time_slot', 'upload'])
                     ->first();
             }
 
@@ -193,16 +214,9 @@ class ShopRepository
                 $this->_collection->put("not_found", ['message' => 'User not found.']);
             }
             if ($shopObject->delete()) {
-                $shopObject = $shopObject->with(
-                    [
-                        'user' => function ($query) {
-                            $query->select("id", "name", "email");
-                        },
-                        'shop_time_slot' => function ($query) {
-                            $query->select('id', 'shop_id', 'day', 'deliver_start_time', 'delivery_end_time', 'change_delivery_date', 'pickup_start_time', 'pickup_end_time', 'change_pickup_date');
-                        }
-                    ]
-                )->first();
+                $shopObject = $shopObject
+                    ->with(['user', 'shop_time_slot', 'upload'])
+                    ->first();
                 $this->_collection->put("data", $shopObject);
             } else {
                 $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);

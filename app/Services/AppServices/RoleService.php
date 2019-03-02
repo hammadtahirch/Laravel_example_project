@@ -24,16 +24,6 @@ class RoleService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response ;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
-
-    /**
      * @var RoleRepository
      */
     protected $_roleRepository;
@@ -44,13 +34,10 @@ class RoleService extends BaseService
      * @param RoleRepository $roleRepository
      * @return void
      */
-    public function __construct(Response $response, RoleRepository $roleRepository)
+    public function __construct(RoleRepository $roleRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_roleRepository = $roleRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
     }
 
     /**

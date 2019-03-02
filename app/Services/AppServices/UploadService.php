@@ -56,7 +56,7 @@ class UploadService extends BaseService
             $ext = explode('/', $mime)[1];
             $name = Str::uuid()->toString();
             $relative_path = public_path() . "/uploads/images/";
-            $absolute_path = secure_asset("uploads/images");
+            $storage_url = secure_asset("uploads/images");
 
             if (!File::exists($relative_path)) {
                 File::makeDirectory(public_path() . '/' . "uploads/images/", $mode = 0777, true, true);
@@ -65,7 +65,7 @@ class UploadService extends BaseService
                 return [
                     "name" => $name,
                     "relative_path" => $relative_path . $name . '.' . $ext,
-                    "absolute_path" => $absolute_path . '/' . $name . '.' . $ext,
+                    "storage_url" => $storage_url . '/' . $name . '.' . $ext,
                     "extension" => $ext
                 ];
             } else {

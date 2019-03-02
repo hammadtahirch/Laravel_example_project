@@ -17,7 +17,7 @@ class AlterProductOrProductVarianceOptionTable extends Migration
 
             $table->integer("price")->default(0)->change();
         });
-        Schema::table("product_variance_option", function (Blueprint $table) {
+        Schema::table("product_variance_options", function (Blueprint $table) {
 
             $table->integer("price")->default(0)->change();
         });
@@ -38,7 +38,7 @@ class AlterProductOrProductVarianceOptionTable extends Migration
 
             $table->double('price')->default(0.00)->change();
         });
-        Schema::table("product_variance_option", function (Blueprint $table) {
+        Schema::table("product_variance_options", function (Blueprint $table) {
 
             $table->double('price')->default(0.00)->change();
         });

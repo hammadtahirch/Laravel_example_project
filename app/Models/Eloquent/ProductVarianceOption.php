@@ -26,7 +26,7 @@ class ProductVarianceOption extends Model
     /**
      * @var string
      */
-    protected $table = "product_variances";
+    protected $table = "product_variance_options";
 
     /**
      * The attributes that are mass assignable.
@@ -39,9 +39,6 @@ class ProductVarianceOption extends Model
         'variance_id',
         'title',
         'price',
-        'is_published',
-        'published_date',
-        'status',
     ];
 
     /**

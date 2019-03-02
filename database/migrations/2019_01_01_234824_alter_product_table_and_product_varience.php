@@ -20,7 +20,7 @@ class AlterProductTableAndProductVarience extends Migration
             $table->integer("min_permitted")->default(0)->after("product_id");
             $table->integer("max_permitted")->default(0)->after("product_id");
         });
-        Schema::create("product_variance_option", function (Blueprint $table) {
+        Schema::create("product_variance_options", function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('shop_id');
             $table->uuid('variance_id');
@@ -62,7 +62,7 @@ class AlterProductTableAndProductVarience extends Migration
             $table->dropColumn("min_permitted");
             $table->dropColumn("max_permitted");
         });
-        Schema::drop("product_variance_option");
+        Schema::drop("product_variance_options");
         Schema::drop("nutritional_info");
     }
 }

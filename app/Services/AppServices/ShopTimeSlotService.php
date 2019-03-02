@@ -40,17 +40,13 @@ class ShopTimeSlotService extends BaseService
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param ShopTimeSlotRepository $shopTimeSlotRepository
      * @return void
      */
-    public function __construct(Response $response, ShopTimeSlotRepository $shopTimeSlotRepository)
+    public function __construct(ShopTimeSlotRepository $shopTimeSlotRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_shopTimeSlotRepository = $shopTimeSlotRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
     }
 
     /**

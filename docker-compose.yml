@@ -59,6 +59,8 @@ services:
     - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
     networks:
     - app-network
+
+  # webpack node
   webpack_npm:
     container_name: webpack_npm
     build: docker/npm_webpack
@@ -68,6 +70,24 @@ services:
     - app
     volumes:
     - ./:/app
+
+#  #MEMCASHED
+#  memcached:
+#    image: memcached
+#    container_name: memcached-container
+#    ports:
+#    - "11212:11211"
+#    networks:
+#    - app-network
+#
+  #REDIS
+  radis:
+    image: redis
+    container_name: redis-container
+    ports:
+    - "63791:6379"
+    expose:
+    - "6379"
 
 #Docker Networks
 networks:

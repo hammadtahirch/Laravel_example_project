@@ -2,13 +2,10 @@
 
 namespace App\Services\AppServices;
 
-use App\Models\Repositories\AuthRepository;
 use App\Services\Transformers\CustomJsonSerializer;
 use EllipseSynergie\ApiResponse\Laravel\Response;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 use League\Fractal\Manager;
-use Validator;
 
 class BaseService
 {
@@ -21,6 +18,31 @@ class BaseService
     |
     */
 
+
+    /**
+     * @var Manager
+     */
+    protected $_fractal;
+
+    /**
+     * @var Response
+     */
+    protected $_response;
+
+    /**
+     * Create a new Service instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $request = app(Request::class);
+        $this->_response = app(Response::class);
+        $this->_fractal = new Manager();
+        $this->_fractal->setSerializer(new CustomJsonSerializer());
+        if (!empty($request->get("include")))
+            $this->_fractal->parseIncludes($request->get("include"));
+    }
 
     /**
      * This function responsible for check object contain paging object or simple collection object

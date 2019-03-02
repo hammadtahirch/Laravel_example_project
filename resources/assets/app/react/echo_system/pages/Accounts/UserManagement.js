@@ -50,7 +50,8 @@ class UserManagement extends Component {
                 phone_number: '',
                 role_id: '',
                 status: '',
-                dataUrl: ''
+                dataUrl: '',
+                upload: ''
 
             },
             filter: {
@@ -221,6 +222,7 @@ class UserManagement extends Component {
      * @param Object user
      */
     handleEditUser(user) {
+        console.log(user);
         this.setState(
             {
                 user: {
@@ -231,6 +233,8 @@ class UserManagement extends Component {
                     phone_number: user.phone_number,
                     role_id: user.role_id,
                     status: user.status,
+                    dataUrl: '',
+                    upload: user.upload,
                 }
             }
         );
@@ -405,7 +409,7 @@ class UserManagement extends Component {
                                             <ValidationErrors validationErrors={this.props.error.data}
                                                               statusCode={this.props.error.status}/>
                                             }
-                                            <div className="col-md-12 mb-2">
+                                            <div className="col-md-8 mb-2">
                                                 <Dropzone onDrop={(e) => this.onDrop(e)}>
                                                     {({getRootProps, getInputProps, isDragActive}) => {
                                                         return (
@@ -425,6 +429,11 @@ class UserManagement extends Component {
                                                 </Dropzone>
                                                 {this.state.user.dataUrl !== "" &&
                                                 <p>YaHu! the image selected.</p>}
+                                            </div>
+                                            <div className="col-md-4 mb-2">
+                                                <img
+                                                    src={(this.state.user.dataUrl) ? this.state.user.dataUrl : (this.state.user.upload) ? this.state.user.upload.storage_url : require('../../../assets/img/placeholder-image.png')}
+                                                    className="model-drop-zone-preview"/>
                                             </div>
                                             <div className="col-md-6 mb-3">
                                                 <label>First Name <span>*</span></label>
@@ -464,7 +473,7 @@ class UserManagement extends Component {
                                                 <label>Status <span>*</span></label>
                                                 <select className="form-control" name="status"
                                                         onChange={(e) => this.handleChange(e)}
-                                                        value={this.state.user.status}>
+                                                        value={(this.state.user.status === 1) ? true : false}>
                                                     <option value=''>Choose Status</option>
                                                     {this.state.status.map(function (status, i) {
                                                         return <option
@@ -544,10 +553,10 @@ class UserManagement extends Component {
  */
 function mapStateToProp(state) {
     return ({
+        error: state.error.error,
         fetch_user_props: state.account.fetch_users,
         fetch_role_props: state.account.fetch_roles,
-        save_user_props: state.account.save_user,
-        error: state.error.error,
+        save_user_props: state.account.save_user
     })
 }
 

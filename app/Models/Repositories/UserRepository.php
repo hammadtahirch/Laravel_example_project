@@ -3,12 +3,16 @@
 namespace App\Models\Repositories;
 
 use App\Models\Eloquent\User;
+use App\Services\AppServices\UploadService;
 use App\Services\Constants\GeneralConstants;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Str;
+use Predis\Client;
 use Validator;
 
 class UserRepository
@@ -28,14 +32,27 @@ class UserRepository
     protected $_collection;
 
     /**
+     * @var UploadService
+     */
+    protected $_uploadService;
+
+    /**
+     * @var UploadRepository
+     */
+    protected $_uploadRepository;
+
+    /**
      * Create a new Service instance.
      *
+     * @param UploadService $uploadService
+     * @param UploadRepository $uploadRepository
      * @return void
      */
-    public function __construct()
+    public function __construct(UploadService $uploadService, UploadRepository $uploadRepository)
     {
         $this->_collection = new Collection();
-
+        $this->_uploadService = $uploadService;
+        $this->_uploadRepository = $uploadRepository;
     }
 
     /**
@@ -46,11 +63,14 @@ class UserRepository
     public function index($request)
     {
         try {
+            $client = new Client('tcp://0.0.0.0:6379');
+            print_r($client);die;
             $userObject = User::query();
             $userObject = $this->_userFilter($userObject, $request);
             $userObject = $userObject->whereHas('roles', function ($query) {
                 $query->where("name", "<>", GeneralConstants::SUPPER_ADMIN);
             })
+                ->with(["upload"])
                 ->orderBy('created_at', 'DESC');
 
             if ($request->has("_render")) {
@@ -86,7 +106,6 @@ class UserRepository
         try {
 
             $userObject = new User();
-
             $userObject->name = $requestObject['first_name'] . " " . $requestObject['last_name'];
             $userObject->email = $requestObject['email'];
             $userObject->password = Str::random(32);
@@ -97,8 +116,25 @@ class UserRepository
             $userObject->save();
             if (!empty($userObject->id)) {
                 DB::table('role_user')->insert(["user_id" => $userObject->id, "role_id" => $requestObject['role_id']]);
+
+                //upload image
+                $request->request->add(["user_id" => $userObject->id, "dataUrl" => $request->get("user")["dataUrl"]]);
+                $imagePayload = $this->_uploadService->storeImage($request);
+
+                $request->request->add(["upload" => [
+                    'name' => $imagePayload["name"],
+                    'relative_path' => $imagePayload["relative_path"],
+                    'storage_url' => $imagePayload["storage_url"],
+                    'user_id' => $userObject->id,
+                    'extension' => $imagePayload["extension"]
+                ]]);
+                $this->_uploadRepository->store($request);
+
+                //upload image
             }
-            $this->_collection->put("data", $userObject->with("roles")->first());
+
+
+            $this->_collection->put("data", $userObject->with(["roles", "upload"])->where("id", "=", $userObject->id)->first());
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
@@ -138,8 +174,28 @@ class UserRepository
             if ($userObject->update($userObject->toArray())) {
                 DB::table('role_user')->where(["user_id" => $userObject->id])
                     ->update(["role_id" => $requestObject['role_id']]);
+
+                if (!empty($request->get('user')["dataUrl"])) {
+
+                    if (!empty($request->get("user")["upload"])) {
+                        $this->_uploadRepository->destroy($request->get("user")["upload"]["id"]);
+                    }
+                    $request->request->add(["user_id" => $id, "dataUrl" => $request->get("user")["dataUrl"]]);
+                    $imagePayload = $this->_uploadService->storeImage($request);
+
+                    $request->request->add(["upload" => [
+                        'name' => $imagePayload["name"],
+                        'relative_path' => $imagePayload["relative_path"],
+                        'storage_url' => $imagePayload["storage_url"],
+                        'user_id' => $id,
+                        'extension' => $imagePayload["extension"]
+                    ]]);
+                    $this->_uploadRepository->store($request);
+
+                }
+
             }
-            $this->_collection->put("data", $userObject->with("roles")->first());
+            $this->_collection->put("data", $userObject->where(["id" => $id])->with(["roles", "upload"])->first());
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
@@ -171,7 +227,7 @@ class UserRepository
                 $this->_collection->put("not_found", ['message' => 'User not found.']);
             }
             if ($userObject->delete()) {
-                $this->_collection->put("data", $userObject->with("roles")->first());
+                $this->_collection->put("data", $userObject->where(["id" => $id])->with(["roles", "upload"])->first());
             } else {
                 $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
             }

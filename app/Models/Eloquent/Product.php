@@ -38,12 +38,21 @@ class Product extends Model
         'shop_id',
         'title',
         'description',
-        'image',
         'price',
         'is_published',
         'published_date',
         'status',
     ];
+
+    /**
+     * relation function between 2 models (Collection & Upload)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function upload()
+    {
+        return $this->hasOne('App\Models\Eloquent\Upload', 'product_id', 'id');
+    }
 
     /**
      * Create a has one relation with Role.

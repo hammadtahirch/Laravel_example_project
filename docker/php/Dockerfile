@@ -21,6 +21,9 @@ RUN apt-get update && apt-get install -y \
     git \
     curl
 
+#install radis and composer stuff.
+RUN apt-get update && apt-get install redis-tools -y && apt-get install -y redis-server openssh-client
+
 #install Imagemagick & PHP Imagick ext
 RUN apt-get update && apt-get install -y \
         libmagickwand-dev --no-install-recommends
@@ -38,6 +41,13 @@ RUN pecl install imagick && docker-php-ext-enable imagick
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# install phpredis extension
+ENV PHPREDIS_VERSION 3.0.0
+RUN mkdir -p /usr/src/php/ext/redis \
+    && curl -L https://github.com/phpredis/phpredis/archive/$PHPREDIS_VERSION.tar.gz | tar xvz -C /usr/src/php/ext/redis --strip 1 \
+    && echo 'redis' >> /usr/src/php-available-exts \
+    && docker-php-ext-install redis
 
 # Add user for laravel application
 RUN groupadd -g 1000 www

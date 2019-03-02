@@ -42,22 +42,26 @@ class ShopNav extends Component {
      */
     render() {
         let _activeTimeSlot = '';
-        let _activeMenu = '';
         let _activeSettings = '';
-        if (this.state.segment.url.includes('time_slot')) {
-            _activeTimeSlot = " active";
-        } else if (this.state.segment.url.includes('menu')) {
-            _activeMenu = " active"
+        let _activeProducts = '';
+        if (this.state.segment.url.includes('products')) {
+            _activeProducts = " active";
+        } else if (this.state.segment.url.includes('create_or_update')) {
+            _activeProducts = " active";
         } else if (this.state.segment.url.includes('settings')) {
             _activeSettings = " active"
+        } else if (this.state.segment.url.includes('time_slot')) {
+            _activeTimeSlot = " active";
+        }else if (this.state.segment.url.includes('product')) {
+            _activeProducts = " active";
         }
         return (
 
             <div>
                 <div className="nav flex-column nav-pills">
 
-                    <a className={"nav-link" + _activeMenu}
-                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.id + "/menu"}>
+                    <a className={"nav-link" + _activeProducts}
+                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.id + "/products"}>
                         <i className="fa fa-bars"></i> Menu
                     </a>
                     <a className={"nav-link" + _activeTimeSlot}

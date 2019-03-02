@@ -22,15 +22,6 @@ class AuthService extends BaseService
     |
     */
 
-    /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
-     * @var Manager
-     */
-    protected $_fractal;
 
     /**
      * @var AuthRepository
@@ -40,17 +31,13 @@ class AuthService extends BaseService
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param AuthRepository $authRepository
      * @return void
      */
-    public function __construct(Response $response, AuthRepository $authRepository)
+    public function __construct(AuthRepository $authRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_authRepository = $authRepository;
-        $this->_fractal = new Manager();
-        $this->_fractal->setSerializer(new CustomJsonSerializer());
-
     }
 
     /**

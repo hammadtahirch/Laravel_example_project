@@ -63,12 +63,13 @@ class ShopManagement extends Component {
                 portal_code: '',
                 latitude: '',
                 longitude: '',
-                dataUrl: "",
+                dataUrl: '',
                 user: {
                     id: '',
                     name: '',
                     email: ''
-                }
+                },
+                upload: ''
 
             },
             filter: {
@@ -295,7 +296,9 @@ class ShopManagement extends Component {
                         id: shop.user.id,
                         name: shop.user.name,
                         email: shop.user.email
-                    }
+                    },
+                    upload: shop.upload,
+                    dataUrl: ''
 
                 },
             }
@@ -407,7 +410,7 @@ class ShopManagement extends Component {
                                     className='fa fa-pencil'></i> Edit</a>
                                 <div className="dropdown-divider"></div>
 
-                                <a className="dropdown-item" href={"shop/" + shop.id + "/time_slot"}><i
+                                <a className="dropdown-item" href={"shop/" + shop.id + "/products"}><i
                                     className="fa fa-cogs"></i> Shop Settings</a>
                                 <div className="dropdown-divider"></div>
 
@@ -533,7 +536,7 @@ class ShopManagement extends Component {
                                             <ValidationErrors validationErrors={this.props.error.data}
                                                               statusCode={this.props.error.status}/>
                                             }
-                                            <div className="col-md-12 mb-2">
+                                            <div className="col-md-8 mb-2">
                                                 <Dropzone onDrop={(e) => this.onDrop(e)}>
                                                     {({getRootProps, getInputProps, isDragActive}) => {
                                                         return (
@@ -553,6 +556,11 @@ class ShopManagement extends Component {
                                                 </Dropzone>
                                                 {this.state.shop.dataUrl !== "" &&
                                                 <p>YaHu! the image selected.</p>}
+                                            </div>
+                                            <div className="col-md-4 mb-2">
+                                                <img
+                                                    src={(this.state.shop.dataUrl) ? this.state.shop.dataUrl : (this.state.shop.upload) ? this.state.shop.upload.storage_url : require('../../../assets/img/placeholder-image.png')}
+                                                    className="model-drop-zone-preview"/>
                                             </div>
                                             <SuggestionInput
                                                 lable={"Select User Account"}

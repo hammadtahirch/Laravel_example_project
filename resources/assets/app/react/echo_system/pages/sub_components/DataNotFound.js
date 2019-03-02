@@ -10,7 +10,7 @@ function DataNotFound(props) {
             </tr>;
             break;
     }
-    return html;
+    return (html);
 }
 
 export default DataNotFound;

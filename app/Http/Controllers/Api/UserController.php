@@ -24,6 +24,7 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
+     * @param UserService $userService
      * @return Collection
      */
     public function index(UserService $userService, Request $request)
@@ -45,7 +46,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  UserService $userService
+     * @param  Request $request
      * @param  int $id
      * @return Collection
      */
@@ -68,8 +70,8 @@ class UserController extends Controller
     /**
      * Validate a new user instance.
      *
+     * @param UserService $userService
      * @param Request $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function login(UserService $userService, Request $request)

@@ -7,8 +7,9 @@ use App\Models\Repositories\UploadRepository;
 use App\Services\Constants\GeneralConstants;
 use App\Models\Repositories\UserRepository;
 use App\Services\Transformers\UserTransformer;
-use EllipseSynergie\ApiResponse\Contracts\Response;
-use Illuminate\Support\Collection;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 use Validator;
 use App\Services\Constants\StatusCodes;
 
@@ -24,59 +25,42 @@ class UserService extends BaseService
     */
 
     /**
-     * @var Response
-     */
-    protected $_response;
-
-    /**
      * @var UserRepository
      */
     protected $_userRepository;
 
-    /**
-     * @var UploadService
-     */
-    protected $_uploadService;
-
-    /**
-     * @var UploadRepository
-     */
-    protected $_uploadRepository;
 
     /**
      * Create a new Service instance.
      *
-     * @param Response $response
      * @param UserRepository $userRepository
-     * @param UploadService $uploadService
-     * @param UploadRepository $uploadRepository
-     *
      * @return void
      */
-    public function __construct(Response $response, UserRepository $userRepository, UploadService $uploadService, UploadRepository $uploadRepository)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->_response = $response;
+        parent::__construct();
         $this->_userRepository = $userRepository;
-        $this->_uploadService = $uploadService;
-        $this->_uploadRepository = $uploadRepository;
     }
 
     /**
      * Display a listing of the resource.
      *
      * @param $request
-     * @return \League\Fractal\Resource\Collection
+     * @return mixed
      */
     public function index($request)
     {
         $collectionResponse = $this->_userRepository->index($request);
         if ($collectionResponse->has("data")) {
+            $collectionObject = $collectionResponse->pull("data");
             if ($request->has("_render")) {
-                return $this->_response
-                    ->withCollection($collectionResponse->pull("data"), new UserTransformer, 'users');
+                $resource = new Collection($collectionObject, new UserTransformer(), 'users');
+                return $this->_fractal->createData($resource)->toArray();
             }
-            return $this->_response
-                ->withPaginator($collectionResponse->pull("data"), new UserTransformer, 'users');
+            $collectionCollection = $collectionObject->getCollection();
+            $resource = new Collection($collectionCollection, new UserTransformer(), 'users');
+            $resource->setPaginator(new IlluminatePaginatorAdapter($collectionObject));
+            return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
@@ -86,7 +70,7 @@ class UserService extends BaseService
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \League\Fractal\Resource\Collection
+     * @return mixed
      */
     public function store($request)
     {
@@ -99,22 +83,11 @@ class UserService extends BaseService
         $collectionResponse = $this->_userRepository->store($request);
         if ($collectionResponse->has("data")) {
             $collectionResponse = $collectionResponse->pull("data");
-
-            //upload image
-            $request->request->add(["user_id" => $collectionResponse->id, "dataUrl" => $request->get("user")["dataUrl"]]);
-            $imagePayload = $this->_uploadService->storeImage($request);
-
-            $request->request->add(["upload" => [
-                'name' => $imagePayload["name"],
-                'relative_path' => $imagePayload["relative_path"],
-                'absolute_path' => $imagePayload["relative_path"],
-                'collection_id' => $collectionResponse->id]
-            ]);
-            $this->_uploadRepository->store($request);
-            dispatch(new GenerateResizedImageJob($imagePayload, config("custom_config.profile_sizes")));
-            //upload image
-            return $this->_response
-                ->withItem($collectionResponse, new UserTransformer, 'user');
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
+            }
+            $resource = new Item($collectionResponse, new UserTransformer(), 'user');
+            return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
@@ -125,7 +98,7 @@ class UserService extends BaseService
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \League\Fractal\Resource\Collection
+     * @return mixed
      */
     public function update($request, $id)
     {
@@ -136,8 +109,12 @@ class UserService extends BaseService
         }
         $collectionResponse = $this->_userRepository->update($request, $id);
         if ($collectionResponse->has("data")) {
-            return $this->_response
-                ->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+            $collectionResponse = $collectionResponse->pull("data");
+            if (!empty($collectionResponse->upload)) {
+                dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
+            }
+            $resource = new Item($collectionResponse, new UserTransformer(), 'users');
+            return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
         }
@@ -147,13 +124,14 @@ class UserService extends BaseService
      * Remove the specified resource from storage.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return mixed
      */
     public function destroy($id)
     {
         $collectionResponse = $this->_userRepository->destroy($id);
         if ($collectionResponse->has("data")) {
-            return $this->_response->withItem($collectionResponse->pull("data"), new UserTransformer, 'user');
+            $resource = new Item($collectionResponse->pull("data"), new UserTransformer(), 'user');
+            return $this->_fractal->createData($resource)->toArray();
         } else if ($collectionResponse->has("not_found")) {
             return $this->_response->withItem($collectionResponse->pull("not_found"), new UserTransformer, 'user');
         } else {
