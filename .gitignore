@@ -13,6 +13,7 @@ yarn-error.log
 .env
 .envrc
 .env.dev
-public/app
+public/app/css/*
+public/app/js/*
 composer.lock
 public/uploads/*
