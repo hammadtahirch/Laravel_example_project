@@ -18,6 +18,7 @@ import Collections from "./echo_system/pages/Settings/Collections";
 import EmailTemplates from "./echo_system/pages/Settings/EmailTemplates";
 import CreateOrUpdateProduct from "./echo_system/pages/Shops/CreateOrUpdateProduct";
 import CreateUpdateProductVariance from "./echo_system/pages/Shops/CreateUpdateProductVariance";
+import CreateUpdateProductVarianceOption from "./echo_system/pages/Shops/CreateUpdateProductVarianceOption";
 
 class Routes extends Component {
     render() {
@@ -38,10 +39,10 @@ class Routes extends Component {
 
                             <Route exact path='/admin/shop/:id/create_or_update/:product_id?'
                                    component={CreateOrUpdateProduct}/>
-                            <Route exact path='/admin/shop/:id/product/:product_id/create_update_product_variance/:variance_id?'
+                            <Route exact path='/admin/shop/:id/product/:product_id/create_update_product_variance'
                                    component={CreateUpdateProductVariance}/>
-                            <Route exact path='/admin/shop/:id/variance/:variance_id/create_update_variance_option/:option_id?'
-                                   component={CreateUpdateProductVariance}/>
+                            <Route exact path='/admin/shop/:id/variance/:variance_id/create_update_variance_option'
+                                   component={CreateUpdateProductVarianceOption}/>
 
                             <Route exact path='/admin/shop/:id/settings' component={ShopSettings}/>
 

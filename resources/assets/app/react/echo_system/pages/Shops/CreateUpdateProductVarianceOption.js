@@ -21,7 +21,7 @@ import Modal from "react-responsive-modal";
 
 const queryString = require('query-string');
 
-class CreateUpdateProductVariance extends Component {
+class CreateUpdateProductVarianceOption extends Component {
 
     /**
      * constructor
@@ -202,7 +202,7 @@ class CreateUpdateProductVariance extends Component {
                                 <div className="dropdown-divider"></div>
 
                                 <a className="dropdown-item"
-                                   href={"/admin/shop/" + this.props.match.params.id + "/variance/" + variance.id + "/create_update_variance_option/" + variance.id}><i
+                                   href={"/admin/shop/" + this.props.match.params.id + "/variance/" + this.props.match.params.variance_id + "/create_update_variance_option/" + variance.id}><i
                                     className='fa fa-plus-circle'></i> Add Options</a>
                                 <div className="dropdown-divider"></div>
                                 <a className="dropdown-item"
@@ -242,46 +242,25 @@ class CreateUpdateProductVariance extends Component {
                                 <div className="regular-page-text mb-15 mt-15">
                                     <div className="regular-page-text">
                                         <div className="card mb-15">
-                                            <div className="card-body" ref={this.myRef}>
-                                                <h5>{(this.state.variance.id === '') ? "Create Variance" : "Update Variance"}</h5>
+                                            <div className="card-body">
+                                                <h5> Product Options </h5>
                                                 <hr/>
                                                 <form>
                                                     <div className="row ">
-                                                        <div className="col-md-4">
+                                                        <div className="col-md-6 mb-3">
                                                             <label>Title<span>*</span></label>
                                                             <input type="text" className="form-control"
-                                                                   name="title" value={this.state.variance.title}
-                                                                   onChange={(e) => this.handleChange(e)}/>
+                                                                   name="city"/>
                                                         </div>
-
-                                                        <div className="col-md-4 mb-3">
-                                                            <label> Maximum Permitted<span>*</span></label>
+                                                        <div className="col-md-6 mb-3">
+                                                            <label>Price<span>*</span></label>
                                                             <input type="text" className="form-control"
-                                                                   name="max_permitted"
-                                                                   value={this.state.variance.max_permitted}
-                                                                   onChange={(e) => this.handleChange(e)}/>
-                                                        </div>
-                                                        <div className="col-md-4 mb-3">
-                                                            <label>Minimum Permitted <span>*</span></label>
-                                                            <input type="text" className="form-control"
-                                                                   name="min_permitted"
-                                                                   value={this.state.variance.min_permitted}
-                                                                   onChange={(e) => this.handleChange(e)}/>
+                                                                   name="province"/>
                                                         </div>
                                                         <div className="col-md-12 mb-3">
-                                                            <label>Description<span>*</span></label>
-                                                            <textarea className="form-control"
-                                                                      name="description"
-                                                                      value={this.state.variance.description}
-                                                                      onChange={(e) => this.handleChange(e)}>
-
-                                                            </textarea>
-                                                        </div>
-                                                        <div className="col-md-12">
                                                             <button type="button"
-                                                                    onClick={() => this.saveUpdateVariance(this.state.variance)}
-                                                                    className="btn btn-outline-dark font-14 pull-right">
-                                                                {(this.state.variance.id === '') ? "Create" : "Update"}
+                                                                    className="btn btn-outline-dark font-14 mb-30 pull-right">
+                                                                Create
                                                             </button>
                                                         </div>
 
@@ -291,7 +270,7 @@ class CreateUpdateProductVariance extends Component {
                                         </div>
                                         <div className="card">
                                             <div className="card-body">
-                                                <h2>Product Variance</h2>
+                                                <h2>Variance Options</h2>
                                                 <hr/>
                                                 <div className="clear-5"></div>
                                                 <form className="mb-30">
@@ -426,4 +405,4 @@ function mapDispatchToProp(dispatch) {
     })
 }
 
-export default connect(mapStateToProp, mapDispatchToProp)(CreateUpdateProductVariance);
+export default connect(mapStateToProp, mapDispatchToProp)(CreateUpdateProductVarianceOption);

@@ -63,8 +63,6 @@ class UserRepository
     public function index($request)
     {
         try {
-            $client = new Client('tcp://0.0.0.0:6379');
-            print_r($client);die;
             $userObject = User::query();
             $userObject = $this->_userFilter($userObject, $request);
             $userObject = $userObject->whereHas('roles', function ($query) {
