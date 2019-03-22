@@ -24,52 +24,54 @@ class VarianceOptionController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param $variance_id
      * @param Request $request
      * @param VarianceOptionService $varianceOptionService
-     * @return array []
+     * @return array[]
      */
-    public function index(Request $request, VarianceOptionService $varianceOptionService)
+    public function index($variance_id, Request $request, VarianceOptionService $varianceOptionService)
     {
-        return $varianceOptionService->index($request);
+        return $varianceOptionService->index($variance_id, $request);
     }
 
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param $variance_id
+     * @param Request $request
      * @param VarianceOptionService $varianceOptionService
-     * @return array []
+     * @return mixed
      */
-    public function store(Request $request, VarianceOptionService $varianceOptionService)
+    public function store($variance_id, Request $request, VarianceOptionService $varianceOptionService)
     {
-        return $varianceOptionService->store($request);
+        return $varianceOptionService->store($variance_id, $request);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  integer $variance_id
-     * @param  integer $id
+     * @param $variance_id
+     * @param $id
+     * @param Request $request
      * @param VarianceOptionService $varianceOptionService
-     * @return  array []
+     * @return mixed
      */
-    public function update(Request $request, $variance_id, $id, VarianceOptionService $varianceOptionService)
+    public function update($variance_id, $id, Request $request, VarianceOptionService $varianceOptionService)
     {
-        return $varianceOptionService->update($request, $variance_id, $id);
+        return $varianceOptionService->update($variance_id, $id, $request);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Update the specified resource in storage.
      *
-     * @param  integer $id
-     * @param  integer $variance_id
+     * @param $variance_id
+     * @param $id
      * @param VarianceOptionService $varianceOptionService
      * @return \Illuminate\Http\Response
      */
-    public function destroy($variance_id, $id, VarianceOptionService $varianceOptionService)
+    public function destroy( $variance_id, $id, VarianceOptionService $varianceOptionService)
     {
-        return $varianceOptionService->destroy($variance_id, $id);
+        return $varianceOptionService->destroy( $variance_id, $id);
     }
 }

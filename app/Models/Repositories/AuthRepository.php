@@ -51,7 +51,7 @@ class AuthRepository
      */
     public function authAbort()
     {
-        $this->_collection->put("forbidden","Oops! You do not have permission");
+        $this->_collection->put("forbidden","Uh-oh! You do not have permission");
         return $this->_collection;
     }
 }

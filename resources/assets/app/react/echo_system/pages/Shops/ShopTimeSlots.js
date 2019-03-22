@@ -53,7 +53,7 @@ class ShopTimeSlots extends Component {
      * componentWillMount [react default life cycle functions]
      */
     componentWillMount() {
-        this.props.fetch_shop_time_slots(this.props.match.params.id);
+        this.props.fetch_shop_time_slots(this.props.match.params.shop_id);
     }
 
     /**

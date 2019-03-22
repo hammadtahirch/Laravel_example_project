@@ -57,6 +57,6 @@ class AuthService extends BaseService
      */
     public function authAbort()
     {
-        return $this->_response->errorForbidden("Oops! You do not have permission");
+        return $this->_response->errorForbidden("Uh-oh! You do not have permission");
     }
 }

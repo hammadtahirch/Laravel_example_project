@@ -63,7 +63,7 @@ class ShopProducts extends Component {
      * componentDidMount [react default life cycle functions]
      */
     componentDidMount() {
-        this.props.fetchProducts(this.props.match.params.id, this._builtQuery());
+        this.props.fetchProducts(this.props.match.params.shop_id, this._builtQuery());
     }
 
     /**
@@ -110,7 +110,7 @@ class ShopProducts extends Component {
      * handleSearch
      */
     handleSearch() {
-        this.props.fetchProducts(this.props.match.params.id, this._builtQuery());
+        this.props.fetchProducts(this.props.match.params.shop_id, this._builtQuery());
     }
 
     /**
@@ -136,7 +136,7 @@ class ShopProducts extends Component {
             });
         }
         if (is_confirm !== false) {
-            this.props.deleteProduct(this.props.match.params.id, this.state.product);
+            this.props.deleteProduct(this.props.match.params.shop_id, this.state.product);
             this.setState({
                 ...this.state,
                 product: {
@@ -164,7 +164,7 @@ class ShopProducts extends Component {
     _productList() {
         if (this.props.fetch_shop_product_props !== '') {
             if (this.props.fetch_shop_product_props.products.length === 0) {
-                return DataNotFound({type: "table", colSpan: "7", message: "Whoops! there is no product available."})
+                return DataNotFound({type: "table", colSpan: "7", message: "Uh-oh! there is no product available."})
             }
             return this.props.fetch_shop_product_props.products.map((product, index) => {
                 return (
@@ -183,17 +183,13 @@ class ShopProducts extends Component {
                             </a>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item"
-                                   href={"/admin/shop/" + this.props.match.params.id + "/create_or_update/" + product.id}><i
+                                   href={"/admin/shop/" + this.props.match.params.shop_id + "/create_or_update/" + product.id}><i
                                     className='fa fa-pencil'></i> Edit</a>
                                 <div className="dropdown-divider"></div>
 
                                 <a className="dropdown-item"
-                                   href={"/admin/shop/" + this.props.match.params.id + "/product/" + product.id + "/create_update_product_variance/"}><i
+                                   href={"/admin/shop/" + this.props.match.params.shop_id + "/product/" + product.id + "/variance/"}><i
                                     className='fa fa-plus-circle'></i> Add Variance</a>
-                                <div className="dropdown-divider"></div>
-
-                                <a className="dropdown-item"><i
-                                    className="fa fa-eye-slash"></i> View</a>
                                 <div className="dropdown-divider"></div>
 
                                 <a className="dropdown-item">
@@ -246,7 +242,7 @@ class ShopProducts extends Component {
                                             <div className="card-body">
                                                 <h2>Menu</h2>
                                                 <hr/>
-                                                <a href={"/admin/shop/" + this.props.match.params.id + "/create_or_update"}
+                                                <a href={"/admin/shop/" + this.props.match.params.shop_id + "/create_or_update"}
                                                    className="btn btn-outline-dark font-14 mb-30 pull-right">Create
                                                     Product
                                                 </a>

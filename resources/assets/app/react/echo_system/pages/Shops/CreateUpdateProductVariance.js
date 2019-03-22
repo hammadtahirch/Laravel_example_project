@@ -32,7 +32,6 @@ class CreateUpdateProductVariance extends Component {
         if (getSession('login') === null) {
             history.push('login');
         }
-        this.myRef = React.createRef()
         this.state = {
             alert: {
                 show: false,
@@ -77,6 +76,42 @@ class CreateUpdateProductVariance extends Component {
      */
     componentDidMount() {
         this.props.fetchProductVariances(this.props.match.params.product_id, this._builtQuery());
+    }
+
+    /**
+     *
+     * @param nextProps
+     * @param prevState
+     */
+    componentWillReceiveProps(nextProps, prevState) {
+        if (nextProps.getSavedProductVarianceProps !== '') {
+            this.setState({
+                option: {
+                    ...this.state,
+                    id: getSavedProductVarianceProps.variance.id,
+                    title: getSavedProductVarianceProps.variance.title,
+                    product_id: getSavedProductVarianceProps.variance.product_id,
+                    max_permitted: getSavedProductVarianceProps.variance.max_permitted,
+                    min_permitted: getSavedProductVarianceProps.variance.min_permitted,
+                    description: getSavedProductVarianceProps.variance.description
+                }
+            })
+            toast.success("Wow! Variance Save Successfully.")
+        }
+        if (nextProps.getDeletedProductVarianceProps !== '') {
+            this.setState({
+                option: {
+                    ...this.state,
+                    id: getDeletedProductVarianceProps.variance.id,
+                    title: getDeletedProductVarianceProps.variance.title,
+                    product_id: getDeletedProductVarianceProps.variance.product_id,
+                    max_permitted: getDeletedProductVarianceProps.variance.max_permitted,
+                    min_permitted: getDeletedProductVarianceProps.variance.min_permitted,
+                    description: getDeletedProductVarianceProps.variance.description
+                }
+            })
+            toast.success("Wow! Variance delete Successfully.")
+        }
     }
 
     /**
@@ -130,7 +165,7 @@ class CreateUpdateProductVariance extends Component {
                 description: selectedVariance.description
             }
         });
-        this.myRef.current.scrollTo(0, 0);
+        window.scrollTo(0, 0)
     }
 
     /**
@@ -180,7 +215,7 @@ class CreateUpdateProductVariance extends Component {
     _productVarianceList() {
         if (this.props.getProductVarianceProps !== '') {
             if (this.props.getProductVarianceProps.variances.length === 0) {
-                return DataNotFound({type: "table", colSpan: "7", message: "Whoops! there is no variance available."})
+                return DataNotFound({type: "table", colSpan: "7", message: "Uh-oh! there is no variance available."})
             }
             return this.props.getProductVarianceProps.variances.map((variance, index) => {
                 return (
@@ -202,7 +237,7 @@ class CreateUpdateProductVariance extends Component {
                                 <div className="dropdown-divider"></div>
 
                                 <a className="dropdown-item"
-                                   href={"/admin/shop/" + this.props.match.params.id + "/variance/" + variance.id + "/create_update_variance_option/" + variance.id}><i
+                                   href={"/admin/shop/" + this.props.match.params.shop_id + "/product/" + this.props.match.params.product_id + "/variance/" + variance.id + "/option"}><i
                                     className='fa fa-plus-circle'></i> Add Options</a>
                                 <div className="dropdown-divider"></div>
                                 <a className="dropdown-item"

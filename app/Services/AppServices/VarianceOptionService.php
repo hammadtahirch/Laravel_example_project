@@ -18,7 +18,7 @@ class VarianceOptionService extends BaseService
     | VarianceOption Service
     |--------------------------------------------------------------------------
     |
-    | This Service is responsible for handling Product Variance Activity
+    | This Service is responsible for handling Product Variance Option Activity
     |
     */
 
@@ -43,16 +43,17 @@ class VarianceOptionService extends BaseService
     /**
      * Display a listing of the resource.
      *
+     * @param $variance_id
      * @param $request
      * @return array []
      */
-    public function index($request)
+    public function index($variance_id, $request)
     {
         $collectionResponse = $this->_varianceOptionRepository->index($request);
         if ($collectionResponse->has("data")) {
             $collectionObject = $collectionResponse->pull("data");
             $collectionCollection = $collectionObject->getCollection();
-            $resource = new Collection($collectionCollection, new VarianceOptionTransformer(), 'variances');
+            $resource = new Collection($collectionCollection, new VarianceOptionTransformer(), 'options');
             $resource->setPaginator(new IlluminatePaginatorAdapter($collectionObject));
             return $this->_fractal->createData($resource)->toArray();
         } else {
@@ -65,20 +66,21 @@ class VarianceOptionService extends BaseService
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  $variance_id
+     * @param  $request
      * @return  mixed
      */
-    public function store($request)
+    public function store($variance_id, $request)
     {
-//        $requestObject = $request->all();
-//        $isValidate = $this->_collectionCreateValidator($requestObject);
-//        if (!empty($isValidate)) {
-//            return $isValidate;
-//        }
+        $requestObject = $request->all();
+        $isValidate = $this->_collectionCreateValidator($requestObject);
+        if (!empty($isValidate)) {
+            return $isValidate;
+        }
         $collectionResponse = $this->_varianceOptionRepository->store($request);
         if ($collectionResponse->has("data")) {
             $collectionResponse = $collectionResponse->pull("data");
-            $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'variance');
+            $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'option');
             return $this->_fractal->createData($resource)->toArray();
         } else {
             return $this->_response->errorInternalError($collectionResponse->pull("exception"));
@@ -88,23 +90,23 @@ class VarianceOptionService extends BaseService
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $variance_id
-     * @param  int $id
+     * @param  $request
+     * @param  $variance_id
+     * @param  $id
      * @return mixed
      */
-    public function update($request, $variance_id, $id)
+    public function update($variance_id, $id, $request)
     {
-//        $requestObject = $request->all();
-//        $isValidate = $this->_collectionUpdateValidator($requestObject);
-//        if (!empty($isValidate)) {
-//            return $isValidate;
-//        }
+        $requestObject = $request->all();
+        $isValidate = $this->_collectionUpdateValidator($requestObject);
+        if (!empty($isValidate)) {
+            return $isValidate;
+        }
 
         $collectionResponse = $this->_varianceOptionRepository->update($request, $variance_id, $id);
         if ($collectionResponse->has("data")) {
             $collectionResponse = $collectionResponse->pull("data");
-            $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'variance');
+            $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'option');
             return $this->_fractal->createData($resource)->toArray();
 
         } else {
@@ -115,15 +117,16 @@ class VarianceOptionService extends BaseService
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
-     * @param  int $variance_id
-     * @return \Illuminate\Http\Response
+     * @param  $id
+     * @param  $variance_id
+     * @return mixed
      */
     public function destroy($variance_id, $id)
     {
         $collectionResponse = $this->_varianceOptionRepository->destroy($variance_id, $id);
         if ($collectionResponse->has("data")) {
-            return $this->_response->withItem($collectionResponse->pull("data"), new VarianceOptionTransformer(), 'variance');
+            $resource = new Item($collectionResponse->pull("data"), new VarianceOptionTransformer(), 'option');
+            return $this->_fractal->createData($resource)->toArray();
         } elseif ($collectionResponse->has("not_found")) {
             return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
         } else {
@@ -140,12 +143,12 @@ class VarianceOptionService extends BaseService
     private function _collectionUpdateValidator(array $request)
     {
         $rules = [
-            'variance.title' => 'required' . $request["variance"]["id"],
-            'variance.description' => 'required',
+            'option.title' => 'required',
+            'option.price' => 'required',
         ];
         $messages = [
-            'variance.title.required' => "Oops! the { title } is required.",
-            'variance.description.required' => "Oops! the { description } is required.",
+            'option.title.required' => "Uh-oh! the { title } is required.",
+            'option.price.required' => "Uh-oh! the { price } is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -163,12 +166,12 @@ class VarianceOptionService extends BaseService
     private function _collectionCreateValidator(array $request)
     {
         $rules = [
-            'variance.title' => 'required',
-            'variance.description' => 'required',
+            'option.title' => 'required',
+            'option.price' => 'required',
         ];
         $messages = [
-            'variance.title.required' => "Oops! the { title } is required.",
-            'variance.description.required' => "Oops! the { description } is required.",
+            'option.title.required' => "Uh-oh! the { title } is required.",
+            'option.price.required' => "Uh-oh! the { price } is required.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {

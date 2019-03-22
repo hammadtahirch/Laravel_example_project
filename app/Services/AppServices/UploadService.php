@@ -69,11 +69,11 @@ class UploadService extends BaseService
                     "extension" => $ext
                 ];
             } else {
-                return ["status" => false, "message" => "Whoops! File is too big."];
+                return ["status" => false, "message" => "Uh-oh! File is too big."];
             }
 
         } else {
-            return ["status" => false, "message" => "Whoops! File is too big."];
+            return ["status" => false, "message" => "Uh-oh! File is too big."];
         }
 
     }

@@ -164,15 +164,15 @@ class ShopService extends BaseService
 
         ];
         $messages = [
-            'shop.title.required' => "Whoops! the { title } is required.",
-            'shop.user_id.required' => "Whoops! the { user } is required.",
-            'shop.address.required' => "Whoops! the { address } is required.",
-            'shop.city.required' => "Whoops! the { city } is required.",
-            'shop.province.required' => "Whoops! the { province } is required.",
-            'shop.country.required' => "Whoops! the { country } is required.",
-            'shop.portal_code.required' => "Whoops! the { portal code } is required.",
-            'shop.latitude.required' => "Whoops! the { latitude } is required.",
-            'shop.longitude.required' => "Whoops! the {longitude } is required.",
+            'shop.title.required' => "Uh-oh! the { title } is required.",
+            'shop.user_id.required' => "Uh-oh! the { user } is required.",
+            'shop.address.required' => "Uh-oh! the { address } is required.",
+            'shop.city.required' => "Uh-oh! the { city } is required.",
+            'shop.province.required' => "Uh-oh! the { province } is required.",
+            'shop.country.required' => "Uh-oh! the { country } is required.",
+            'shop.portal_code.required' => "Uh-oh! the { portal code } is required.",
+            'shop.latitude.required' => "Uh-oh! the { latitude } is required.",
+            'shop.longitude.required' => "Uh-oh! the {longitude } is required.",
 
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -203,15 +203,15 @@ class ShopService extends BaseService
 
         ];
         $messages = [
-            'shop.title.required' => "Whoops! the { title } is required.",
-            'shop.user_id.required' => "Whoops! the { user } is required.",
-            'shop.address.required' => "Whoops! the { address } is required.",
-            'shop.city.required' => "Whoops! the { city } is required.",
-            'shop.province.required' => "Whoops! the { province } is required.",
-            'shop.country.required' => "Whoops! the { country } is required.",
-            'shop.portal_code.required' => "Whoops! the { portal code } is required.",
-            'shop.latitude.required' => "Whoops! the { latitude } is required.",
-            'shop.longitude.required' => "Whoops! the {longitude } is required.",
+            'shop.title.required' => "Uh-oh! the { title } is required.",
+            'shop.user_id.required' => "Uh-oh! the { user } is required.",
+            'shop.address.required' => "Uh-oh! the { address } is required.",
+            'shop.city.required' => "Uh-oh! the { city } is required.",
+            'shop.province.required' => "Uh-oh! the { province } is required.",
+            'shop.country.required' => "Uh-oh! the { country } is required.",
+            'shop.portal_code.required' => "Uh-oh! the { portal code } is required.",
+            'shop.latitude.required' => "Uh-oh! the { latitude } is required.",
+            'shop.longitude.required' => "Uh-oh! the {longitude } is required.",
 
         ];
 

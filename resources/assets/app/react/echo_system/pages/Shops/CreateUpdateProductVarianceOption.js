@@ -6,11 +6,6 @@ import {DatetimePickerTrigger} from 'rc-datetime-picker';
 import 'react-toastify/dist/ReactToastify.css';
 import {getSession} from "../../../store/helper/helper";
 import {ToastContainer, toast} from 'react-toastify';
-import {
-    _deleteProductVariance,
-    _fetchAllProductVariances, _saveProductVariance,
-
-} from "../../../store/action/action-product-variance";
 import ValidationErrors from "../sub_components/ValidationErrors";
 import history from "../../../History";
 import Loading from "../sub_components/Loading";
@@ -18,6 +13,12 @@ import Header from "../../layout/Header";
 import ShopNav from "./_nav/ShopNav";
 import Pagination from "../sub_components/Pagination";
 import Modal from "react-responsive-modal";
+import {
+    _deleteProductVarianceOption,
+    _fetchAllProductVarianceOptions,
+    _saveProductVarianceOption
+} from "../../../store/action/action-product-variance-option";
+import {convertDollarToCent} from "../../../store/helper/utill-helper";
 
 const queryString = require('query-string');
 
@@ -32,7 +33,6 @@ class CreateUpdateProductVarianceOption extends Component {
         if (getSession('login') === null) {
             history.push('login');
         }
-        this.myRef = React.createRef()
         this.state = {
             alert: {
                 show: false,
@@ -41,13 +41,11 @@ class CreateUpdateProductVarianceOption extends Component {
                     _purpose: null
                 },
             },
-            variance: {
+            option: {
                 id: '',
                 title: '',
-                product_id: '',
-                max_permitted: '',
-                min_permitted: '',
-                description: '',
+                price: '',
+                variance_id: '',
             },
             filter: {
                 filterName: '',
@@ -76,8 +74,42 @@ class CreateUpdateProductVarianceOption extends Component {
      * componentDidMount [react default life cycle functions]
      */
     componentDidMount() {
-        this.props.fetchProductVariances(this.props.match.params.product_id, this._builtQuery());
+        this.props.fetchProductVarianceOptions(this.props.match.params.variance_id, this._builtQuery());
     }
+
+    /**
+     *
+     * @param nextProps
+     * @param prevState
+     */
+    componentWillReceiveProps(nextProps, prevState) {
+        console.log(nextProps);
+        if (nextProps.getSavedProductVarianceOptionProps !== '') {
+
+            this.setState({
+                option: {
+                    ...this.state,
+                    id: nextProps.getSavedProductVarianceOptionProps.option.id,
+                    title: nextProps.getSavedProductVarianceOptionProps.option.title,
+                    price: nextProps.getSavedProductVarianceOptionProps.option.price
+                }
+            })
+            toast.success("Wow! Variance Save Successfully.")
+        }
+
+        if (nextProps.getDeletedProductVarianceOptionProps !== '') {
+            this.setState({
+                option: {
+                    ...this.state,
+                    id: nextProps.getDeletedProductVarianceOptionProps.option.id,
+                    title: nextProps.getDeletedProductVarianceOptionProps.option.title,
+                    price: nextProps.getDeletedProductVarianceOptionProps.option.price
+                }
+            })
+            toast.success("Wow! Variance delete Successfully.")
+        }
+    }
+
 
     /**
      * handleFilter
@@ -99,10 +131,10 @@ class CreateUpdateProductVarianceOption extends Component {
      */
     handleChange(e) {
         const {name, value} = e.target;
-        const {variance} = this.state;
+        const {option} = this.state;
         this.setState({
-            variance: {
-                ...variance,
+            option: {
+                ...option,
                 [name]: value
             }
         });
@@ -111,53 +143,53 @@ class CreateUpdateProductVarianceOption extends Component {
     /**
      * save data in storage
      *
-     * @param variance
+     * @param option
      */
-    saveUpdateVariance(variance) {
-        variance.product_id = this.props.match.params.product_id;
-        this.props.saveUpdateProductVariance(variance.product_id, variance);
+    saveUpdateOption(option) {
+        debugger;
+        option = {
+            ...option,
+            price: convertDollarToCent(option.price)
+        }
+        option.variance_id = this.props.match.params.variance_id;
+        this.props.saveUpdateProductVarianceOption(option.variance_id, option);
     }
 
-    editVariance(selectedVariance) {
+    editOption(selectedOption) {
+        debugger;
         this.setState({
             ...this.state,
-            variance: {
-                id: selectedVariance.id,
-                title: selectedVariance.title,
-                product_id: selectedVariance.product_id,
-                max_permitted: selectedVariance.max_permitted,
-                min_permitted: selectedVariance.min_permitted,
-                description: selectedVariance.description
+            option: {
+                id: selectedOption.id,
+                title: selectedOption.title,
+                price: selectedOption.price
             }
         });
-        this.myRef.current.scrollTo(0, 0);
+        window.scrollTo(0, 0)
     }
 
     /**
-     * handleDeleteVariance
+     * handleDeleteOption
      * @param var _isOpen
      * @param object user
      * @param var is_confirm
      */
-    handleDeleteVariance(_isOpen, selectedVariance = null, is_confirm = false) {
-        if (selectedVariance !== null) {
+    handleDeleteOption(_isOpen, selectedOption = null, is_confirm = false) {
+        if (selectedOption !== null) {
             this.setState({
                 ...this.state,
-                variance: {
-                    id: selectedVariance.id,
-                    title: selectedVariance.title,
-                    product_id: this.props.match.params.product_id,
-                    max_permitted: selectedVariance.max_permitted,
-                    min_permitted: selectedVariance.min_permitted,
-                    description: selectedVariance.description
+                option: {
+                    id: selectedOption.id,
+                    title: selectedOption.title,
+                    price: selectedOption.price
                 }
             });
         }
         if (is_confirm !== false) {
-            this.props.deleteProductVariance(this.props.match.params.product_id, this.state.variance);
+            this.props.deleteProductVarianceOption(this.props.match.params.variance_id, this.state.option);
             this.setState({
                 ...this.state,
-                variance: {
+                option: {
                     id: '',
                     title: '',
                     product_id: '',
@@ -177,18 +209,16 @@ class CreateUpdateProductVarianceOption extends Component {
     /**
      * _shopList
      */
-    _productVarianceList() {
-        if (this.props.getProductVarianceProps !== '') {
-            if (this.props.getProductVarianceProps.variances.length === 0) {
-                return DataNotFound({type: "table", colSpan: "7", message: "Whoops! there is no variance available."})
+    _productOptionList() {
+        if (this.props.getProductVarianceOptionProps !== '') {
+            if (this.props.getProductVarianceOptionProps.options.length === 0) {
+                return DataNotFound({type: "table", colSpan: "7", message: "Uh-oh! there is no option available."})
             }
-            return this.props.getProductVarianceProps.variances.map((variance, index) => {
+            return this.props.getProductVarianceOptionProps.options.map((option, index) => {
                 return (
                     <tr key={index}>
-                        <td>{variance.title}</td>
-                        <td>{variance.description}</td>
-                        <td>{variance.max_permitted}</td>
-                        <td>{variance.min_permitted}</td>
+                        <td>{option.title}</td>
+                        <td>{option.price}</td>
                         <td className='text-center'>
                             <a className="dropdown-toggle"
                                data-toggle="dropdown"
@@ -197,16 +227,11 @@ class CreateUpdateProductVarianceOption extends Component {
                             </a>
                             <div className="dropdown-menu">
                                 <a className="dropdown-item"
-                                   onClick={() => this.editVariance(variance)}><i
+                                   onClick={() => this.editOption(option)}><i
                                     className='fa fa-pencil'></i> Edit</a>
                                 <div className="dropdown-divider"></div>
-
                                 <a className="dropdown-item"
-                                   href={"/admin/shop/" + this.props.match.params.id + "/variance/" + this.props.match.params.variance_id + "/create_update_variance_option/" + variance.id}><i
-                                    className='fa fa-plus-circle'></i> Add Options</a>
-                                <div className="dropdown-divider"></div>
-                                <a className="dropdown-item"
-                                   onClick={() => this.handleDeleteVariance(true, variance)}><i
+                                   onClick={() => this.handleDeleteOption(true, option)}><i
                                     className='fa fa-trash'></i> Delete</a>
                             </div>
                         </td>
@@ -245,22 +270,29 @@ class CreateUpdateProductVarianceOption extends Component {
                                             <div className="card-body">
                                                 <h5> Product Options </h5>
                                                 <hr/>
+                                                {(this.props.error !== "") &&
+                                                <ValidationErrors validationErrors={this.props.error.data}
+                                                                  statusCode={this.props.error.status}/>
+                                                }
                                                 <form>
                                                     <div className="row ">
                                                         <div className="col-md-6 mb-3">
                                                             <label>Title<span>*</span></label>
                                                             <input type="text" className="form-control"
-                                                                   name="city"/>
+                                                                   value={this.state.option.title}
+                                                                   name="title" onChange={(e) => this.handleChange(e)}/>
                                                         </div>
                                                         <div className="col-md-6 mb-3">
                                                             <label>Price<span>*</span></label>
                                                             <input type="text" className="form-control"
-                                                                   name="province"/>
+                                                                   name="price" onChange={(e) => this.handleChange(e)}
+                                                                   value={this.state.option.price}/>
                                                         </div>
                                                         <div className="col-md-12 mb-3">
                                                             <button type="button"
-                                                                    className="btn btn-outline-dark font-14 mb-30 pull-right">
-                                                                Create
+                                                                    className="btn btn-outline-dark font-14 mb-30 pull-right"
+                                                                    onClick={() => this.saveUpdateOption(this.state.option)}>
+                                                                {(this.state.option.id) ? "Update" : "Create"}
                                                             </button>
                                                         </div>
 
@@ -270,7 +302,7 @@ class CreateUpdateProductVarianceOption extends Component {
                                         </div>
                                         <div className="card">
                                             <div className="card-body">
-                                                <h2>Variance Options</h2>
+                                                <h2>Options</h2>
                                                 <hr/>
                                                 <div className="clear-5"></div>
                                                 <form className="mb-30">
@@ -304,19 +336,17 @@ class CreateUpdateProductVarianceOption extends Component {
                                                     <thead>
                                                     <tr>
                                                         <th>Title</th>
-                                                        <th>Description</th>
-                                                        <th>Max Permitted</th>
-                                                        <th>min Permitted</th>
-                                                        <th>Actions</th>
+                                                        <th>price</th>
+                                                        <th></th>
                                                     </tr>
                                                     </thead>
                                                     <tbody>
-                                                    {this._productVarianceList()}
+                                                    {this._productOptionList()}
 
                                                     </tbody>
                                                 </table>
-                                                {this.props.fetchProductVariances.meta && this.props.fetchProductVariances.meta.pagination.total_pages > 1 &&
-                                                <Pagination meta={this.props.fetchProductVariances.meta}
+                                                {this.props.fetchProductVarianceOptions.meta && this.props.fetchProductVarianceOptions.meta.pagination.total_pages > 1 &&
+                                                <Pagination meta={this.props.fetchProductVarianceOptions.meta}
                                                             url={location.pathname}/>
                                                 }
                                             </div>
@@ -331,7 +361,7 @@ class CreateUpdateProductVarianceOption extends Component {
                 <div>
                     <Modal
                         open={this.state.alert.show}
-                        onClose={() => this.handleDeleteVariance(false)}
+                        onClose={() => this.handleDeleteoption(false)}
                         closeOnEsc={false}
                         closeOnOverlayClick={false}
                         styles={{maxWidth: "1000px"}}>
@@ -348,12 +378,12 @@ class CreateUpdateProductVarianceOption extends Component {
                                             <div className="row ">
 
                                                 <div className="col-md-12 mb-10">
-                                                    Are you sure you want to delete (<b>{this.state.variance.title}</b>)?
+                                                    Are you sure you want to delete (<b>{this.state.option.title}</b>)?
                                                 </div>
                                                 <div className="col-md-12 ">
                                                     <button type="button"
                                                             className="btn btn-outline-dark font-14 pull-right "
-                                                            onClick={() => this.handleDeleteVariance(false, null, true)}>
+                                                            onClick={() => this.handleDeleteOption(false, null, true)}>
                                                         Proceed
                                                     </button>
                                                 </div>
@@ -379,9 +409,9 @@ class CreateUpdateProductVarianceOption extends Component {
  */
 function mapStateToProp(state) {
     return ({
-        getProductVarianceProps: state.product_variance.fetch_product_variances,
-        getSavedProductVarianceProps: state.product_variance.save_product_variance,
-        getDeletedProductVarianceProps: state.product_variance.delete_product_variance,
+        getProductVarianceOptionProps: state.product_variance_option.fetch_product_variance_options,
+        getSavedProductVarianceOptionProps: state.product_variance_option.save_product_variance_option,
+        getDeletedProductVarianceOptionProps: state.product_variance_option.delete_product_variance_option,
         error: state.error.error,
     })
 }
@@ -393,14 +423,14 @@ function mapStateToProp(state) {
  */
 function mapDispatchToProp(dispatch) {
     return ({
-        fetchProductVariances: (product_id, params) => {
-            dispatch(_fetchAllProductVariances(product_id, params));
+        fetchProductVarianceOptions: (variance_id, params) => {
+            dispatch(_fetchAllProductVarianceOptions(variance_id, params));
         },
-        saveUpdateProductVariance: (product_id, params) => {
-            dispatch(_saveProductVariance(product_id, params));
+        saveUpdateProductVarianceOption: (variance_id, params) => {
+            dispatch(_saveProductVarianceOption(variance_id, params));
         },
-        deleteProductVariance: (product_id, params) => {
-            dispatch(_deleteProductVariance(product_id, params));
+        deleteProductVarianceOption: (variance_id, params) => {
+            dispatch(_deleteProductVarianceOption(variance_id, params));
         }
     })
 }

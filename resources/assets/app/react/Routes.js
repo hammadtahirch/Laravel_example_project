@@ -34,14 +34,14 @@ class Routes extends Component {
                             <Route exact path='/admin/shop_management' component={ShopManagement}/>
                             <Route exact path='/admin/collections' component={Collections}/>
                             <Route exact path='/admin/templates' component={EmailTemplates}/>
-                            <Route exact path='/admin/shop/:id/time_slot' component={ShopTimeSlots}/>
-                            <Route exact path='/admin/shop/:id/products' component={ShopProducts}/>
+                            <Route exact path='/admin/shop/:shop_id/time_slot' component={ShopTimeSlots}/>
+                            <Route exact path='/admin/shop/:shop_id/products' component={ShopProducts}/>
 
-                            <Route exact path='/admin/shop/:id/create_or_update/:product_id?'
+                            <Route exact path='/admin/shop/:shop_id/create_or_update/:product_id?'
                                    component={CreateOrUpdateProduct}/>
-                            <Route exact path='/admin/shop/:id/product/:product_id/create_update_product_variance'
+                            <Route exact path='/admin/shop/:shop_id/product/:product_id/variance'
                                    component={CreateUpdateProductVariance}/>
-                            <Route exact path='/admin/shop/:id/variance/:variance_id/create_update_variance_option'
+                            <Route exact path='/admin/shop/:shop_id/product/:product_id/variance/:variance_id/option'
                                    component={CreateUpdateProductVarianceOption}/>
 
                             <Route exact path='/admin/shop/:id/settings' component={ShopSettings}/>

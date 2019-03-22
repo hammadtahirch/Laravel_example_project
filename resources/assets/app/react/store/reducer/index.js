@@ -2,6 +2,7 @@ import account from './account-reducer';
 import shop from './shop-reducer';
 import product from './product-reducer';
 import product_variance from './product-variance-reducer';
+import product_variance_option from './product-variance-option-reducer';
 import setting from './setting-reducer';
 import shop_time_slot from './shop-time-slot-reducer';
 import collection from './collection-reducer';
@@ -17,6 +18,7 @@ export default combineReducers({
     shop: shop,
     product: product,
     product_variance: product_variance,
+    product_variance_option: product_variance_option,
     shop_time_slot: shop_time_slot,
     setting: setting,
     collection: collection,

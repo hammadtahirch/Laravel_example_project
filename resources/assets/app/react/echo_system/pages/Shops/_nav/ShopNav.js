@@ -52,7 +52,7 @@ class ShopNav extends Component {
             _activeSettings = " active"
         } else if (this.state.segment.url.includes('time_slot')) {
             _activeTimeSlot = " active";
-        }else if (this.state.segment.url.includes('product')) {
+        } else if (this.state.segment.url.includes('product')) {
             _activeProducts = " active";
         }
         return (
@@ -61,15 +61,15 @@ class ShopNav extends Component {
                 <div className="nav flex-column nav-pills">
 
                     <a className={"nav-link" + _activeProducts}
-                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.id + "/products"}>
+                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.shop_id + "/products"}>
                         <i className="fa fa-bars"></i> Menu
                     </a>
                     <a className={"nav-link" + _activeTimeSlot}
-                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.id + "/time_slot"}>
+                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.shop_id + "/time_slot"}>
                         <i className="fa fa-clock-o"></i> Time Settings
                     </a>
                     <a className={"nav-link" + _activeSettings}
-                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.id + "/settings"}>
+                       href={Config.WEB_ADDRESS + "admin/shop/" + this.state.segment.params.shop_id + "/settings"}>
                         <i className="fa fa-cogs"></i> Settings
                     </a>
                 </div>

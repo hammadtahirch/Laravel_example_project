@@ -151,9 +151,9 @@ class CollectionService extends BaseService
             'collection.description' => 'required',
         ];
         $messages = [
-            'collection.title.required' => "Oops! the { title } is required.",
-            'collection.title.unique' => "Oops! the { collection } has already been taken.",
-            'collection.description.required' => "Oops! the { description } is required.",
+            'collection.title.required' => "Uh-oh! the { title } is required.",
+            'collection.title.unique' => "Uh-oh! the { collection } has already been taken.",
+            'collection.description.required' => "Uh-oh! the { description } is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -175,9 +175,9 @@ class CollectionService extends BaseService
             'collection.description' => 'required',
         ];
         $messages = [
-            'collection.title.required' => "Oops! the { title } is required.",
-            'collection.title.unique' => "Oops! the { collection } has already been taken.",
-            'collection.description.required' => "Oops! the { description } is required.",
+            'collection.title.required' => "Uh-oh! the { title } is required.",
+            'collection.title.unique' => "Uh-oh! the { collection } has already been taken.",
+            'collection.description.required' => "Uh-oh! the { description } is required.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {

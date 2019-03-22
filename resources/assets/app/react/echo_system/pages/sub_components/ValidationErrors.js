@@ -20,7 +20,7 @@ class ValidationErrors extends Component {
     _validation(props) {
         if (props.statusCode === 401) {
             if (typeof props.validationErrors.error === "undefined") {
-                return (<strong>Whoops! Sorry your are not valid user</strong>);
+                return (<strong>Uh-oh! Sorry your are not valid user</strong>);
             } else {
                 return (
                     <li>
@@ -41,7 +41,7 @@ class ValidationErrors extends Component {
         }
         else if (props.statusCode === 500) {
             debugger;
-            return (<strong>Whoops! Sorry {props.validationErrors.message}</strong>);
+            return (<strong>Uh-oh! Sorry {props.validationErrors.message}</strong>);
         }
 
     }

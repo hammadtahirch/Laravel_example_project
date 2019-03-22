@@ -219,12 +219,12 @@ class UserService extends BaseService
             'user.c_password' => 'required|same:user.password',
         ];
         $messages = [
-            'user.name.required' => "Oops! name is required.",
-            'user.email.required' => "Oops! email is required",
-            'user.email.email' => "Oops! email is not correct format.",
-            'user.password.required' => "Oops! password is required.",
-            'user.c_password.required' => "Oops! retype is required.",
-            'user.c_password.same' => "Oops! Password does not match.",
+            'user.name.required' => "Uh-oh! name is required.",
+            'user.email.required' => "Uh-oh! email is required",
+            'user.email.email' => "Uh-oh! email is not correct format.",
+            'user.password.required' => "Uh-oh! password is required.",
+            'user.c_password.required' => "Uh-oh! retype is required.",
+            'user.c_password.same' => "Uh-oh! Password does not match.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {
@@ -250,14 +250,14 @@ class UserService extends BaseService
 
         ];
         $messages = [
-            'user.first_name.required' => "Whoops! the { first name } is required.",
-            'user.last_name.required' => "Whoops! the { last name } is required.",
-            'user.email.required' => "Whoops! the { email } is required",
-            'user.email.email' => "Whoops! the { email } is not correct format.",
-            'user.email.unique' => "Whoops! the { email } has already been taken.",
-            'user.phone_number.required' => "Whoops! the { phone number } required.",
-            'user.role_id.required' => "Whoops! the { role } is required.",
-            'user.status.required' => "Whoops! the { status } is required.",
+            'user.first_name.required' => "Uh-oh! the { first name } is required.",
+            'user.last_name.required' => "Uh-oh! the { last name } is required.",
+            'user.email.required' => "Uh-oh! the { email } is required",
+            'user.email.email' => "Uh-oh! the { email } is not correct format.",
+            'user.email.unique' => "Uh-oh! the { email } has already been taken.",
+            'user.phone_number.required' => "Uh-oh! the { phone number } required.",
+            'user.role_id.required' => "Uh-oh! the { role } is required.",
+            'user.status.required' => "Uh-oh! the { status } is required.",
 
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -284,14 +284,14 @@ class UserService extends BaseService
 
         ];
         $messages = [
-            'user.first_name.required' => "Whoops! the { first name } is required.",
-            'user.last_name.required' => "Whoops! the { last name } is required.",
-            'user.email.required' => "Whoops! the { email } is required",
-            'user.email.email' => "Whoops! the { email } is not correct format.",
-            'user.email.unique' => "Whoops! the { email } has already been taken.",
-            'user.phone_number.required' => "Whoops! the { phone number } required.",
-            'user.role_id.required' => "Whoops! the { role } is required.",
-            'user.status.required' => "Whoops! the { status } is required.",
+            'user.first_name.required' => "Uh-oh! the { first name } is required.",
+            'user.last_name.required' => "Uh-oh! the { last name } is required.",
+            'user.email.required' => "Uh-oh! the { email } is required",
+            'user.email.email' => "Uh-oh! the { email } is not correct format.",
+            'user.email.unique' => "Uh-oh! the { email } has already been taken.",
+            'user.phone_number.required' => "Uh-oh! the { phone number } required.",
+            'user.role_id.required' => "Uh-oh! the { role } is required.",
+            'user.status.required' => "Uh-oh! the { status } is required.",
 
         ];
 
@@ -314,9 +314,9 @@ class UserService extends BaseService
             'user.password' => 'required',
         ];
         $messages = [
-            'user.email.required' => "Whoops! the { email } is required",
-            'user.email.email' => "Whoops! the { email } is not correct format.",
-            'user.password.required' => "Whoops! the { password } is required."
+            'user.email.required' => "Uh-oh! the { email } is required",
+            'user.email.email' => "Uh-oh! the { email } is not correct format.",
+            'user.password.required' => "Uh-oh! the { password } is required."
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {

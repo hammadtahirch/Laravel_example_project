@@ -117,13 +117,14 @@ class ProductVarianceService extends BaseService
      *
      * @param  int $id
      * @param  int $product_id
-     * @return \Illuminate\Http\Response
+     * @return mixed
      */
     public function destroy($product_id, $id)
     {
         $collectionResponse = $this->_productVarianceRepository->destroy($product_id, $id);
         if ($collectionResponse->has("data")) {
-            return $this->_response->withItem($collectionResponse->pull("data"), new ProductVarianceTransformer(), 'variance');
+            $resource = new Item($collectionResponse->pull("data"), new ProductVarianceTransformer(), 'variance');
+            return $this->_fractal->createData($resource)->toArray();
         } elseif ($collectionResponse->has("not_found")) {
             return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
         } else {
@@ -144,8 +145,8 @@ class ProductVarianceService extends BaseService
             'variance.description' => 'required',
         ];
         $messages = [
-            'variance.title.required' => "Oops! the { title } is required.",
-            'variance.description.required' => "Oops! the { description } is required.",
+            'variance.title.required' => "Uh-oh! the { title } is required.",
+            'variance.description.required' => "Uh-oh! the { description } is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -167,8 +168,8 @@ class ProductVarianceService extends BaseService
             'variance.description' => 'required',
         ];
         $messages = [
-            'variance.title.required' => "Oops! the { title } is required.",
-            'variance.description.required' => "Oops! the { description } is required.",
+            'variance.title.required' => "Uh-oh! the { title } is required.",
+            'variance.description.required' => "Uh-oh! the { description } is required.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {

@@ -45,7 +45,7 @@ class RoleRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception]);
         }
         return $this->_collection;
@@ -74,12 +74,12 @@ class RoleRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception]);
         }
 

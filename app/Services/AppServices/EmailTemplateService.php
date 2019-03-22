@@ -148,14 +148,14 @@ class EmailTemplateService extends BaseService
             'template.email_body' => 'required',
         ];
         $messages = [
-            'template.key.required' => "Whoops! the { key } is required.",
-            'template.key.unique' => "Whoops! the { key } has already been taken.",
-            'template.subject.required' => "Whoops! the { subject } is required.",
-            'template.subject.unique' => "Whoops! the { subject }  has already exist.",
-            'template.from_email.required' => "Whoops! the { from email } is required.",
-            'template.from_email.email' => "Whoops! the { from email } is wrong.",
-            'template.from_name.required' => "Whoops! the { from name } is required.",
-            'template.email_body.required' => "Whoops! the { email body } is required.",
+            'template.key.required' => "Uh-oh! the { key } is required.",
+            'template.key.unique' => "Uh-oh! the { key } has already been taken.",
+            'template.subject.required' => "Uh-oh! the { subject } is required.",
+            'template.subject.unique' => "Uh-oh! the { subject }  has already exist.",
+            'template.from_email.required' => "Uh-oh! the { from email } is required.",
+            'template.from_email.email' => "Uh-oh! the { from email } is wrong.",
+            'template.from_name.required' => "Uh-oh! the { from name } is required.",
+            'template.email_body.required' => "Uh-oh! the { email body } is required.",
 
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
@@ -180,14 +180,14 @@ class EmailTemplateService extends BaseService
             'template.email_body' => 'required',
         ];
         $messages = [
-            'template.key.required' => "Whoops! the { key } is required.",
-            'template.key.unique' => "Whoops! the { key } has already been taken.",
-            'template.subject.required' => "Whoops! the { subject } is required.",
-            'template.subject.unique' => "Whoops! the { subject }  has already exist.",
-            'template.from_email.required' => "Whoops! the { from email } is required.",
-            'template.from_email.email' => "Whoops! the { from email } is wrong.",
-            'template.from_name.required' => "Whoops! the { from name } is required.",
-            'template.email_body.required' => "Whoops! the { email body } is required.",
+            'template.key.required' => "Uh-oh! the { key } is required.",
+            'template.key.unique' => "Uh-oh! the { key } has already been taken.",
+            'template.subject.required' => "Uh-oh! the { subject } is required.",
+            'template.subject.unique' => "Uh-oh! the { subject }  has already exist.",
+            'template.from_email.required' => "Uh-oh! the { from email } is required.",
+            'template.from_email.email' => "Uh-oh! the { from email } is wrong.",
+            'template.from_name.required' => "Uh-oh! the { from name } is required.",
+            'template.email_body.required' => "Uh-oh! the { email body } is required.",
 
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);

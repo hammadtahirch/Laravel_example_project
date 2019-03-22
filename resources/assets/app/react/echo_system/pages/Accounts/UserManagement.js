@@ -222,7 +222,6 @@ class UserManagement extends Component {
      * @param Object user
      */
     handleEditUser(user) {
-        console.log(user);
         this.setState(
             {
                 user: {

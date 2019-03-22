@@ -230,7 +230,7 @@ class EmailTemplates extends Component {
     _templateList(props) {
         if (props.fetch_template_props !== '') {
             if (props.fetch_template_props.templates.length === 0) {
-                return DataNotFound({type: "table", colSpan: "4", message: "Whoops! there is no template available."})
+                return DataNotFound({type: "table", colSpan: "4", message: "Uh-oh! there is no template available."})
             }
 
             return props.fetch_template_props.templates.map((template, index) => {

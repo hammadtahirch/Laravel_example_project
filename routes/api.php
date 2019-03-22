@@ -28,6 +28,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('shop/{shop_id}/time_slot', 'Api\ShopTimeSlotController');
     Route::resource('shop/{shop_id}/products', 'Api\ShopProductsController');
     Route::resource('product/{product_id}/variances', 'Api\ProductVarianceController');
+    Route::resource('variance/{variance_id}/option', 'Api\VarianceOptionController');
     Route::resource('role', 'Api\RoleController');
     Route::resource('permission', 'Api\PermissionController');
     Route::get('details', 'Api\UserController@details');

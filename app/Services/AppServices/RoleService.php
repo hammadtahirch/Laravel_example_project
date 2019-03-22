@@ -95,9 +95,9 @@ class RoleService extends BaseService
             'role.description' => 'required',
         ];
         $messages = [
-            'shop.name.required' => "Oops! name is required.",
-            'shop.display_name.required' => "Oops! display_name is required.",
-            'shop.description.required' => "Oops! description is required.",
+            'shop.name.required' => "Uh-oh! name is required.",
+            'shop.display_name.required' => "Uh-oh! display_name is required.",
+            'shop.description.required' => "Uh-oh! description is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);

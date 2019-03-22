@@ -148,10 +148,10 @@ class PermissionService extends BaseService
             'permission.description' => 'required',
         ];
         $messages = [
-            'permission.name.required' => "Whoops! the { name } is required.",
-            'permission.name.unique' => "Whoops! the { name } has already been taken.",
-            'permission.display_name.required' => "Whoops! the { display name } is required.",
-            'permission.description.required' => "Whoops! the { description } is required.",
+            'permission.name.required' => "Uh-oh! the { name } is required.",
+            'permission.name.unique' => "Uh-oh! the { name } has already been taken.",
+            'permission.display_name.required' => "Uh-oh! the { display name } is required.",
+            'permission.description.required' => "Uh-oh! the { description } is required.",
         ];
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);
         if ($validator->fails()) {
@@ -173,10 +173,10 @@ class PermissionService extends BaseService
             'permission.description' => 'required',
         ];
         $messages = [
-            'permission.name.required' => "Whoops! the { name } is required.",
-            'permission.name.unique' => "Whoops! the { name } has already been taken.",
-            'permission.display_name.required' => "Whoops! the { display name } is required.",
-            'permission.description.required' => "Whoops! the { description } is required.",
+            'permission.name.required' => "Uh-oh! the { name } is required.",
+            'permission.name.unique' => "Uh-oh! the { name } has already been taken.",
+            'permission.display_name.required' => "Uh-oh! the { display name } is required.",
+            'permission.description.required' => "Uh-oh! the { description } is required.",
         ];
 
         $validator = \Illuminate\Support\Facades\Validator::make($request, $rules, $messages);

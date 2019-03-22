@@ -71,14 +71,14 @@ class ShopRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! exception contact to admin",
+                    "message" => "Uh-oh! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
@@ -128,12 +128,12 @@ class ShopRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! exception contact to admin",
+                    "message" => "Uh-oh! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
@@ -186,12 +186,12 @@ class ShopRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! query exception contact to admin",
+                    "message" => "Uh-oh! query exception contact to admin",
                     "query_exception" => $exception]);
         } catch (\Exception $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! exception contact to admin",
+                    "message" => "Uh-oh! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
@@ -224,14 +224,14 @@ class ShopRepository
         } catch (QueryException $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! Query exception contact to admin",
+                    "message" => "Uh-oh! Query exception contact to admin",
                     "query_exception" => $exception
                 ]
             );
         } catch (\Exception $exception) {
             $this->_collection->put("exception",
                 [
-                    "message" => "Oops! exception contact to admin",
+                    "message" => "Uh-oh! exception contact to admin",
                     "query_exception" => $exception
                 ]
             );

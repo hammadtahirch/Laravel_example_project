@@ -72,7 +72,8 @@ class CreateOrUpdateProduct extends Component {
      */
     componentDidMount() {
         if (typeof this.props.match.params.product_id !== 'undefined') {
-            this.props.fetchProductById(this.props.match.params.id, this.props.match.params.product_id);
+            console.log(this.props.match.params);
+            this.props.fetchProductById(this.props.match.params.shop_id, this.props.match.params.product_id);
         }
 
     }
@@ -297,7 +298,7 @@ class CreateOrUpdateProduct extends Component {
                                                         <div className="col-md-12">
                                                             <button type="button"
                                                                     className="btn btn-outline-dark font-14 pull-right"
-                                                                    onClick={() => this.save_product(this.props.match.params.id, this.state.product)}>
+                                                                    onClick={() => this.save_product(this.props.match.params.shop_id, this.state.product)}>
                                                                 {(this.state.product.id === '') ? "Create" : "Update"}
                                                             </button>
                                                         </div>
