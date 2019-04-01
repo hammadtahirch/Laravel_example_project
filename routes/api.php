@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::resource('template', 'Api\EmailTemplateController');
     Route::resource('shop/{shop_id}/time_slot', 'Api\ShopTimeSlotController');
     Route::resource('shop/{shop_id}/products', 'Api\ShopProductsController');
+    Route::post('shop/{shop_id}/product/{product_id}/duplicate', 'Api\ShopProductsController@duplicateProduct');
     Route::resource('product/{product_id}/variances', 'Api\ProductVarianceController');
     Route::resource('variance/{variance_id}/option', 'Api\VarianceOptionController');
     Route::resource('role', 'Api\RoleController');

@@ -33,7 +33,7 @@ export function getSession(key) {
     try {
         return JSON.parse(window.sessionStorage.getItem(key));
     } catch (e) {
-        console.log();
+        console.log("session not maintain properly.");
     }
 
 }

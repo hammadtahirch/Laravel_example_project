@@ -50,7 +50,7 @@ class ShopManagement extends Component {
                     _purpose: null
                 },
             },
-            _suggestions: {},
+            _suggestions: '',
             shop: {
                 id: '',
                 user_id: '',
@@ -116,8 +116,8 @@ class ShopManagement extends Component {
      * componentWillReceiveProps [react default life cycle functions]
      * @param NextProps
      */
-    componentWillReceiveProps(NextProps) {
-        this.setState({"_suggestions": NextProps.fetch_user_props})
+    componentWillReceiveProps(nextProps) {
+        this.setState({"_suggestions": nextProps.fetch_user_props})
     }
 
     /**
@@ -189,7 +189,7 @@ class ShopManagement extends Component {
 
     /**
      * handleIsModelOpen
-     * @param var _isOpen
+     * @param _isOpen
      */
     handleIsModelOpen(_isOpen) {
         if (_isOpen === true) {
@@ -227,9 +227,9 @@ class ShopManagement extends Component {
 
     /**
      * handleDeleteShop
-     * @param var _isOpen
-     * @param object user
-     * @param var is_confirm
+     * @param  _isOpen
+     * @param  shop
+     * @param  is_confirm
      */
     handleDeleteShop(_isOpen, shop = null, is_confirm = false) {
         if (shop !== null) {
@@ -319,7 +319,7 @@ class ShopManagement extends Component {
     handleKeyUpSuggestions(e) {
         this.props.fetch_user_list(queryString.parse(queryString.stringify({
             email: e.target.value,
-            role_id: 5,
+            role_id: 'e50b5369-9b68-4a88-b203-9b35e43aa205',
             _render: "list"
         })));
     }
@@ -429,6 +429,9 @@ class ShopManagement extends Component {
      * render [DOM render ]
      */
     render() {
+        {
+            (this.props.savedShopProps !== "") && toast.success("Wow! shop Save Successfully.")
+        }
         const modalStyle = {
             modal: {
                 maxWidth: "500px",
@@ -564,7 +567,8 @@ class ShopManagement extends Component {
                                             </div>
                                             <SuggestionInput
                                                 lable={"Select User Account"}
-                                                suggestions={(this.state._suggestions == '') ? '' : this.state._suggestions.users}
+                                                suggestions={(this.state._suggestions === '') ? '' : this.state._suggestions.users}
+                                                displayKey={"email"}
                                                 onClick={(user) => this.handleOnClickSuggestions(user)}
                                                 onKeyUp={(e) => this.handleKeyUpSuggestions(e)}
                                                 value={this.state.shop.user.email}
@@ -731,6 +735,7 @@ function mapStateToProp(state) {
     return ({
         fetch_shop_props: state.shop.fetch_shops,
         fetch_user_props: state.account.fetch_users,
+        savedShopProps: state.shop.save_shop,
         error: state.error.error,
     })
 }

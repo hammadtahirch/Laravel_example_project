@@ -45,36 +45,41 @@ class UploadService extends BaseService
      */
     public function storeImage($request)
     {
-        $requestObject = $request->all();
-        if (strlen($requestObject["dataUrl"]) > 128) {
+        try {
+            $requestObject = $request->all();
+            if (strlen($requestObject["dataUrl"]) > 128) {
 
-            list($mime, $data) = explode(';', $requestObject["dataUrl"]);
-            list(, $data) = explode(',', $data);
-            $data = base64_decode($data);
+                list($mime, $data) = explode(';', $requestObject["dataUrl"]);
+                list(, $data) = explode(',', $data);
+                $data = base64_decode($data);
 
-            $mime = explode(':', $mime)[1];
-            $ext = explode('/', $mime)[1];
-            $name = Str::uuid()->toString();
-            $relative_path = public_path() . "/uploads/images/";
-            $storage_url = secure_asset("uploads/images");
+                $mime = explode(':', $mime)[1];
+                $ext = explode('/', $mime)[1];
+                $name = Str::uuid()->toString();
+                $relative_path = public_path() . "/uploads/images/";
+                $storage_url = secure_asset("uploads/images");
 
-            if (!File::exists($relative_path)) {
-                File::makeDirectory(public_path() . '/' . "uploads/images/", $mode = 0777, true, true);
-            }
-            if (file_put_contents($relative_path . $name . '.' . $ext, $data) > 0) {
-                return [
-                    "name" => $name,
-                    "relative_path" => $relative_path . $name . '.' . $ext,
-                    "storage_url" => $storage_url . '/' . $name . '.' . $ext,
-                    "extension" => $ext
-                ];
+                if (!File::exists($relative_path)) {
+                    File::makeDirectory(public_path() . '/' . "uploads/images/", $mode = 0777, true, true);
+                }
+                if (file_put_contents($relative_path . $name . '.' . $ext, $data) > 0) {
+                    return [
+                        "name" => $name,
+                        "relative_path" => $relative_path . $name . '.' . $ext,
+                        "storage_url" => $storage_url . '/' . $name . '.' . $ext,
+                        "extension" => $ext
+                    ];
+                } else {
+                    return ["status" => false, "message" => "Uh-oh! File is too big."];
+                }
+
             } else {
                 return ["status" => false, "message" => "Uh-oh! File is too big."];
             }
-
-        } else {
-            return ["status" => false, "message" => "Uh-oh! File is too big."];
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
 
     }
 
@@ -83,6 +88,7 @@ class UploadService extends BaseService
      *
      * @param array $imagePayload
      * @param array $sizePayload
+     * @return mixed
      */
     public function resizeDifferentResolution(array $imagePayload, array $sizePayload)
     {
@@ -96,8 +102,9 @@ class UploadService extends BaseService
                     ->save(public_path("/uploads/images") . "/" . $imagePayload["name"] . "_w" . explode("X", $size)[0] . "." . $imagePayload["extension"]);
 
             } catch (\Exception $exception) {
-                echo $exception->getMessage();
+                return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
             }
         }
+        return null;
     }
 }

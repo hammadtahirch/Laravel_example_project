@@ -57,15 +57,14 @@ class ShopTimeSlotService extends BaseService
      */
     public function index($shop_id)
     {
-        $collectionResponse = $this->_shopTimeSlotRepository->index($shop_id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopTimeSlotRepository->index($shop_id);
             $resource = new Collection($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slots');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError(
-                $collectionResponse->pull("exception")
-            );
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -77,14 +76,14 @@ class ShopTimeSlotService extends BaseService
      */
     public function save($shop_id, $request)
     {
-        $collectionResponse = $this->_shopTimeSlotRepository->save($shop_id, $request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopTimeSlotRepository->save($shop_id, $request);
             $resource = new Item($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slot');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -97,13 +96,13 @@ class ShopTimeSlotService extends BaseService
      */
     public function update($shop_id, $request, $id)
     {
-        $collectionResponse = $this->_shopTimeSlotRepository->update($shop_id, $request, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopTimeSlotRepository->update($shop_id, $request, $id);
             $resource = new Item($collectionResponse->pull("data"), new ShopTimeSlotTransformer(), 'shop_time_slot');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 }

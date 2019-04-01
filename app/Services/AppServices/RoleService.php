@@ -43,42 +43,43 @@ class RoleService extends BaseService
     /**
      * Display a listing of the resource.
      *
-     * @return array []
+     * @return array/mixed
      */
     public function index()
     {
-        $collectionResponse = $this->_roleRepository->index();
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_roleRepository->index();
             $resource = new Collection($collectionResponse->pull("data"), new RoleTransformer(), "roles");
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return array []
+     * @param $request
+     * @return array|Collection|mixed
      */
     public function store($request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_roleCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-
-        $collectionResponse = $this->_roleRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_roleCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_roleRepository->store($request);
             $resource = new Item($collectionResponse->pull("data"), new RoleTransformer(), "roles");
             return $this->_fractal
                 ->createData($resource)
                 ->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -104,5 +105,6 @@ class RoleService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 }

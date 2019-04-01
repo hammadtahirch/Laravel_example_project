@@ -38,6 +38,7 @@ class UploadRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function store($request)
     {
@@ -56,17 +57,9 @@ class UploadRepository
             $this->_collection->put("data", $uploadObject);
 
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -79,6 +72,7 @@ class UploadRepository
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function update($request, $id)
     {
@@ -90,17 +84,9 @@ class UploadRepository
                 $this->_collection->put("data", $uploadObject);
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -110,6 +96,7 @@ class UploadRepository
      *
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function destroy($id)
     {
@@ -117,27 +104,17 @@ class UploadRepository
 
             $uploadObject = FileUpload::find($id);
             if (!$uploadObject) {
-                $this->_collection->put("not_found", ['message' => 'Collection not found']);
+                throw new \Exception('Collection not found');
             }
             if ($uploadObject->delete()) {
                 $this->_collection->put("data", $uploadObject);
             } else {
-                $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
+                throw new \Exception('Internal server error user not deleted');
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }

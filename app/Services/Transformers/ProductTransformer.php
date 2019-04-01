@@ -31,7 +31,8 @@ class ProductTransformer extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        'upload'
+        'upload',
+        'collection'
     ];
 
     /**
@@ -71,6 +72,24 @@ class ProductTransformer extends TransformerAbstract
         $uploadObject = $product->upload;
         if (!empty($uploadObject))
             return $this->item($uploadObject, new UploadTransformer(), false);
+        else
+            return null;
+    }
+
+    /**
+     * Include Upload
+     *
+     * @param Product $product
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeCollection(Product $product)
+    {
+        if (empty($product->collect)) {
+            return null;
+        }
+        $uploadObject = $product->collect->collection;
+        if (!empty($uploadObject))
+            return $this->item($uploadObject, new CollectionTransformer(), false);
         else
             return null;
     }

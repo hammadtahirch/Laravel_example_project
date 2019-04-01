@@ -55,13 +55,23 @@ class Product extends Model
     }
 
     /**
-     * Create a has one relation with Role.
+     * Create a has many relation with Role.
      *
      * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
     public function product_variance()
     {
         return $this->hasMany('App\Models\Eloquent\ProductVariance', 'product_id', 'id');
+    }
+
+    /**
+     * Create a has one relation with collect.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function collect()
+    {
+        return $this->hasOne('App\Models\Eloquent\Collect', 'product_id', 'id');
     }
 
     /**

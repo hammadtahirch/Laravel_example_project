@@ -43,11 +43,17 @@ class AuthService extends BaseService
     /**
      * This function is responsible for current user permission
      *
+     * @param $permission_name
      * @return Collection $collection
      */
     public function authChecker($permission_name)
     {
-        return Auth::user()->can($permission_name);
+        try {
+            return Auth::user()->can($permission_name);
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
+        }
+
     }
 
     /**
@@ -57,6 +63,11 @@ class AuthService extends BaseService
      */
     public function authAbort()
     {
-        return $this->_response->errorForbidden("Uh-oh! You do not have permission");
+        try {
+            return $this->_response->errorForbidden("Uh-oh! You do not have permission");
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
+        }
+
     }
 }

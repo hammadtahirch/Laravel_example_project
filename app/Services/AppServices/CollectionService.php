@@ -51,15 +51,19 @@ class CollectionService extends BaseService
      */
     public function index($request)
     {
-        $collectionResponse = $this->_collectionRepository->index($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_collectionRepository->index($request);
             $collectionObject = $collectionResponse->pull("data");
+            if ($request->has("_render")) {
+                $resource = new Collection($collectionObject, new CollectionTransformer(), 'collections');
+                return $this->_fractal->createData($resource)->toArray();
+            }
             $collectionCollection = $collectionObject->getCollection();
             $resource = new Collection($collectionCollection, new CollectionTransformer(), 'collections');
             $resource->setPaginator(new IlluminatePaginatorAdapter($collectionObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
 
 
@@ -73,22 +77,24 @@ class CollectionService extends BaseService
      */
     public function store($request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_collectionCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $collectionResponse = $this->_collectionRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_collectionCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_collectionRepository->store($request);
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.collection_size")));
             }
             $resource = new Item($collectionResponse, new CollectionTransformer(), 'collection');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -100,24 +106,23 @@ class CollectionService extends BaseService
      */
     public function update($request, $id)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_collectionUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-
-        $collectionResponse = $this->_collectionRepository->update($request, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_collectionUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_collectionRepository->update($request, $id);
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
             }
             $resource = new Item($collectionResponse->where(["id" => $id])->with("upload")->first(), new CollectionTransformer(), 'collection');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -128,14 +133,13 @@ class CollectionService extends BaseService
      */
     public function destroy($id)
     {
-        $collectionResponse = $this->_collectionRepository->destroy($id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_collectionRepository->destroy($id);
             return $this->_response->withItem($collectionResponse->pull("data")->where(["id" => $id])->with("upload")->first(), new CollectionTransformer(), 'collection');
-        } elseif ($collectionResponse->has("not_found")) {
-            return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**

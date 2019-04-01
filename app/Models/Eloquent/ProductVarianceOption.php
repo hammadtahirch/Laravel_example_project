@@ -35,7 +35,6 @@ class ProductVarianceOption extends Model
      */
     protected $fillable = [
         'id',
-        'shop_id',
         'variance_id',
         'title',
         'price',

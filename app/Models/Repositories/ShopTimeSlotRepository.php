@@ -40,6 +40,7 @@ class ShopTimeSlotRepository
      *
      * @param $shop_id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function index($shop_id)
     {
@@ -51,19 +52,9 @@ class ShopTimeSlotRepository
             $this->_collection->put("data", $timeSlotObject);
 
         } catch (QueryException $exception) {
-            $this->_collection->put("data",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("data",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -74,6 +65,7 @@ class ShopTimeSlotRepository
      * @param  \Illuminate\Http\Request $request
      * @param  int $shop_id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function save($shop_id, $request)
     {
@@ -85,17 +77,9 @@ class ShopTimeSlotRepository
                 $this->_collection->pull("data", $timeSlotObject);
             }
         } catch (QueryException $exception) {
-            $this->_collection->pull("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->pull("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -107,6 +91,7 @@ class ShopTimeSlotRepository
      * @param  int $shop_id
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function update($shop_id, $request, $id)
     {
@@ -118,17 +103,9 @@ class ShopTimeSlotRepository
                 $this->_collection->pull("data", $timeSlotObject);
             }
         } catch (QueryException $exception) {
-            $this->_collection->pull("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->pull("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }

@@ -24,9 +24,6 @@ export function filterGeoLocationComponent(response) {
     } else {
         return [];
     }
-
-    console.log(response);
-
 }
 
 /**

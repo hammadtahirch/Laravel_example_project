@@ -44,7 +44,6 @@ export function _saveProductVarianceOption(variance_id, data) {
             delete data.id
             instance.post('variance/' + variance_id + '/option', {option: data})
                 .then(function (response) {
-                    console.log(response);
                     dispatch({type: ActionTypes.SAVE_PRODUCT_VARIANCE_OPTION, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
                     dispatch(_fetchAllProductVarianceOptions(variance_id, null))

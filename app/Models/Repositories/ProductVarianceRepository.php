@@ -38,6 +38,7 @@ class ProductVarianceRepository
      *
      * @param $request
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function index($request)
     {
@@ -47,19 +48,9 @@ class ProductVarianceRepository
             $this->_varianceFilter($variancePagination, $request);
             $this->_collection->put("data", $variancePagination->paginate(10));
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -69,6 +60,7 @@ class ProductVarianceRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function store($request)
     {
@@ -84,17 +76,9 @@ class ProductVarianceRepository
             }
             $this->_collection->put("data", $varianceObject->where(["id" => $varianceObject->id])->first());
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -107,6 +91,7 @@ class ProductVarianceRepository
      * @param  int $product_id
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function update($request, $product_id, $id)
     {
@@ -122,17 +107,9 @@ class ProductVarianceRepository
                 );
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -143,6 +120,7 @@ class ProductVarianceRepository
      * @param  int $id
      * @param  int $product_id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function destroy($product_id, $id)
     {
@@ -150,27 +128,17 @@ class ProductVarianceRepository
 
             $varianceObject = Variance::find($id);
             if (!$varianceObject) {
-                $this->_collection->put("not_found", ['message' => 'Variance not found']);
+                throw new \Exception('Variance not found');
             }
             if ($varianceObject->delete()) {
                 $this->_collection->put("data", $varianceObject);
             } else {
-                $this->_collection->put("exception", ['message' => 'Internal server error Variance not deleted']);
+                throw new \Exception('Internal server error Variance not deleted');
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }

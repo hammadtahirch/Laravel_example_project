@@ -83,7 +83,6 @@ class CreateUpdateProductVarianceOption extends Component {
      * @param prevState
      */
     componentWillReceiveProps(nextProps, prevState) {
-        console.log(nextProps);
         if (nextProps.getSavedProductVarianceOptionProps !== '') {
 
             this.setState({

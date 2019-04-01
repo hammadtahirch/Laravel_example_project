@@ -59,6 +59,7 @@ class UserRepository
      * Display a listing of the resource.
      * @param $request
      * @return Collection _collection
+     * @throws \Exception
      */
     public function index($request)
     {
@@ -78,15 +79,9 @@ class UserRepository
             }
 
         } catch (QueryException $exception) {
-            $this->_collection->put("exception", [
-                "message" => "Uh-oh! query exception contact to admin",
-                "query_exception" => $exception
-            ]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception", [
-                "message" => "Uh-oh! exception contact to admin",
-                "query_exception" => $exception
-            ]);
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -96,6 +91,7 @@ class UserRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @return Collection _collection
+     * @throws \Exception
      */
     public function store($request)
     {
@@ -134,17 +130,9 @@ class UserRepository
 
             $this->_collection->put("data", $userObject->with(["roles", "upload"])->where("id", "=", $userObject->id)->first());
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -156,6 +144,7 @@ class UserRepository
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @return Collection
+     * @throws \Exception
      */
     public function update($request, $id)
     {
@@ -195,17 +184,9 @@ class UserRepository
             }
             $this->_collection->put("data", $userObject->where(["id" => $id])->with(["roles", "upload"])->first());
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -216,33 +197,24 @@ class UserRepository
      *
      * @param  int $id
      * @return Collection
+     * @throws \Exception
      */
     public function destroy($id)
     {
         try {
             $userObject = User::find($id);
             if (!$userObject) {
-                $this->_collection->put("not_found", ['message' => 'User not found.']);
+                throw new \Exception("User not found.");
             }
             if ($userObject->delete()) {
                 $this->_collection->put("data", $userObject->where(["id" => $id])->with(["roles", "upload"])->first());
             } else {
-                $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
+                throw new \Exception('Internal server error user not deleted');
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -251,25 +223,30 @@ class UserRepository
      * Validate a new user instance.
      *
      * @param $request
-     *
      * @return Collection _collection
+     * @throws \Exception
      */
     public function login($request)
     {
-        $request = $request->all();
-        $request = $request['user'];
-        if (Auth::attempt(['email' => $request['email'], 'password' => $request['password'] . "_" . strtolower($request['email'])])) {
-            $user = Auth::user();
-            $this->_collection->put("data",
-                [
-                    'success' => [
-                        "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
-                        "user" => $user
-                    ]
-                ]);
-        } else {
-            $this->_collection->put("exception", "Whoop! the { email } or { password } you’ve entered doesn’t match any account");
+        try {
+            $request = $request->all();
+            $request = $request['user'];
+            if (Auth::attempt(['email' => $request['email'], 'password' => $request['password'] . "_" . strtolower($request['email'])])) {
+                $user = Auth::user();
+                $this->_collection->put("data",
+                    [
+                        'success' => [
+                            "token" => $user->createToken(env('ACCESS_TOKEN_APP_NAME'))->accessToken,
+                            "user" => $user
+                        ]
+                    ]);
+            } else {
+                $this->_collection->put("exception", "Whoop! the { email } or { password } you’ve entered doesn’t match any account");
+            }
+        } catch (\Exception $exception) {
+            throw new \Exception($exception);
         }
+
         return $this->_collection;
     }
 
@@ -277,15 +254,15 @@ class UserRepository
      * Create a new user instance after a valid registration.
      *
      * @param $request
-     *
      * @return Collection _collection
+     * @throws \Exception
      */
     public function register($request)
     {
-        $request = $request->all();
-        $request = $request['user'];
-        $request['password'] = bcrypt($request['password'] . "_" . strtolower($request['email']));
         try {
+            $request = $request->all();
+            $request = $request['user'];
+            $request['password'] = bcrypt($request['password'] . "_" . strtolower($request['email']));
             $user = User::create($request);
             $this->_collection->put("data",
                 [
@@ -294,19 +271,9 @@ class UserRepository
                 ]
             );
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -315,8 +282,8 @@ class UserRepository
      * this is responsible to sign out from application
      *
      * @param $request
-     *
      * @return Collection
+     * @throws \Exception
      */
     public function signOut($request)
     {
@@ -330,7 +297,7 @@ class UserRepository
                 );
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception", ["query_exception" => $exception]);
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }

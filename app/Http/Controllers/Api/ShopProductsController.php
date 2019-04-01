@@ -84,4 +84,19 @@ class ShopProductsController extends Controller
     {
         return $shopProductsService->destroy($shop_id, $id);
     }
+
+    /**
+     * Duplicate Current Product
+     *
+     * @param $shop_id
+     * @param $product_id
+     * @param Request $request
+     * @param ShopProductsService $shopProductsService
+     * @return array
+     * @throws \Exception
+     */
+    public function duplicateProduct($shop_id, $product_id, Request $request, ShopProductsService $shopProductsService)
+    {
+        return $shopProductsService->duplicateProduct($shop_id, $product_id, $request);
+    }
 }

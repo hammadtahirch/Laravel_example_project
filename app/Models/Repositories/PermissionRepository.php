@@ -41,6 +41,7 @@ class PermissionRepository
      *
      * @param $request
      * @return Collection $collection
+     * @throws \Exception
      */
     public function index($request)
     {
@@ -58,10 +59,7 @@ class PermissionRepository
 
             $this->_collection->put("data", $permissionPagination);
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -72,6 +70,7 @@ class PermissionRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @return Collection $collection
+     * @throws \Exception
      */
     public function store($request)
     {
@@ -90,15 +89,9 @@ class PermissionRepository
                 $this->_collection->put("data", $permissionObject);
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         }
 
         return $this->_collection;
@@ -110,6 +103,7 @@ class PermissionRepository
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @return Collection $collection
+     * @throws \Exception
      */
     public function update($request, $id)
     {
@@ -138,15 +132,9 @@ class PermissionRepository
 
 
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -156,6 +144,7 @@ class PermissionRepository
      *
      * @param  int $id
      * @return Collection $collection
+     * @throws \Exception
      */
     public function destroy($id)
     {
@@ -163,28 +152,18 @@ class PermissionRepository
 
             $permissionObject = Permission::find($id);
             if (!$permissionObject) {
-                $this->_collection->put("not_found", ['message' => 'Permission not found.']);
+                throw new \Exception('Permission not found.');
             }
             if ($permissionObject->delete()) {
                 $this->_collection->put("data", $permissionObject->first());
             } else {
-                $this->_collection->put("exception", ['message' => 'Internal server error user not deleted']);
+                throw new \Exception('Internal server error Permission not deleted');
             }
 
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }

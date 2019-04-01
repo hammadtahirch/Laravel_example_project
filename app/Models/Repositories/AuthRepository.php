@@ -20,7 +20,7 @@ class AuthRepository
     /**
      * @var Collection
      */
-   protected $_collection;
+    protected $_collection;
 
     /**
      * Create a new Service instance.
@@ -36,22 +36,34 @@ class AuthRepository
      * This function is responsible for current user permission
      *
      * @param $permission_name
-     * @return Collection $collection
+     * @return Collection
+     * @throws \Exception
      */
     public function authChecker($permission_name)
     {
-        $this->_collection->put("data",Auth::user()->can($permission_name));
-        return $this->_collection;
+        try {
+            $this->_collection->put("data", Auth::user()->can($permission_name));
+            return $this->_collection;
+        } catch (\Exception $exception) {
+            throw new \Exception($exception);
+        }
+
     }
 
     /**
      * This function is responsible for return error message
      *
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function authAbort()
     {
-        $this->_collection->put("forbidden","Uh-oh! You do not have permission");
-        return $this->_collection;
+        try {
+            $this->_collection->put("forbidden", "Uh-oh! You do not have permission");
+            return $this->_collection;
+        } catch (\Exception $exception) {
+            throw new \Exception($exception);
+        }
+
     }
 }

@@ -3,8 +3,12 @@
 namespace App\Services\AppServices;
 
 use App\Jobs\GenerateResizedImageJob;
+use App\Models\Eloquent\Product;
+use App\Models\Eloquent\ProductVariance;
+use App\Models\Repositories\ProductVarianceRepository;
 use App\Models\Repositories\ShopProductsRepository;
 use App\Models\Repositories\UploadRepository;
+use App\Models\Repositories\VarianceOptionRepository;
 use App\Services\Transformers\CustomJsonSerializer;
 use App\Services\Transformers\ProductTransformer;
 use EllipseSynergie\ApiResponse\Contracts\Response;
@@ -31,6 +35,16 @@ class ShopProductsService extends BaseService
      */
     protected $_shopProductRepository;
 
+    /**
+     * @var ProductVarianceRepository
+     */
+    protected $_productVariance;
+
+    /**
+     * @var VarianceOptionRepository
+     */
+    protected $_varianceOption;
+
 
     /**
      * Create a new Service instance.
@@ -38,10 +52,12 @@ class ShopProductsService extends BaseService
      * @param ShopProductsRepository $shopProductsRepository
      * @return void
      */
-    public function __construct(ShopProductsRepository $shopProductsRepository)
+    public function __construct(ShopProductsRepository $shopProductsRepository, ProductVarianceRepository $productVarianceRepository, VarianceOptionRepository $varianceOptionRepository)
     {
         parent::__construct();
         $this->_shopProductRepository = $shopProductsRepository;
+        $this->_productVariance = $productVarianceRepository;
+        $this->_varianceOption = $varianceOptionRepository;
 
     }
 
@@ -54,8 +70,8 @@ class ShopProductsService extends BaseService
      */
     public function index($shop_id, $request)
     {
-        $collectionResponse = $this->_shopProductRepository->index($shop_id, $request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopProductRepository->index($shop_id, $request);
             $productObject = $collectionResponse->pull("data");
             if ($this->hasPagingObject($productObject)) {
                 $productCollection = $productObject->getCollection();
@@ -63,28 +79,31 @@ class ShopProductsService extends BaseService
                 $resource->setPaginator(new IlluminatePaginatorAdapter($productObject));
             }
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
      * Display a listing of the resource.
      *
      * @param $shop_id
-     * @param Request $request
+     * @param $id
      * @return array []
      */
     public function show($shop_id, $id)
     {
-        $collectionResponse = $this->_shopProductRepository->show($shop_id, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopProductRepository->show($shop_id, $id);
             $productObject = $collectionResponse->pull("data");
             $resource = new Item($productObject, new ProductTransformer(), 'product');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -96,17 +115,18 @@ class ShopProductsService extends BaseService
      */
     public function store($shop_id, $request)
     {
-        $collectionObject = $this->_shopProductRepository->store($shop_id, $request);
-        if ($collectionObject->has("data")) {
+        try {
+            $collectionObject = $this->_shopProductRepository->store($shop_id, $request);
             $productObject = $collectionObject->pull("data");
             if (!empty($productObject->upload)) {
                 dispatch(new GenerateResizedImageJob($productObject->upload->toArray(), config("custom_config.product_size")));
             }
             $resource = new Item($productObject, new ProductTransformer(), "product");
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionObject->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
 
     }
 
@@ -121,18 +141,18 @@ class ShopProductsService extends BaseService
      */
     public function update($shop_id, $request, $id)
     {
-        $collectionObject = $this->_shopProductRepository->update($shop_id, $request, $id);
-        if ($collectionObject->has("data")) {
+        try {
+            $collectionObject = $this->_shopProductRepository->update($shop_id, $request, $id);
             $productObject = $collectionObject->pull("data");
             if (!empty($productObject->upload)) {
                 dispatch(new GenerateResizedImageJob($productObject->upload->toArray(), config("custom_config.product_size")));
             }
-
             $resource = new Item($productObject, new ProductTransformer(), "product");
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionObject->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -144,16 +164,69 @@ class ShopProductsService extends BaseService
      */
     public function destroy($shop_id, $id)
     {
-        $collectionObject = $this->_shopProductRepository->destroy($shop_id, $id);
-        if ($collectionObject->has("data")) {
+        try {
+            $collectionObject = $this->_shopProductRepository->destroy($shop_id, $id);
             $productObject = $collectionObject->pull("data");
             $resource = new Item($productObject, new ProductTransformer(), "product");
             return $this->_fractal->createData($resource)->toArray();
-        } else if ($collectionObject->has("not_found")) {
-            return $this->_response->errorNotFound($collectionObject->pull("not_found"));
-        } else {
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
+        }
 
-            return $this->_response->errorInternalError($collectionObject->pull("exception"));
+    }
+
+    /**
+     * Duplicate Current Product
+     *
+     * @param $shop_id
+     * @param $product_id
+     * @param $request
+     * @return array
+     * @throws \Exception
+     */
+    public function duplicateProduct($shop_id, $product_id, $request)
+    {
+        try {
+
+
+            $productObject = $this->_shopProductRepository->show($shop_id, $product_id);
+            $productDetail = $productObject->get("data");
+            $productVariances = $productDetail->product_variance;
+            $request->request->add(
+                ["product" => [
+                    'shop_id' => $productDetail->shop_id,
+                    'title' => "Copy " . $productDetail->title,
+                    'description' => $productDetail->description,
+                    'price' => $productDetail->price,
+                    'is_published' => $productDetail->is_published,
+                    'published_date' => $productDetail->published_date,
+                    'status' => $productDetail->status,
+                ]]);
+            $newProduct = $this->_shopProductRepository->store($shop_id, $request)->get("data");
+            foreach ($productVariances as $index => $variance) {
+                $request->request->add(["variance" => [
+                    'title' => $variance->title,
+                    'product_id' => $newProduct->id,
+                    'description' => $variance->description,
+                    'max_permitted' => $variance->max_permitted,
+                    'min_permitted' => $variance->min_permitted,
+                ]]);
+                $newVariance = $this->_productVariance->store($request)->get("data");
+                foreach ($variance->product_variance_option as $index => $option) {
+                    $request->request->add(["option" => [
+                        'variance_id' => $newVariance->id,
+                        'title' => $option->title,
+                        'price' => $option->price
+                    ]]);
+                    $this->_varianceOption->store($request);
+                }
+            }
+
+            $newProduct = $this->_shopProductRepository->show($shop_id, $newProduct->id);
+            $resource = new Item($newProduct->get("data"), new ProductTransformer(), "product");
+            return $this->_fractal->createData($resource)->toArray();
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
     }
 }

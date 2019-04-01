@@ -96,7 +96,6 @@ export function _saveProduct(shop_id, data) {
  * @returns dispatch
  */
 export function _deleteProduct(shop_id, data) {
-    console.log("shop_id", shop_id);
     return dispatch => {
         dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
@@ -116,17 +115,18 @@ export function _deleteProduct(shop_id, data) {
 /**
  * Duplicate existing product.
  *
- * @param data
- * @returns dispatch
+ * @param shop_id
+ * @param product_id
+ * @returns {Function}
+ * @private
  */
-export function _duplicateProduct(shop_id, data) {
+export function _duplicateProduct(shop_id, product_id) {
     return dispatch => {
         dispatch({type: ActionTypes.ERROR, payload: ''})
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
-        instance.delete('shop/' + shop_id + '/products' + data.id)
+        instance.post('shop/' + shop_id + '/product/' + product_id + '/duplicate')
             .then(function (response) {
-                dispatch({type: ActionTypes.DELETE_PRODUCT, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
                 dispatch(_fetchAllProduct(shop_id, null));
             })

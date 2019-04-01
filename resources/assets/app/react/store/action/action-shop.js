@@ -33,14 +33,14 @@ export function _saveShop(data) {
     let objectInstance = '';
     return dispatch => {
         dispatch({type: ActionTypes.ERROR, payload: ''})
+        dispatch({type: ActionTypes.FETCH_USERS, payload: {data: ''}});
         dispatch({type: ActionTypes.LOADING, payload: true});
         const instance = _setHeaders();
         if (!data.id) {
             delete data.id
             instance.post('shop', {shop: data})
                 .then(function (response) {
-
-                    dispatch({type: ActionTypes.SAVE_USER, payload: response})
+                    dispatch({type: ActionTypes.SAVE_SHOP, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
                     dispatch(_fetchAllShop());
                 })
@@ -52,7 +52,7 @@ export function _saveShop(data) {
         } else {
             instance.put('shop/' + data.id, {shop: data})
                 .then(function (response) {
-                    dispatch({type: ActionTypes.SAVE_USER, payload: response})
+                    dispatch({type: ActionTypes.SAVE_SHOP, payload: response})
                     dispatch({type: ActionTypes.LOADING, payload: false});
                     dispatch(_fetchAllShop());
                 })
@@ -78,7 +78,7 @@ export function _deleteShop(data) {
         const instance = _setHeaders();
         instance.delete('shop/' + data.id)
             .then(function (response) {
-                dispatch({type: ActionTypes.DELETE_USER, payload: response})
+                dispatch({type: ActionTypes.DELETE_SHOP, payload: response})
                 dispatch({type: ActionTypes.LOADING, payload: false});
                 dispatch(_fetchAllShop());
             })

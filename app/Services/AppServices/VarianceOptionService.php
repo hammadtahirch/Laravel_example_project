@@ -49,15 +49,15 @@ class VarianceOptionService extends BaseService
      */
     public function index($variance_id, $request)
     {
-        $collectionResponse = $this->_varianceOptionRepository->index($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_varianceOptionRepository->index($request);
             $collectionObject = $collectionResponse->pull("data");
             $collectionCollection = $collectionObject->getCollection();
             $resource = new Collection($collectionCollection, new VarianceOptionTransformer(), 'options');
             $resource->setPaginator(new IlluminatePaginatorAdapter($collectionObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
 
 
@@ -72,19 +72,20 @@ class VarianceOptionService extends BaseService
      */
     public function store($variance_id, $request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_collectionCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $collectionResponse = $this->_varianceOptionRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_collectionCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_varianceOptionRepository->store($request);
             $collectionResponse = $collectionResponse->pull("data");
             $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'option');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -97,21 +98,20 @@ class VarianceOptionService extends BaseService
      */
     public function update($variance_id, $id, $request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_collectionUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-
-        $collectionResponse = $this->_varianceOptionRepository->update($request, $variance_id, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_collectionUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_varianceOptionRepository->update($request, $variance_id, $id);
             $collectionResponse = $collectionResponse->pull("data");
             $resource = new Item($collectionResponse, new VarianceOptionTransformer(), 'option');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -123,15 +123,14 @@ class VarianceOptionService extends BaseService
      */
     public function destroy($variance_id, $id)
     {
-        $collectionResponse = $this->_varianceOptionRepository->destroy($variance_id, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_varianceOptionRepository->destroy($variance_id, $id);
             $resource = new Item($collectionResponse->pull("data"), new VarianceOptionTransformer(), 'option');
             return $this->_fractal->createData($resource)->toArray();
-        } elseif ($collectionResponse->has("not_found")) {
-            return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -155,6 +154,7 @@ class VarianceOptionService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**

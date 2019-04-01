@@ -30,14 +30,21 @@ class BaseService
     protected $_response;
 
     /**
+     * @var \Illuminate\Foundation\Application|mixed
+     */
+    protected $logService;
+
+    /**
      * Create a new Service instance.
      *
      * @return void
      */
     public function __construct()
     {
+
         $request = app(Request::class);
         $this->_response = app(Response::class);
+        $this->logService = app(LogService::class);
         $this->_fractal = new Manager();
         $this->_fractal->setSerializer(new CustomJsonSerializer());
         if (!empty($request->get("include")))

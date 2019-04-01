@@ -8,23 +8,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 /**
- * Class ProductVariance
+ * Class Collection
  * @package App\Models\Eloquent
  */
-class ProductVariance extends Model
+class Collect extends Model
 {
     /**
      * @trait
      */
     use SoftDeletes;
+
     /**
-     * @var bool
+     * @var
      */
     public $incrementing = false;
-    /**
-     * @var string
-     */
-    protected $table = "product_variances";
 
     /**
      * The attributes that are mass assignable.
@@ -33,21 +30,19 @@ class ProductVariance extends Model
      */
     protected $fillable = [
         'id',
-        'title',
+        'shop_id',
         'product_id',
-        'description',
-        'max_permitted',
-        'min_permitted'
+        'collection_id',
     ];
 
     /**
-     * Create a has one relation with Role.
+     * relation function between 2 models (Collection)
      *
-     * @return \Illuminate\Database\Eloquent\Relations\hasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function product_variance_option()
+    public function collection()
     {
-        return $this->hasMany('App\Models\Eloquent\ProductVarianceOption', 'variance_id', 'id');
+        return $this->hasOne('App\Models\Eloquent\Collection', 'id', 'collection_id');
     }
 
     /**

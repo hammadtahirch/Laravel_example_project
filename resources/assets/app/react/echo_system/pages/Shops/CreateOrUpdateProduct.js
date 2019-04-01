@@ -17,6 +17,11 @@ import ValidationErrors from "../sub_components/ValidationErrors";
 import {convertDollarToCent} from "../../../store/helper/utill-helper";
 import {ToastContainer} from "react-toastify";
 import Loading from "../sub_components/Loading";
+import SuggestionInput from "../sub_components/SuggestionInput";
+import {_fetchAllUser} from "../../../store/action/action-acounts";
+import {_fetchAllCollection} from "../../../store/action/action-collection";
+import store from "../../../store";
+import ActionTypes from "../../../store/constant/constant";
 
 const queryString = require('query-string');
 
@@ -33,6 +38,7 @@ class CreateOrUpdateProduct extends Component {
         }
 
         this.state = {
+            _suggestions: '',
             product: {
                 id: '',
                 title: '',
@@ -41,7 +47,13 @@ class CreateOrUpdateProduct extends Component {
                 status: 1,
                 is_published: 1,
                 dataUrl: '',
-                upload: ''
+                upload: '',
+                collection: {
+                    id: '',
+                    title: '',
+                    description: '',
+                    image: '',
+                }
 
             },
             status: [
@@ -72,7 +84,6 @@ class CreateOrUpdateProduct extends Component {
      */
     componentDidMount() {
         if (typeof this.props.match.params.product_id !== 'undefined') {
-            console.log(this.props.match.params);
             this.props.fetchProductById(this.props.match.params.shop_id, this.props.match.params.product_id);
         }
 
@@ -84,36 +95,51 @@ class CreateOrUpdateProduct extends Component {
      * @param prevState
      */
     componentWillReceiveProps(nextProps, prevState) {
+        if (nextProps.getSuggestedCollectionListProps !== '') {
+            this.setState({"_suggestions": nextProps.getSuggestedCollectionListProps})
+        }
         if (nextProps.getSavedProductProps !== '') {
             this.setState({
                 product: {
-                    ...this.state,
+                    ...this.state.product,
                     id: nextProps.getSavedProductProps.product.id,
                     title: nextProps.getSavedProductProps.product.title,
                     description: nextProps.getSavedProductProps.product.description,
                     price: nextProps.getSavedProductProps.product.price,
                     status: nextProps.getSavedProductProps.product.status,
                     is_published: nextProps.getSavedProductProps.product.is_published,
-                    upload: nextProps.getSavedProductProps.product.upload
+                    upload: nextProps.getSavedProductProps.product.upload,
+                    collection: {
+                        id: nextProps.getSavedProductProps.product.collection.id,
+                        title: nextProps.getSavedProductProps.product.collection.title,
+                        description: nextProps.getSavedProductProps.product.collection.description,
+                        image: nextProps.getSavedProductProps.product.collection.image,
+                    }
                 }
             })
             if (typeof nextProps.match.params.product_id === 'undefined') {
                 history.push(nextProps.location.pathname + "/" + nextProps.getSavedProductProps.product.id);
             }
+            this.setState({"_suggestions": ''})
         }
 
         if (nextProps.getProductById !== '') {
-
             this.setState({
                 product: {
-                    ...this.state,
+                    ...this.state.product,
                     id: nextProps.getProductById.product.id,
                     title: nextProps.getProductById.product.title,
                     description: nextProps.getProductById.product.description,
                     price: nextProps.getProductById.product.price,
                     status: nextProps.getProductById.product.status,
                     is_published: nextProps.getProductById.product.is_published,
-                    upload: nextProps.getProductById.product.upload
+                    upload: nextProps.getProductById.product.upload,
+                    collection: {
+                        id: nextProps.getProductById.product.collection.id,
+                        title: nextProps.getProductById.product.collection.title,
+                        description: nextProps.getProductById.product.collection.description,
+                        image: nextProps.getProductById.product.collection.image,
+                    }
                 }
             })
         }
@@ -124,7 +150,6 @@ class CreateOrUpdateProduct extends Component {
      * @param var event
      */
     handleChange(event) {
-        debugger;
         const {name, value} = event.target;
         const {product} = this.state;
         this.setState({
@@ -139,11 +164,11 @@ class CreateOrUpdateProduct extends Component {
      * store or update data in storage
      */
     save_product(shop_id, product) {
-        product = {
-            ...product,
-            price: convertDollarToCent(product.price)
-        }
+        product["price"] = convertDollarToCent(product.price);
         this.props.saveProduct(shop_id, product);
+        this.setState({
+            _suggestions: ''
+        });
     }
 
     /**
@@ -169,6 +194,37 @@ class CreateOrUpdateProduct extends Component {
             reader.onerror = () => console.log('file reading has failed');
             reader.readAsDataURL(file);
         })
+    }
+
+    /**
+     * _handleOnClickSuggestions
+     */
+    handleOnClickSuggestions(collection) {
+        this.setState({
+                product: {
+                    ...this.state.product,
+                    collection: {
+                        ...this.state.product.collection,
+                        id: collection.id,
+                        title: collection.title,
+                        description: collection.description,
+                        image: collection.image,
+                    }
+
+                },
+                _suggestions: ''
+            }
+        );
+    }
+
+    /**
+     * _handleKeyUpSuggestions
+     */
+    handleKeyUpSuggestions(e) {
+        this.props.getCollectionSuggestions(queryString.parse(queryString.stringify({
+            title: e.target.value,
+            _render: "list"
+        })));
     }
 
     /**
@@ -280,7 +336,17 @@ class CreateOrUpdateProduct extends Component {
                                                                 })}
                                                             </select>
                                                         </div>
-
+                                                        <div className="col-md-6 mb-3 padding-0">
+                                                            <SuggestionInput
+                                                                lable={"Select Collection"}
+                                                                displayKey={"title"}
+                                                                suggestions={(this.state._suggestions.length === 0) ? '' : this.state._suggestions.collections}
+                                                                onClick={(user) => this.handleOnClickSuggestions(user)}
+                                                                onKeyUp={(e) => this.handleKeyUpSuggestions(e)}
+                                                                value={this.state.product.collection.title}
+                                                                placeholder={"Search Collection"}
+                                                            />
+                                                        </div>
                                                         <div className="col-md-6 mb-3">
                                                             <label>Published <span>*</span></label>
                                                             <select className="form-control" name="is_published"
@@ -331,9 +397,10 @@ class CreateOrUpdateProduct extends Component {
  */
 function mapStateToProp(state) {
     return ({
-        error: state.error.error,
         getSavedProductProps: state.product.save_product,
-        getProductById: state.product.fetch_product_by_id
+        getProductById: state.product.fetch_product_by_id,
+        getSuggestedCollectionListProps: state.collection.fetch_collections,
+        error: state.error.error,
     })
 }
 
@@ -344,6 +411,9 @@ function mapStateToProp(state) {
  */
 function mapDispatchToProp(dispatch) {
     return ({
+        getCollectionSuggestions: (params) => {
+            dispatch(_fetchAllCollection(params));
+        },
         fetchProductById: (shop_id, product_id) => {
             dispatch(_fetchProductById(shop_id, product_id));
         },

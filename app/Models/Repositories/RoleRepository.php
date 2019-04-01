@@ -43,10 +43,7 @@ class RoleRepository
                 ->where('id', '<>', GeneralConstants::SUPPER_ADMIN_ID)->get();
             $this->_collection->put("data", $roleObject);
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -72,15 +69,9 @@ class RoleRepository
                 $this->_collection->put("data", $roleObject);
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         }
 
         return $this->_collection;

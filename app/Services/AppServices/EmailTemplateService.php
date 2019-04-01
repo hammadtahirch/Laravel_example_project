@@ -52,15 +52,15 @@ class EmailTemplateService extends BaseService
      */
     public function index($request)
     {
-        $templateResponse = $this->_templateRepository->index($request);
-        if ($templateResponse->has("data")) {
+        try {
+            $templateResponse = $this->_templateRepository->index($request);
             $templateObject = $templateResponse->pull("data");
             $templateCollection = $templateObject->getCollection();
             $resource = new Collection($templateCollection, new TemplateTransformer(), 'templates');
             $resource->setPaginator(new IlluminatePaginatorAdapter($templateObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($templateResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
 
 
@@ -74,19 +74,19 @@ class EmailTemplateService extends BaseService
      */
     public function store($request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_templateCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $templateResponse = $this->_templateRepository->store($request);
-        if ($templateResponse->has("data")) {
-
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_templateCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $templateResponse = $this->_templateRepository->store($request);
             $resource = new Item($templateResponse->pull("data"), new TemplateTransformer(), 'template');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($templateResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -98,20 +98,20 @@ class EmailTemplateService extends BaseService
      */
     public function update($request, $id)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_templateUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_templateUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
 
-        $templateResponse = $this->_templateRepository->update($request, $id);
-        if ($templateResponse->has("data")) {
+            $templateResponse = $this->_templateRepository->update($request, $id);
             $resource = new Item($templateResponse->pull("data"), new TemplateTransformer(), 'template');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($templateResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -122,14 +122,13 @@ class EmailTemplateService extends BaseService
      */
     public function destroy($id)
     {
-        $templateResponse = $this->_templateRepository->destroy($id);
-        if ($templateResponse->has("data")) {
+        try {
+            $templateResponse = $this->_templateRepository->destroy($id);
             return $this->_response->withItem($templateResponse->pull("data"), new TemplateTransformer(), 'template');
-        } elseif ($templateResponse->has("not_found")) {
-            return $this->_response->errorNotFound($templateResponse->pull("not_found"));
-        } else {
-            return $this->_response->errorInternalError($templateResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -162,6 +161,7 @@ class EmailTemplateService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**

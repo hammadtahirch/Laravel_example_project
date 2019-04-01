@@ -73,8 +73,6 @@ class EmailTemplates extends Component {
 
 
     handleSwitch(value) {
-        // debugger;
-        console.log(value);
         const {template} = this.state;
         this.setState({
             template: {

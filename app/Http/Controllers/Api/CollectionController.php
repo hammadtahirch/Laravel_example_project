@@ -27,7 +27,12 @@ class CollectionController extends Controller
      */
     public function index(Request $request, CollectionService $collectionService)
     {
-        return $collectionService->index($request);
+        try {
+            return $collectionService->index($request);
+        } catch (\Exception $exception) {
+            logger($exception);
+        }
+
     }
 
 

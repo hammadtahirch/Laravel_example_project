@@ -54,18 +54,16 @@ class ShopService extends BaseService
      */
     public function index($request)
     {
-        $collectionResponse = $this->_shopRepository->index($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopRepository->index($request);
             $shopObject = $collectionResponse->pull("data");
             $shopCollection = $shopObject->getCollection();
             $resource = new Collection($shopCollection, new ShopTransformer(), 'shops');
             $resource->setPaginator(new IlluminatePaginatorAdapter($shopObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
-
-
     }
 
     /**
@@ -76,22 +74,23 @@ class ShopService extends BaseService
      */
     public function store($request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_shopCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $collectionResponse = $this->_shopRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_shopCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_shopRepository->store($request);
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.shop_sizes")));
             }
             $resource = new Item($collectionResponse, new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -103,25 +102,24 @@ class ShopService extends BaseService
      */
     public function update($request, $id)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_shopUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_shopUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
 
-        $collectionResponse = $this->_shopRepository->update($request, $id);
-
-        if ($collectionResponse->has("data")) {
+            $collectionResponse = $this->_shopRepository->update($request, $id);
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
             }
             $resource = new Item($collectionResponse, new ShopTransformer(), 'shop');
             return $this->_fractal->createData($resource)->toArray();
-
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -132,14 +130,13 @@ class ShopService extends BaseService
      */
     public function destroy($id)
     {
-        $collectionResponse = $this->_shopRepository->destroy($id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_shopRepository->destroy($id);
             return $this->_response->withItem($collectionResponse->pull("data")->with("upload")->where(["id" => $id])->first(), new ShopTransformer(), 'user');
-        } elseif ($collectionResponse->has("not_found")) {
-            return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -179,6 +176,7 @@ class ShopService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**
@@ -219,5 +217,6 @@ class ShopService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 }

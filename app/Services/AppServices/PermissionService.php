@@ -50,42 +50,44 @@ class PermissionService extends BaseService
      */
     public function index($request)
     {
-        $collectionResponse = $this->_permissionRepository->index($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_permissionRepository->index($request);
             $permissionObject = $collectionResponse->pull("data");
             $permissionCollection = $permissionObject->getCollection();
             $resource = new Collection($permissionCollection, new PermissionTransformer(), 'permissions');
             $resource->setPaginator(new IlluminatePaginatorAdapter($permissionObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return array []
+     * @param $request
+     * @return array|Collection
      */
     public function store($request)
     {
-
-        $requestObject = $request->all();
-        $isValidate = $this->_roleCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-
-        $collectionResponse = $this->_permissionRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_roleCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_permissionRepository->store($request);
             $resource = new Item($collectionResponse->pull("data"), new PermissionTransformer(), "permission");
             return $this->_fractal
                 ->createData($resource)
                 ->toArray();
-        } else {
-            $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
+
     }
 
     /**
@@ -93,25 +95,25 @@ class PermissionService extends BaseService
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return array[]
+     * @return array|Collection
      */
     public function update($request, $id)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_roleUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-
-        $collectionResponse = $this->_permissionRepository->update($request, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_roleUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_permissionRepository->update($request, $id);
             $resource = new Item($collectionResponse->pull("data"), new PermissionTransformer(), "permission");
             return $this->_fractal
                 ->createData($resource)
                 ->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -122,16 +124,15 @@ class PermissionService extends BaseService
      */
     public function destroy($id)
     {
-
-        $collectionResponse = $this->_permissionRepository->destroy($id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_permissionRepository->destroy($id);
             $resource = new Item($collectionResponse->pull("data"), new PermissionTransformer(), 'permission');
             return $this->_fractal->createData($resource)->toArray();
-        } elseif ($collectionResponse->pull("not_found")) {
-            return $this->_response->errorNotFound($collectionResponse->pull("not_found"));
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
+
     }
 
     /**
@@ -183,5 +184,6 @@ class PermissionService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 }

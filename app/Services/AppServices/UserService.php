@@ -50,8 +50,9 @@ class UserService extends BaseService
      */
     public function index($request)
     {
-        $collectionResponse = $this->_userRepository->index($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_userRepository->index($request);
+
             $collectionObject = $collectionResponse->pull("data");
             if ($request->has("_render")) {
                 $resource = new Collection($collectionObject, new UserTransformer(), 'users');
@@ -61,9 +62,10 @@ class UserService extends BaseService
             $resource = new Collection($collectionCollection, new UserTransformer(), 'users');
             $resource->setPaginator(new IlluminatePaginatorAdapter($collectionObject));
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -75,22 +77,24 @@ class UserService extends BaseService
     public function store($request)
     {
 
-        $requestObject = $request->all();
-        $isValidate = $this->_userCreateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $collectionResponse = $this->_userRepository->store($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_userCreateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_userRepository->store($request);
+
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
             }
             $resource = new Item($collectionResponse, new UserTransformer(), 'user');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -102,22 +106,23 @@ class UserService extends BaseService
      */
     public function update($request, $id)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_userUpdateValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
-        }
-        $collectionResponse = $this->_userRepository->update($request, $id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_userUpdateValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_userRepository->update($request, $id);
             $collectionResponse = $collectionResponse->pull("data");
             if (!empty($collectionResponse->upload)) {
                 dispatch(new GenerateResizedImageJob($collectionResponse->upload->toArray(), config("custom_config.profile_sizes")));
             }
             $resource = new Item($collectionResponse, new UserTransformer(), 'users');
             return $this->_fractal->createData($resource)->toArray();
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
@@ -128,61 +133,63 @@ class UserService extends BaseService
      */
     public function destroy($id)
     {
-        $collectionResponse = $this->_userRepository->destroy($id);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_userRepository->destroy($id);
             $resource = new Item($collectionResponse->pull("data"), new UserTransformer(), 'user');
             return $this->_fractal->createData($resource)->toArray();
-        } else if ($collectionResponse->has("not_found")) {
-            return $this->_response->withItem($collectionResponse->pull("not_found"), new UserTransformer, 'user');
-        } else {
-            return $this->_response->withItem($collectionResponse->pull("exception"), new UserTransformer, 'user');
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
     }
 
     /**
      * Validate a new user instance.
      *
      * @param $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function login($request)
     {
-        $requestObject = $request->all();
-        $isValidate = $this->_loginValidator($requestObject);
-        if (!empty($isValidate)) {
-            return $isValidate;
+        try {
+            $requestObject = $request->all();
+            $isValidate = $this->_loginValidator($requestObject);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_userRepository->login($request);
+            if ($collectionResponse->has("data")) {
+                return response()->json(
+                    $collectionResponse->pull("data"), StatusCodes::SUCCESS);
+            } else {
+                return $this->_response->errorUnauthorized($collectionResponse->pull("exception"));
+            }
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
-        $collectionResponse = $this->_userRepository->login($request);
-        if ($collectionResponse->has("data")) {
-            return response()->json(
-                $collectionResponse->pull("data"), StatusCodes::SUCCESS);
-        } else {
-            return $this->_response->errorUnauthorized($collectionResponse->pull("exception"));
-        }
+
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
      * @param array $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function register($request)
     {
-        $request = $request->all();
-        $isValidate = $this->_registrationValidator($request);
-        if (!empty($isValidate)) {
-            return $isValidate;
+        try {
+            $request = $request->all();
+            $isValidate = $this->_registrationValidator($request);
+            if (!empty($isValidate)) {
+                return $isValidate;
+            }
+            $collectionResponse = $this->_userRepository->register($request);
+            return response()->json($collectionResponse->pull("data"), StatusCodes::SUCCESS);
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
 
-        $collectionResponse = $this->_userRepository->register($request);
-        if ($collectionResponse->has("data")) {
-            return response()->json($collectionResponse->pull("data"), StatusCodes::SUCCESS);
-        } else {
-            return $this->_response->errorInternalError($collectionResponse->pull("exception"));
-        }
 
     }
 
@@ -190,18 +197,18 @@ class UserService extends BaseService
      * this is responsible to sign out from application
      *
      * @param Request $request
-     *
      * @return \League\Fractal\Resource\Collection
      */
     public function signOut($request)
     {
-
-        $collectionResponse = $this->_userRepository->signOut($request);
-        if ($collectionResponse->has("data")) {
+        try {
+            $collectionResponse = $this->_userRepository->signOut($request);
             return response()->json($collectionResponse->pull("data"), StatusCodes::SUCCESS);
-        } else {
-            return response()->json($collectionResponse->pull("exception"), StatusCodes::BAD_REQUEST);
+        } catch (\Exception $exception) {
+            return $this->logService->exception('Uh-oh! Due Exception code is breaking.', $exception->getMessage());
         }
+
+
     }
 
     /**
@@ -230,6 +237,7 @@ class UserService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**
@@ -264,6 +272,7 @@ class UserService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**
@@ -299,6 +308,7 @@ class UserService extends BaseService
         if ($validator->fails()) {
             return response()->json(collect(["errors" => $validator->errors()]), StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**
@@ -323,6 +333,7 @@ class UserService extends BaseService
             $collection = collect(["errors" => $validator->errors()]);
             return response()->json($collection, StatusCodes::UNCROSSABLE);
         }
+        return null;
     }
 
     /**

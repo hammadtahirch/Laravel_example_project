@@ -114,6 +114,13 @@ class ShopProducts extends Component {
     }
 
     /**
+     * handleDuplicateProduct
+     */
+    handleDuplicateProduct(product_id) {
+        this.props.duplicateProduct(this.props.match.params.shop_id, product_id);
+    }
+
+    /**
      * handleDeleteProduct
      * @param var _isOpen
      * @param object user
@@ -192,7 +199,7 @@ class ShopProducts extends Component {
                                     className='fa fa-plus-circle'></i> Add Variance</a>
                                 <div className="dropdown-divider"></div>
 
-                                <a className="dropdown-item">
+                                <a className="dropdown-item" onClick={() => this.handleDuplicateProduct(product.id)}>
                                     <i className='fa fa-clone'></i> Duplicate</a>
 
                                 <div className="dropdown-divider"></div>
@@ -377,8 +384,8 @@ function mapDispatchToProp(dispatch) {
         deleteProduct: (shop_id, params) => {
             dispatch(_deleteProduct(shop_id, params));
         },
-        duplicateProduct: (shop_id, params) => {
-            dispatch(_duplicateProduct(shop_id, params));
+        duplicateProduct: (shop_id, product_id) => {
+            dispatch(_duplicateProduct(shop_id, product_id));
         },
 
     })

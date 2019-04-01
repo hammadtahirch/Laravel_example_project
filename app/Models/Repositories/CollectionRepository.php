@@ -53,6 +53,7 @@ class CollectionRepository
      *
      * @param $request
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function index($request)
     {
@@ -67,19 +68,9 @@ class CollectionRepository
                 $this->_collection->put("data", $collectionPagination->paginate(10));
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -89,6 +80,7 @@ class CollectionRepository
      *
      * @param  \Illuminate\Http\Request $request
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function store($request)
     {
@@ -119,17 +111,9 @@ class CollectionRepository
 
             $this->_collection->put("data", $collectionObject->where(["id" => $collectionObject->id])->with("upload")->first());
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
 
@@ -142,6 +126,7 @@ class CollectionRepository
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function update($request, $id)
     {
@@ -176,17 +161,9 @@ class CollectionRepository
                 );
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! query exception contact to admin",
-                    "query_exception" => $exception]);
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
@@ -196,6 +173,7 @@ class CollectionRepository
      *
      * @param  int $id
      * @return Collection $_collection
+     * @throws \Exception
      */
     public function destroy($id)
     {
@@ -203,27 +181,17 @@ class CollectionRepository
 
             $collectionObject = MarketCollection::find($id);
             if (!$collectionObject) {
-                $this->_collection->put("not_found", ['message' => 'Collection not found']);
+                throw new \Exception("Collection not found");
             }
             if ($collectionObject->delete()) {
                 $this->_collection->put("data", $collectionObject->with(["upload"])->first());
             } else {
-                $this->_collection->put("exception", ['message' => 'Internal server error collection not deleted']);
+                throw new \Exception("Internal server error collection not deleted");
             }
         } catch (QueryException $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! Query exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         } catch (\Exception $exception) {
-            $this->_collection->put("exception",
-                [
-                    "message" => "Uh-oh! exception contact to admin",
-                    "query_exception" => $exception
-                ]
-            );
+            throw new \Exception($exception);
         }
         return $this->_collection;
     }
