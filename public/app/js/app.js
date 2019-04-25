@@ -97335,18 +97335,18 @@ function (_Component) {
         src: __webpack_require__(/*! ../../../assets/img/core-img/user.svg */ "./resources/assets/app/react/assets/img/core-img/user.svg"),
         alt: ""
       })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        href: _store_config_app_constants__WEBPACK_IMPORTED_MODULE_5__["default"].WEB_ADDRESS,
         className: "dropdown-menu"
       }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
-        className: "dropdown-item"
+        className: "dropdown-item manu_dropdown_a"
       }, "Profile"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "dropdown-divider"
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+        className: "dropdown-item manu_dropdown_a",
         href: _store_config_app_constants__WEBPACK_IMPORTED_MODULE_5__["default"].WEB_ADDRESS + "admin/role_permission"
       }, "Settings"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
         className: "dropdown-divider"
       }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
-        className: "dropdown-item",
+        className: "dropdown-item manu_dropdown_a",
         onClick: this.handleSignOut
       }, "Sign Out"))) : '');
     }
@@ -101128,15 +101128,17 @@ function (_Component) {
   }, {
     key: "componentWillReceiveProps",
     value: function componentWillReceiveProps(nextProps, prevState) {
+      console.log("getSavedProductVarianceProps", nextProps.getSavedProductVarianceProps);
+
       if (nextProps.getSavedProductVarianceProps !== '') {
         this.setState({
-          option: _objectSpread({}, this.state, {
-            id: getSavedProductVarianceProps.variance.id,
-            title: getSavedProductVarianceProps.variance.title,
-            product_id: getSavedProductVarianceProps.variance.product_id,
-            max_permitted: getSavedProductVarianceProps.variance.max_permitted,
-            min_permitted: getSavedProductVarianceProps.variance.min_permitted,
-            description: getSavedProductVarianceProps.variance.description
+          variance: _objectSpread({}, this.state.variance, {
+            id: nextProps.getSavedProductVarianceProps.variance.id,
+            title: nextProps.getSavedProductVarianceProps.variance.title,
+            product_id: nextProps.getSavedProductVarianceProps.variance.product_id,
+            max_permitted: nextProps.getSavedProductVarianceProps.variance.max_permitted,
+            min_permitted: nextProps.getSavedProductVarianceProps.variance.min_permitted,
+            description: nextProps.getSavedProductVarianceProps.variance.description
           })
         });
         react_toastify__WEBPACK_IMPORTED_MODULE_6__["toast"].success("Wow! Variance Save Successfully.");
@@ -101144,13 +101146,13 @@ function (_Component) {
 
       if (nextProps.getDeletedProductVarianceProps !== '') {
         this.setState({
-          option: _objectSpread({}, this.state, {
-            id: getDeletedProductVarianceProps.variance.id,
-            title: getDeletedProductVarianceProps.variance.title,
-            product_id: getDeletedProductVarianceProps.variance.product_id,
-            max_permitted: getDeletedProductVarianceProps.variance.max_permitted,
-            min_permitted: getDeletedProductVarianceProps.variance.min_permitted,
-            description: getDeletedProductVarianceProps.variance.description
+          variance: _objectSpread({}, this.state.variance, {
+            id: nextProps.getDeletedProductVarianceProps.variance.id,
+            title: nextProps.getDeletedProductVarianceProps.variance.title,
+            product_id: nextProps.getDeletedProductVarianceProps.variance.product_id,
+            max_permitted: nextProps.getDeletedProductVarianceProps.variance.max_permitted,
+            min_permitted: nextProps.getDeletedProductVarianceProps.variance.min_permitted,
+            description: nextProps.getDeletedProductVarianceProps.variance.description
           })
         });
         react_toastify__WEBPACK_IMPORTED_MODULE_6__["toast"].success("Wow! Variance delete Successfully.");

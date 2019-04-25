@@ -73,7 +73,7 @@ class ProductVarianceService extends BaseService
     {
         try {
             $requestObject = $request->all();
-            $isValidate = $this->_collectionCreateValidator($requestObject);
+            $isValidate = $this->_varianceCreateValidator($requestObject);
             if (!empty($isValidate)) {
                 return $isValidate;
             }
@@ -99,7 +99,7 @@ class ProductVarianceService extends BaseService
     {
         try {
             $requestObject = $request->all();
-            $isValidate = $this->_collectionUpdateValidator($requestObject);
+            $isValidate = $this->_varianceUpdateValidator($requestObject);
             if (!empty($isValidate)) {
                 return $isValidate;
             }
@@ -133,15 +133,15 @@ class ProductVarianceService extends BaseService
     }
 
     /**
-     * This function responsible for validating collection on update.
+     * This function responsible for validating variance on update.
      *
      * @param  array $request
      * @return \League\Fractal\Resource\Collection
      */
-    private function _collectionUpdateValidator(array $request)
+    private function _varianceUpdateValidator(array $request)
     {
         $rules = [
-            'variance.title' => 'required' . $request["variance"]["id"],
+            'variance.title' => 'required',
             'variance.description' => 'required',
         ];
         $messages = [
@@ -157,12 +157,12 @@ class ProductVarianceService extends BaseService
     }
 
     /**
-     * This function responsible for validating collection on update.
+     * This function responsible for validating variance on update.
      *
      * @param  array $request
      * @return \League\Fractal\Resource\Collection
      */
-    private function _collectionCreateValidator(array $request)
+    private function _varianceCreateValidator(array $request)
     {
         $rules = [
             'variance.title' => 'required',

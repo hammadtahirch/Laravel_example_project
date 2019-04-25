@@ -84,30 +84,31 @@ class CreateUpdateProductVariance extends Component {
      * @param prevState
      */
     componentWillReceiveProps(nextProps, prevState) {
+        console.log("getSavedProductVarianceProps",nextProps.getSavedProductVarianceProps);
         if (nextProps.getSavedProductVarianceProps !== '') {
             this.setState({
-                option: {
-                    ...this.state,
-                    id: getSavedProductVarianceProps.variance.id,
-                    title: getSavedProductVarianceProps.variance.title,
-                    product_id: getSavedProductVarianceProps.variance.product_id,
-                    max_permitted: getSavedProductVarianceProps.variance.max_permitted,
-                    min_permitted: getSavedProductVarianceProps.variance.min_permitted,
-                    description: getSavedProductVarianceProps.variance.description
+                variance: {
+                    ...this.state.variance,
+                    id: nextProps.getSavedProductVarianceProps.variance.id,
+                    title: nextProps.getSavedProductVarianceProps.variance.title,
+                    product_id: nextProps.getSavedProductVarianceProps.variance.product_id,
+                    max_permitted: nextProps.getSavedProductVarianceProps.variance.max_permitted,
+                    min_permitted: nextProps.getSavedProductVarianceProps.variance.min_permitted,
+                    description: nextProps.getSavedProductVarianceProps.variance.description
                 }
             })
             toast.success("Wow! Variance Save Successfully.")
         }
         if (nextProps.getDeletedProductVarianceProps !== '') {
             this.setState({
-                option: {
-                    ...this.state,
-                    id: getDeletedProductVarianceProps.variance.id,
-                    title: getDeletedProductVarianceProps.variance.title,
-                    product_id: getDeletedProductVarianceProps.variance.product_id,
-                    max_permitted: getDeletedProductVarianceProps.variance.max_permitted,
-                    min_permitted: getDeletedProductVarianceProps.variance.min_permitted,
-                    description: getDeletedProductVarianceProps.variance.description
+                variance: {
+                    ...this.state.variance,
+                    id: nextProps.getDeletedProductVarianceProps.variance.id,
+                    title: nextProps.getDeletedProductVarianceProps.variance.title,
+                    product_id: nextProps.getDeletedProductVarianceProps.variance.product_id,
+                    max_permitted: nextProps.getDeletedProductVarianceProps.variance.max_permitted,
+                    min_permitted: nextProps.getDeletedProductVarianceProps.variance.min_permitted,
+                    description: nextProps.getDeletedProductVarianceProps.variance.description
                 }
             })
             toast.success("Wow! Variance delete Successfully.")

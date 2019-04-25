@@ -62,7 +62,8 @@ class LeftTopMenu extends Component {
                                             {/*</ul>*/}
                                         {/*</div>*/}
                                         {/*<span className="dd-trigger"></span><span className="dd-arrow"></span></li>*/}
-                                    <li className="cn-dropdown-item has-down pr12"><a href="#">Accounts</a>
+                                    <li className="cn-dropdown-item has-down pr12">
+                                        <a href="#">Accounts</a>
                                         <ul className="dropdown">
                                             <li>
                                                 <a href={Config.WEB_ADDRESS + "admin/user_management"}>User Management</a>

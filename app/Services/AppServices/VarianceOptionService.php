@@ -8,7 +8,6 @@ use App\Services\Transformers\VarianceOptionTransformer;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use League\Fractal\Resource\Item;
-use Validator;
 use App\Services\Constants\StatusCodes;
 
 class VarianceOptionService extends BaseService
@@ -74,7 +73,7 @@ class VarianceOptionService extends BaseService
     {
         try {
             $requestObject = $request->all();
-            $isValidate = $this->_collectionCreateValidator($requestObject);
+            $isValidate = $this->_optionCreateValidator($requestObject);
             if (!empty($isValidate)) {
                 return $isValidate;
             }
@@ -100,7 +99,7 @@ class VarianceOptionService extends BaseService
     {
         try {
             $requestObject = $request->all();
-            $isValidate = $this->_collectionUpdateValidator($requestObject);
+            $isValidate = $this->_optionUpdateValidator($requestObject);
             if (!empty($isValidate)) {
                 return $isValidate;
             }
@@ -139,7 +138,7 @@ class VarianceOptionService extends BaseService
      * @param  array $request
      * @return \League\Fractal\Resource\Collection
      */
-    private function _collectionUpdateValidator(array $request)
+    private function _optionUpdateValidator(array $request)
     {
         $rules = [
             'option.title' => 'required',
@@ -163,7 +162,7 @@ class VarianceOptionService extends BaseService
      * @param  array $request
      * @return \League\Fractal\Resource\Collection
      */
-    private function _collectionCreateValidator(array $request)
+    private function _optionCreateValidator(array $request)
     {
         $rules = [
             'option.title' => 'required',

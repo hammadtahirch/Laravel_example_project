@@ -26,19 +26,20 @@ class RightTopMenu extends Component {
 
         return (
             <div className="header-meta d-flex clearfix justify-content-end">
-                { session !== null? <div className="user-login-info">
+                {session !== null ? <div className="user-login-info">
                     <a href="" className="dropdown-toggle" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
                         <img src={require('../../../assets/img/core-img/user.svg')} alt=""/>
                     </a>
-                    <div href={Config.WEB_ADDRESS} className="dropdown-menu">
-                        <a className="dropdown-item">Profile</a>
+                    <div className="dropdown-menu">
+                        <a className="dropdown-item manu_dropdown_a">Profile</a>
                         <div className="dropdown-divider"></div>
-                        <a href={Config.WEB_ADDRESS + "admin/role_permission"}>Settings</a>
+                        <a className="dropdown-item manu_dropdown_a"
+                           href={Config.WEB_ADDRESS + "admin/role_permission"}>Settings</a>
                         <div className="dropdown-divider"></div>
-                        <a className="dropdown-item" onClick={this.handleSignOut}>Sign Out</a>
+                        <a className="dropdown-item manu_dropdown_a" onClick={this.handleSignOut}>Sign Out</a>
                     </div>
-                </div>:''}
+                </div> : ''}
             </div>
         );
     }
